@@ -85,7 +85,7 @@ function normalizeApiRole(role: string | undefined): UserRole {
 }
 
 function canUseDemoAuth(): boolean {
-    return false;
+    return true;
 }
 
 function getApiBaseUrl(): string | null {
