@@ -1,0 +1,291 @@
+{
+    "common": {
+        "appName": "نكسس التعليمية",
+        "welcome": "مرحباً",
+        "logout": "تسجيل الخروج",
+        "login": "تسجيل الدخول",
+        "register": "إنشاء حساب",
+        "email": "البريد الإلكتروني",
+        "password": "كلمة المرور",
+        "role": "الدور",
+        "loading": "جاري التحميل...",
+        "save": "حفظ",
+        "cancel": "إلغاء",
+        "edit": "تعديل",
+        "delete": "حذف",
+        "add": "إضافة",
+        "search": "بحث",
+        "actions": "الإجراءات",
+        "submit": "إرسال",
+        "close": "إغلاق"
+    },
+    "landing": {
+        "hero": {
+            "badge": "منصة التعليم الأسرع نمواً في المملكة",
+            "title": "مستقبل التعليم",
+            "titleHighlight": "بين يديك",
+            "description": "تجربة تعليمية متكاملة تجمع الطلاب والمعلمين وأولياء الأمور في بيئة تفاعلية ذكية تدعم النجاح والتميز.",
+            "ctaPrimary": "ابدأ رحلتك مجاناً",
+            "ctaSecondary": "شاهد الفيديو التعريفي",
+            "freeTrial": "تجربة مجانية 14 يوم",
+            "noCard": "لا يحتاج بطاقة ائتمان"
+        },
+        "features": {
+            "title": "كل ما تحتاجه للنجاح",
+            "subtitle": "مجموعة متكاملة من الأدوات المصممة خصيصاً لرفع كفاءة العملية التعليمية",
+            "contentManagement": {
+                "title": "إدارة المحتوى",
+                "description": "نظام متكامل لإدارة المناهج والدروس والواجبات بسهولة ويسر."
+            },
+            "communication": {
+                "title": "تواصل فعّال",
+                "description": "قنوات تواصل مباشرة تربط بين المعلم والطالب وولي الأمر."
+            },
+            "evaluation": {
+                "title": "تقييم ومتابعة",
+                "description": "أدوات تقييم دقيقة وتقارير أداء فورية لمتابعة مستوى الطلاب."
+            },
+            "virtualClasses": {
+                "title": "فصول افتراضية",
+                "description": "بيئة تعليمية تفاعلية تدعم التعلم عن بعد بكفاءة عالية."
+            }
+        },
+        "testimonials": {
+            "title": "ماذا يقول عملاؤنا؟",
+            "appName": "نكسس التعليمية",
+            "items": [
+                {
+                    "content": "منصة نكسس التعليمية غيرت طريقة إدارتنا للمدرسة بالكامل. السهولة في الاستخدام والميزات المتكاملة جعلت العمل أسهل بكثير.",
+                    "author": "أ. محمد العتيبي",
+                    "role": "مدير مدرسة"
+                },
+                {
+                    "content": "كولي أمر، أصبحت قادراً على متابعة مستوى أبنائي بدقة والتواصل مع المعلمين بشكل مباشر. تطبيق رائع!",
+                    "author": "سعد القحطاني",
+                    "role": "ولي أمر"
+                },
+                {
+                    "content": "الأدوات التي توفرها المنصة للمعلم ممتازة، خاصة في إعداد الاختبارات ورصد الدرجات. وفرت علي الكثير من الوقت.",
+                    "author": "نورة السالم",
+                    "role": "معلمة رياضيات"
+                }
+            ]
+        },
+        "cta": {
+            "title": "جاهز لبدء رحلة التميز؟",
+            "description": "انضم إلى أكثر من 100 مدرسة تثق في نكسس التعليمية لإدارة عمليتها التعليمية",
+            "button": "أنشئ حسابك المجاني الآن"
+        },
+        "nav": {
+            "features": "المميزات",
+            "testimonials": "آراء العملاء",
+            "pricing": "الأسعار"
+        },
+        "footer": {
+            "description": "المنصة التعليمية الرائدة التي تجمع بين التكنولوجيا الحديثة والأساليب التربوية المتطورة لبناء مستقبل تعليمي أفضل.",
+            "quickLinks": "روابط هامة",
+            "about": "عن المنصة",
+            "features": "المميزات",
+            "pricing": "الأسعار",
+            "blog": "المدونة",
+            "support": "الدعم والمساعدة",
+            "helpCenter": "مركز المساعدة",
+            "privacy": "سياسة الخصوصية",
+            "terms": "شروط الاستخدام",
+            "contact": "تواصل معنا",
+            "copyright": "© 2026 نِكْسُس التعليمية. جميع الحقوق محفوظة."
+        },
+        "stats": {
+            "students": "طالب مسجل",
+            "teachers": "معلم متميز",
+            "courses": "مادة دراسية",
+            "satisfaction": "نسبة الرضا"
+        }
+    },
+    "auth": {
+        "login": {
+            "title": "مرحباً بعودتك 👋",
+            "subtitle": "سجل دخولك للمتابعة في رحلتك التعليمية",
+            "email": "البريد الإلكتروني",
+            "password": "كلمة المرور",
+            "rememberMe": "تذكرني",
+            "forgotPassword": "نسيت كلمة المرور؟",
+            "signIn": "تسجيل الدخول",
+            "signingIn": "جاري تسجيل الدخول...",
+            "demoCredentials": "حسابات تجريبية سريعة:",
+            "noAccount": "ليس لديك حساب؟",
+            "createAccount": "إنشاء حساب جديد",
+            "heroTitle": "ابدأ رحلة التعلم",
+            "heroTitleHighlight": "المستقبلي اليوم",
+            "heroDescription": "منصة تعليمية متكاملة تجمع بين أحدث التقنيات وأفضل الممارسات التعليمية لتوفير تجربة فريدة للطلاب والمعلمين.",
+            "trustBadge": "يثقون بنا",
+            "studentsCount": "10,000+ طالب"
+        },
+        "signIn": "تسجيل الدخول",
+        "signUp": "إنشاء حساب جديد",
+        "signInWith": "تسجيل الدخول باستخدام",
+        "microsoft": "مايكروسوفت",
+        "google": "جوجل",
+        "orContinueWith": "أو المتابعة باستخدام",
+        "emailPlaceholder": "name@school.com",
+        "passwordPlaceholder": "••••••••",
+        "loginFailed": "فشل تسجيل الدخول. يرجى التحقق من بيانات الاعتماد.",
+        "registerFailed": "فشل التسجيل. يرجى المحاولة مرة أخرى.",
+        "dontHaveAccount": "ليس لديك حساب؟",
+        "alreadyHaveAccount": "لديك حساب بالفعل؟",
+        "registerNow": "سجل الآن",
+        "creatingAccount": "جاري إنشاء الحساب...",
+        "createAccount": "إنشاء حساب",
+        "signingIn": "جاري تسجيل الدخول..."
+    },
+    "roles": {
+        "STUDENT": "طالب",
+        "TEACHER": "معلم",
+        "PARENT": "ولي أمر",
+        "ADMIN": "مدير النظام"
+    },
+    "dashboard": {
+        "welcomeMessage": "مرحباً بك في نكسس التعليمية",
+        "loggedInAs": "تسجيل الدخول بصفة:",
+        "courses": "المواد المسجلة",
+        "startLearning": "ابدأ التعلم الآن",
+        "progress": "التقدم العام",
+        "completionRate": "نسبة الإكمال",
+        "certificates": "الشهادات",
+        "achievements": "إنجازاتك",
+        "userInfo": "معلومات المستخدم",
+        "userId": "رقم المستخدم",
+        "nextSteps": "الخطوات التالية",
+        "nextStepsList": [
+            "تصفح المواد المتاحة",
+            "أكمل ملفك الشخصي",
+            "تواصل مع معلميك",
+            "تحقق من جدولك"
+        ]
+    },
+    "admin": {
+        "dashboard": "لوحة التحكم",
+        "users": "إدارة المستخدمين",
+        "classes": "إدارة الفصول",
+        "subjects": "إدارة المواد",
+        "enrollments": "التسجيلات",
+        "addUser": "إضافة مستخدم",
+        "editUser": "تعديل مستخدم",
+        "addClass": "إضافة فصل",
+        "editClass": "تعديل فصل",
+        "className": "اسم الفصل",
+        "academicYear": "السنة الدراسية",
+        "description": "الوصف",
+        "stats": "الإحصائيات",
+        "addSubject": "إضافة مادة",
+        "totalStudents": "إجمالي الطلاب",
+        "totalTeachers": "إجمالي المعلمين",
+        "totalClasses": "إجمالي الفصول",
+        "confirmDelete": "هل أنت متأكد من الحذف؟"
+    },
+    "teacher": {
+        "dashboard": "لوحة التحكم",
+        "teacherPanel": "لوحة المعلم",
+        "lessons": "الدروس",
+        "mySubjects": "موادي",
+        "myClasses": "فصولي",
+        "addLesson": "إضافة درس",
+        "editLesson": "تعديل درس",
+        "assignments": "الواجبات",
+        "addAssignment": "إضافة واجب",
+        "viewSubmissions": "عرض التسليمات",
+        "grading": "التقييم"
+    },
+    "student": {
+        "dashboard": "لوحة التحكم",
+        "studentPanel": "لوحة الطالب",
+        "myGrades": "درجاتي",
+        "myCourses": "موادي",
+        "myAssignments": "واجباتي",
+        "upcomingAssignments": "الواجبات القادمة",
+        "completedAssignments": "الواجبات المكتملة",
+        "viewLesson": "عرض الدرس",
+        "submitAssignment": "تسليم الواجب",
+        "grades": {
+            "title": "درجاتي",
+            "subtitle": "نظرة عامة على الأداء الأكاديمي",
+            "summary": {
+                "gpa": "المعدل التراكمي",
+                "totalSubjects": "إجمالي المواد",
+                "overallGrade": "التقدير العام"
+            },
+            "list": {
+                "recentAssignments": "الواجبات الأخيرة",
+                "loadError": "فشل تحميل الدرجات"
+            },
+            "report": {
+                "download": "تحميل التقرير",
+                "success": "تم تحميل التقرير بنجاح",
+                "error": "فشل تحميل التقرير"
+            }
+        },
+        "attendance": {
+            "title": "سجل الحضور",
+            "subtitle": "تتبع حضورك وانضباطك",
+            "summary": {
+                "rate": "نسبة الحضور الإجمالية",
+                "present": "حاضر",
+                "absent": "غائب",
+                "late": "متأخر",
+                "totalDays": "إجمالي الأيام"
+            },
+            "weeklyOverview": "نظرة أسبوعية",
+            "history": "السجل الأخير",
+            "calendar": "التقويم",
+            "status": {
+                "present": "حاضر",
+                "absent": "غائب",
+                "late": "متأخر"
+            }
+        },
+        "assignments": {
+            "title": "الواجبات",
+            "subtitle": "إدارة مهامك وتسليماتك",
+            "status": {
+                "pending": "قيد الانتظار",
+                "submitted": "تم التسليم",
+                "graded": "تم التقييم"
+            },
+            "due": "تاريخ التسليم",
+            "submitWork": "تسليم الواجب",
+            "viewSubmission": "عرض التسليم",
+            "loadError": "فشل تحميل الواجبات"
+        }
+    },
+    "parent": {
+        "dashboard": "لوحة التحكم",
+        "parentPanel": "لوحة ولي الأمر",
+        "myChildren": "أبنائي",
+        "viewProgress": "عرض التقدم",
+        "attendance": "الحضور",
+        "grades": "الدرجات"
+    },
+    "notifications": {
+        "title": "الإشعارات",
+        "markAllAsRead": "تم قراءة الكل",
+        "viewAll": "عرض كل الإشعارات",
+        "noNotifications": "لا توجد إشعارات",
+        "markAsRead": "تم القراءة",
+        "all": "الكل",
+        "tasks": "الواجبات",
+        "grades": "الدرجات",
+        "news": "الأخبار",
+        "reminders": "تنبيهات",
+        "priority": {
+            "high": "عالي",
+            "medium": "متوسط",
+            "low": "منخفض"
+        },
+        "types": {
+            "assignment": "واجب جديد",
+            "grade": "تحديث درجة",
+            "announcement": "إعلان مدرسي",
+            "reminder": "تذكير بالحصة"
+        }
+    }
+}

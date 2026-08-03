@@ -1,0 +1,124 @@
+{
+    "ar": {
+        "common": {
+            "appName": "منصة مليون",
+            "welcome": "مرحباً",
+            "logout": "تسجيل الخروج",
+            "login": "تسجيل الدخول",
+            "register": "إنشاء حساب",
+            "email": "البريد الإلكتروني",
+            "password": "كلمة المرور",
+            "role": "الدور",
+            "loading": "جاري التحميل..."
+        },
+        "auth": {
+            "signIn": "تسجيل الدخول",
+            "signUp": "إنشاء حساب جديد",
+            "signInWith": "تسجيل الدخول باستخدام",
+            "microsoft": "Microsoft (حساب المدرسة)",
+            "google": "Google",
+            "orContinueWith": "أو المتابعة باستخدام",
+            "emailPlaceholder": "example@school.com",
+            "passwordPlaceholder": "••••••••",
+            "createAccount": "إنشاء الحساب",
+            "signingIn": "جاري تسجيل الدخول...",
+            "creatingAccount": "جاري إنشاء الحساب...",
+            "alreadyHaveAccount": "هل لديك حساب بالفعل؟",
+            "dontHaveAccount": "ليس لديك حساب؟",
+            "registerNow": "سجل الآن",
+            "loginFailed": "فشل تسجيل الدخول",
+            "registerFailed": "فشل إنشاء الحساب"
+        },
+        "roles": {
+            "STUDENT": "طالب",
+            "TEACHER": "مدرس",
+            "PARENT": "ولي أمر",
+            "ADMIN": "مسؤول"
+        },
+        "dashboard": {
+            "welcomeMessage": "مرحباً بك في منصة مليون",
+            "loggedInAs": "تم تسجيل الدخول بصلاحية:",
+            "courses": "الدورات المسجلة",
+            "startLearning": "ابدأ التعلم الآن"
+        },
+        "admin": {
+            "dashboard": "لوحة التحكم",
+            "users": "المستخدمين",
+            "classes": "إدارة الفصول",
+            "subjects": "إدارة المواد",
+            "enrollments": "التسجيلات"
+        },
+        "teacher": {
+            "dashboard": "لوحة التحكم",
+            "teacherPanel": "لوحة المعلم",
+            "lessons": "الدروس",
+            "mySubjects": "موادي"
+        },
+        "student": {
+            "dashboard": "لوحة التحكم",
+            "studentPanel": "لوحة الطالب",
+            "myGrades": "درجاتي"
+        }
+    },
+    "en": {
+        "common": {
+            "appName": "NEXUS ED",
+            "welcome": "Welcome",
+            "logout": "Logout",
+            "login": "Login",
+            "register": "Register",
+            "email": "Email",
+            "password": "Password",
+            "role": "Role",
+            "loading": "Loading..."
+        },
+        "auth": {
+            "signIn": "Sign in to your account",
+            "signUp": "Create a new account",
+            "signInWith": "Sign in with",
+            "microsoft": "Microsoft",
+            "google": "Google",
+            "orContinueWith": "Or continue with",
+            "emailPlaceholder": "name@school.com",
+            "passwordPlaceholder": "••••••••",
+            "loginFailed": "Login failed. Please check your credentials.",
+            "registerFailed": "Registration failed. Please try again.",
+            "dontHaveAccount": "Don't have an account?",
+            "alreadyHaveAccount": "Already have an account?",
+            "registerNow": "Register now",
+            "creatingAccount": "Creating account...",
+            "createAccount": "Create Account",
+            "signingIn": "Signing in..."
+        },
+        "roles": {
+            "STUDENT": "Student",
+            "TEACHER": "Teacher",
+            "PARENT": "Parent",
+            "ADMIN": "Admin"
+        },
+        "dashboard": {
+            "welcomeMessage": "Welcome to NEXUS ED",
+            "loggedInAs": "Logged in as:",
+            "courses": "Enrolled Courses",
+            "startLearning": "Start learning now"
+        },
+        "admin": {
+            "dashboard": "Dashboard",
+            "users": "Users Management",
+            "classes": "Manage Classes",
+            "subjects": "Manage Subjects",
+            "enrollments": "Enrollments"
+        },
+        "teacher": {
+            "dashboard": "Dashboard",
+            "teacherPanel": "Teacher Panel",
+            "lessons": "Lessons",
+            "mySubjects": "My Subjects"
+        },
+        "student": {
+            "dashboard": "Dashboard",
+            "studentPanel": "Student Panel",
+            "myGrades": "My Grades"
+        }
+    }
+}

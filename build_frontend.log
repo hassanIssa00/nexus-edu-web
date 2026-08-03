@@ -1,0 +1,33 @@
+
+> web@0.1.0 build
+> next build
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   ▲ Next.js 16.0.5 (Turbopack)
+   - Environments: .env.local
+
+ ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+   Creating an optimized production build ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ ✓ Compiled successfully in 24.4s
+   Running TypeScript ...
+Failed to compile.
+
+./components/notifications/push-permission.tsx:6:41
+Type error: Cannot find module '@/components/ui/alert' or its corresponding type declarations.
+
+[0m [90m 4 |[39m [36mimport[39m { [33mCard[39m[33m,[39m [33mCardContent[39m[33m,[39m [33mCardHeader[39m[33m,[39m [33mCardTitle[39m[33m,[39m [33mCardDescription[39m } [36mfrom[39m [32m'@/components/ui/card'[39m[33m;[39m
+ [90m 5 |[39m [36mimport[39m { [33mButton[39m } [36mfrom[39m [32m'@/components/ui/button'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 6 |[39m [36mimport[39m { [33mAlert[39m[33m,[39m [33mAlertDescription[39m } [36mfrom[39m [32m'@/components/ui/alert'[39m[33m;[39m
+ [90m   |[39m                                         [31m[1m^[22m[39m
+ [90m 7 |[39m [36mimport[39m { [33mBell[39m[33m,[39m [33mBellOff[39m[33m,[39m [33mCheck[39m[33m,[39m [33mX[39m } [36mfrom[39m [32m'lucide-react'[39m[33m;[39m
+ [90m 8 |[39m [36mimport[39m { motion } [36mfrom[39m [32m'framer-motion'[39m[33m;[39m
+ [90m 9 |[39m[0m
+Next.js build worker exited with code: 1 and signal: null
+npm error Lifecycle script `build` failed with error:
+npm error code 1
+npm error path C:\Users\hassa\Desktop\anti\million-platform\apps\web
+npm error workspace web@0.1.0
+npm error location C:\Users\hassa\Desktop\anti\million-platform\apps\web
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c next build

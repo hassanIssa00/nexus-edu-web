@@ -1,0 +1,143 @@
+
+> web@0.1.0 build
+> next build
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   ▲ Next.js 16.0.5 (Turbopack)
+   - Environments: .env.local, .env
+
+ ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+   Creating an optimized production build ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ ✓ Compiled successfully in 6.5s
+   Running TypeScript ...
+   Collecting page data using 23 workers ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   Generating static pages using 23 workers (0/110) ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Supabase Config: {
+  url: 'https://placeholder.supabase.co',
+  key: 'PRESENT',
+  env: 'production'
+}
+Supabase Config: {
+  url: 'https://placeholder.supabase.co',
+  key: 'PRESENT',
+  env: 'production'
+}
+Supabase Config: {
+  url: 'https://placeholder.supabase.co',
+  key: 'PRESENT',
+  env: 'production'
+}
+Supabase Config: {
+  url: 'https://placeholder.supabase.co',
+  key: 'PRESENT',
+  env: 'production'
+}
+Supabase Config: {
+  url: 'https://placeholder.supabase.co',
+  key: 'PRESENT',
+  env: 'production'
+}
+   Generating static pages using 23 workers (27/110) 
+   Generating static pages using 23 workers (54/110) 
+   Generating static pages using 23 workers (82/110) 
+ ✓ Generating static pages using 23 workers (110/110) in 782.2ms
+   Finalizing page optimization ...
+
+Route (app)
+┌ ○ /_not-found
+├ ƒ /[locale]
+├ ƒ /[locale]/admin
+├ ƒ /[locale]/admin/classes
+├ ƒ /[locale]/admin/content
+├ ƒ /[locale]/admin/dashboard
+├ ƒ /[locale]/admin/enrollments
+├ ƒ /[locale]/admin/games
+├ ƒ /[locale]/admin/permissions
+├ ƒ /[locale]/admin/settings
+├ ƒ /[locale]/admin/subjects
+├ ƒ /[locale]/admin/users
+├ ƒ /[locale]/dashboard
+├ ƒ /[locale]/live/[id]
+├ ƒ /[locale]/login
+├ ƒ /[locale]/parent
+├ ƒ /[locale]/parent/dashboard
+├ ƒ /[locale]/parent/notifications
+├ ƒ /[locale]/parent/payments
+├ ƒ /[locale]/parent/settings
+├ ƒ /[locale]/pricing
+├ ƒ /[locale]/register
+├ ƒ /[locale]/student
+├ ƒ /[locale]/student/analytics
+├ ƒ /[locale]/student/assignments
+├ ƒ /[locale]/student/assignments/submit
+├ ƒ /[locale]/student/attendance
+├ ƒ /[locale]/student/content
+├ ƒ /[locale]/student/courses
+├ ƒ /[locale]/student/games
+├ ƒ /[locale]/student/grades
+├ ƒ /[locale]/student/leaderboard
+├ ƒ /[locale]/student/lessons
+├ ƒ /[locale]/student/messages
+├ ƒ /[locale]/student/million
+├ ƒ /[locale]/student/million-journey
+├ ƒ /[locale]/student/million-journey/badges
+├ ƒ /[locale]/student/million-journey/leaderboard
+├ ƒ /[locale]/student/million/room/[roomId]
+├ ƒ /[locale]/student/schedule
+├ ƒ /[locale]/student/settings
+├ ƒ /[locale]/student/settings/notifications
+├ ƒ /[locale]/student/subjects
+├ ƒ /[locale]/student/subjects/[id]
+├ ƒ /[locale]/student/subscription
+├ ƒ /[locale]/teacher
+├ ƒ /[locale]/teacher/assignments
+├ ƒ /[locale]/teacher/assignments/[id]/submissions
+├ ƒ /[locale]/teacher/assignments/create
+├ ƒ /[locale]/teacher/attendance
+├ ƒ /[locale]/teacher/classes
+├ ƒ /[locale]/teacher/grading
+├ ƒ /[locale]/teacher/lessons
+├ ƒ /[locale]/teacher/notifications
+├ ƒ /[locale]/teacher/settings
+├ ƒ /[locale]/test-locale
+├ ƒ /[locale]/test-login
+├ ○ /robots.txt
+├ ○ /sitemap.xml
+└ ○ /test-login
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

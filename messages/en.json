@@ -1,0 +1,290 @@
+{
+    "common": {
+        "appName": "NEXUS ED",
+        "welcome": "Welcome",
+        "logout": "Logout",
+        "login": "Login",
+        "register": "Sign Up",
+        "email": "Email",
+        "password": "Password",
+        "role": "Role",
+        "loading": "Loading...",
+        "save": "Save",
+        "cancel": "Cancel",
+        "edit": "Edit",
+        "delete": "Delete",
+        "add": "Add",
+        "search": "Search",
+        "actions": "Actions",
+        "submit": "Submit",
+        "close": "Close"
+    },
+    "landing": {
+        "hero": {
+            "badge": "The Fastest Growing Education Platform in Saudi Arabia",
+            "title": "The Future of Education",
+            "titleHighlight": "In Your Hands",
+            "description": "A comprehensive learning experience that brings together students, teachers, and parents in an interactive smart environment supporting success and excellence.",
+            "ctaPrimary": "Start Your Journey Free",
+            "ctaSecondary": "Watch Demo Video",
+            "freeTrial": "14-day free trial",
+            "noCard": "No credit card required"
+        },
+        "features": {
+            "title": "Everything You Need to Succeed",
+            "subtitle": "A comprehensive set of tools designed specifically to enhance educational efficiency",
+            "contentManagement": {
+                "title": "Content Management",
+                "description": "A complete system for managing curricula, lessons, and assignments with ease."
+            },
+            "communication": {
+                "title": "Effective Communication",
+                "description": "Direct communication channels connecting teachers, students, and parents."
+            },
+            "evaluation": {
+                "title": "Assessment & Tracking",
+                "description": "Precise evaluation tools and real-time performance reports to monitor student progress."
+            },
+            "virtualClasses": {
+                "title": "Virtual Classrooms",
+                "description": "An interactive learning environment supporting highly efficient distance learning."
+            }
+        },
+        "testimonials": {
+            "title": "What Our Clients Say",
+            "items": [
+                {
+                    "content": "NEXUS ED completely transformed how we manage our school. The ease of use and integrated features made work much easier.",
+                    "author": "Mohamed Al-Otaibi",
+                    "role": "School Principal"
+                },
+                {
+                    "content": "As a parent, I can now accurately monitor my children's progress and communicate directly with teachers. Amazing app!",
+                    "author": "Saad Al-Qahtani",
+                    "role": "Parent"
+                },
+                {
+                    "content": "The tools the platform provides for teachers are excellent, especially in preparing tests and recording grades. Saved me a lot of time.",
+                    "author": "Noura Al-Salem",
+                    "role": "Math Teacher"
+                }
+            ]
+        },
+        "cta": {
+            "title": "Ready to Begin Your Excellence Journey?",
+            "description": "Join over 100 schools that trust NEXUS ED to manage their educational operations",
+            "button": "Create Your Free Account Now"
+        },
+        "nav": {
+            "features": "Features",
+            "testimonials": "Testimonials",
+            "pricing": "Pricing"
+        },
+        "footer": {
+            "description": "The leading educational platform that combines modern technology with advanced teaching methods to build a better educational future.",
+            "quickLinks": "Quick Links",
+            "about": "About",
+            "features": "Features",
+            "pricing": "Pricing",
+            "blog": "Blog",
+            "support": "Support & Help",
+            "helpCenter": "Help Center",
+            "privacy": "Privacy Policy",
+            "terms": "Terms of Service",
+            "contact": "Contact Us",
+            "copyright": "© 2026 NEXUS EDU. All rights reserved."
+        },
+        "stats": {
+            "students": "Registered Students",
+            "teachers": "Expert Teachers",
+            "courses": "Academic Courses",
+            "satisfaction": "Satisfaction Rate"
+        }
+    },
+    "auth": {
+        "login": {
+            "title": "Welcome Back 👋",
+            "subtitle": "Sign in to continue your learning journey",
+            "email": "Email Address",
+            "password": "Password",
+            "rememberMe": "Remember me",
+            "forgotPassword": "Forgot password?",
+            "signIn": "Sign In",
+            "signingIn": "Signing in...",
+            "demoCredentials": "Quick Demo Credentials:",
+            "noAccount": "Don't have an account?",
+            "createAccount": "Create New Account",
+            "heroTitle": "Start Your",
+            "heroTitleHighlight": "Future Learning Journey Today",
+            "heroDescription": "An integrated educational platform combining the latest technologies and best teaching practices to provide a unique experience for students and teachers.",
+            "trustBadge": "trust us",
+            "studentsCount": "10,000+ students"
+        },
+        "signIn": "Sign In",
+        "signUp": "Sign Up",
+        "signInWith": "Sign in with",
+        "microsoft": "Microsoft",
+        "google": "Google",
+        "orContinueWith": "Or continue with",
+        "emailPlaceholder": "name@school.com",
+        "passwordPlaceholder": "••••••••",
+        "loginFailed": "Login failed. Please check your credentials.",
+        "registerFailed": "Registration failed. Please try again.",
+        "dontHaveAccount": "Don't have an account?",
+        "alreadyHaveAccount": "Already have an account?",
+        "registerNow": "Register now",
+        "creatingAccount": "Creating account...",
+        "createAccount": "Create Account",
+        "signingIn": "Signing in..."
+    },
+    "roles": {
+        "STUDENT": "Student",
+        "TEACHER": "Teacher",
+        "PARENT": "Parent",
+        "ADMIN": "Admin"
+    },
+    "dashboard": {
+        "welcomeMessage": "Welcome to NEXUS ED",
+        "loggedInAs": "Logged in as:",
+        "courses": "Enrolled Courses",
+        "startLearning": "Start learning now",
+        "progress": "Overall Progress",
+        "completionRate": "Completion rate",
+        "certificates": "Certificates",
+        "achievements": "Your achievements",
+        "userInfo": "User Information",
+        "userId": "User ID",
+        "nextSteps": "Next Steps",
+        "nextStepsList": [
+            "Browse available courses",
+            "Complete your profile",
+            "Connect with your teachers",
+            "Check your schedule"
+        ]
+    },
+    "admin": {
+        "dashboard": "Dashboard",
+        "users": "Users Management",
+        "classes": "Manage Classes",
+        "subjects": "Manage Subjects",
+        "enrollments": "Enrollments",
+        "addUser": "Add User",
+        "editUser": "Edit User",
+        "addClass": "Add Class",
+        "editClass": "Edit Class",
+        "className": "Class Name",
+        "academicYear": "Academic Year",
+        "description": "Description",
+        "stats": "Statistics",
+        "addSubject": "Add Subject",
+        "totalStudents": "Total Students",
+        "totalTeachers": "Total Teachers",
+        "totalClasses": "Total Classes",
+        "confirmDelete": "Are you sure you want to delete?"
+    },
+    "teacher": {
+        "dashboard": "Dashboard",
+        "teacherPanel": "Teacher Panel",
+        "lessons": "Lessons",
+        "mySubjects": "My Subjects",
+        "myClasses": "My Classes",
+        "addLesson": "Add Lesson",
+        "editLesson": "Edit Lesson",
+        "assignments": "Assignments",
+        "addAssignment": "Add Assignment",
+        "viewSubmissions": "View Submissions",
+        "grading": "Grading"
+    },
+    "student": {
+        "dashboard": "Dashboard",
+        "studentPanel": "Student Panel",
+        "myGrades": "My Grades",
+        "myCourses": "My Courses",
+        "myAssignments": "My Assignments",
+        "upcomingAssignments": "Upcoming Assignments",
+        "completedAssignments": "Completed Assignments",
+        "viewLesson": "View Lesson",
+        "submitAssignment": "Submit Assignment",
+        "grades": {
+            "title": "My Grades",
+            "subtitle": "Academic performance overview",
+            "summary": {
+                "gpa": "GPA / Average",
+                "totalSubjects": "Total Subjects",
+                "overallGrade": "Overall Grade"
+            },
+            "list": {
+                "recentAssignments": "Recent Assignments",
+                "loadError": "Failed to load grades"
+            },
+            "report": {
+                "download": "Download Report",
+                "success": "Report downloaded successfully",
+                "error": "Failed to download report"
+            }
+        },
+        "attendance": {
+            "title": "Attendance",
+            "subtitle": "Track your presence and punctuality",
+            "summary": {
+                "rate": "Overall Attendance",
+                "present": "Present",
+                "absent": "Absent",
+                "late": "Late",
+                "totalDays": "Total Days"
+            },
+            "weeklyOverview": "Weekly Overview",
+            "history": "Recent History",
+            "calendar": "Calendar",
+            "status": {
+                "present": "Present",
+                "absent": "Absent",
+                "late": "Late"
+            }
+        },
+        "assignments": {
+            "title": "Assignments",
+            "subtitle": "Manage your tasks and submissions",
+            "status": {
+                "pending": "Pending",
+                "submitted": "Submitted",
+                "graded": "Graded"
+            },
+            "due": "Due",
+            "submitWork": "Submit Work",
+            "viewSubmission": "View Submission",
+            "loadError": "Failed to load assignments"
+        }
+    },
+    "parent": {
+        "dashboard": "Dashboard",
+        "parentPanel": "Parent Panel",
+        "myChildren": "My Children",
+        "viewProgress": "View Progress",
+        "attendance": "Attendance",
+        "grades": "Grades"
+    },
+    "notifications": {
+        "title": "Notifications",
+        "markAllAsRead": "Mark all as read",
+        "viewAll": "View All Notifications",
+        "noNotifications": "No notifications",
+        "markAsRead": "Mark read",
+        "all": "All",
+        "tasks": "Tasks",
+        "grades": "Grades",
+        "news": "News",
+        "reminders": "Reminders",
+        "priority": {
+            "high": "High",
+            "medium": "Medium",
+            "low": "Low"
+        },
+        "types": {
+            "assignment": "New Assignment",
+            "grade": "Grade Updated",
+            "announcement": "Announcement",
+            "reminder": "Reminder"
+        }
+    }
+}
