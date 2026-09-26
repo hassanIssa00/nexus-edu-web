@@ -1,149 +1,168 @@
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Link } from '@/i18n/routing';
-import { BookOpen, Clock, User, Loader2, AlertCircle, Hash } from 'lucide-react';
-import { apiClient } from '@/lib/api/client';
-import { motion } from 'framer-motion';
+import { useState } from 'react'
+import Link from 'next/link'
+import {
+  BookOpen, Search, Sparkles, GraduationCap, Layers3, PenTool, CheckCircle2
+} from 'lucide-react'
+import { curriculaList } from '@/lib/curriculaData'
 
-interface Subject {
-    id: string;
-    name: string;
-    code?: string;
-    className?: string;
-    teacher?: { name?: string; email?: string };
-    _count?: { lessons: number; assignments: number };
-}
+export default function StudentSubjectsPage() {
+  const [search, setSearch] = useState('')
 
-const SUBJECT_COLORS = [
-    'from-blue-500 to-indigo-600',
-    'from-emerald-500 to-teal-600',
-    'from-purple-500 to-violet-600',
-    'from-rose-500 to-pink-600',
-    'from-amber-500 to-orange-600',
-    'from-cyan-500 to-sky-600',
-];
-
-export default function SubjectsPage() {
-    const [subjects, setSubjects] = useState<Subject[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
-
-    useEffect(() => {
-        apiClient.get('/subjects/my')
-            .then(res => setSubjects(res.data?.data || res.data || []))
-            .catch(() => setError('تعذر تحميل المواد الدراسية'))
-            .finally(() => setLoading(false));
-    }, []);
-
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center h-64">
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="flex flex-col items-center justify-center h-64 gap-3 text-center" dir="rtl">
-                <AlertCircle className="w-12 h-12 text-red-400" />
-                <p className="text-muted-foreground">{error}</p>
-            </div>
-        );
-    }
-
+  const filtered = curriculaList.filter((c) => {
+    if (!search) return true
+    const q = search.toLowerCase()
     return (
-        <div className="space-y-6" dir="rtl">
+      c.title.toLowerCase().includes(q) ||
+      c.badge.toLowerCase().includes(q) ||
+      c.subtitle.toLowerCase().includes(q) ||
+      c.shortTitle.toLowerCase().includes(q)
+    )
+  })
+
+  const totalPages = curriculaList.reduce((acc, c) => acc + c.pageCount, 0)
+
+  return (
+    <div className="min-h-screen" dir="rtl">
+      {/* ── Hero Banner ── */}
+      <header className="overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-l from-slate-950 via-indigo-950 to-blue-900 p-6 text-white shadow-xl mb-6">
+        <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
+          <div>
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-400/20 px-3.5 py-1 text-xs font-black text-amber-300 ring-1 ring-amber-400/40">
+                <Sparkles size={14} />
+                المناهج الرسمية المعتمدة 1448هـ
+              </span>
+              <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white/80">
+                الصف الأول الابتدائي
+              </span>
+            </div>
+            <h1 className="text-3xl font-black md:text-4xl">مجلد المناهج التعليمية التفاعلية</h1>
+            <p className="mt-3 max-w-2xl text-sm font-bold leading-7 text-slate-300">
+              جميع الكتب المدرسية الرسمية مدمجة بنظام التفاعل — تصفح الصفحات بالقلم، ارسم وعلّق، وانتقل بين الوحدات بضغطة واحدة.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-2 rounded-2xl bg-white/10 p-4 backdrop-blur-sm ring-1 ring-white/20 sm:min-w-[240px]">
             <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold">📚 المواد الدراسية</h1>
-                    <p className="text-muted-foreground mt-1">جميع موادك الدراسية في الفصل الحالي</p>
+              <span className="text-xs font-bold text-white/70">إجمالي المواد</span>
+              <span className="text-xl font-black text-amber-300">{curriculaList.length} مواد</span>
+            </div>
+            <div className="flex items-center justify-between border-t border-white/10 pt-2">
+              <span className="text-xs font-bold text-white/70">إجمالي الصفحات</span>
+              <span className="text-xl font-black text-white">{totalPages} صفحة</span>
+            </div>
+            <div className="flex items-center justify-between border-t border-white/10 pt-2">
+              <span className="text-xs font-bold text-white/70">الوحدات المتاحة</span>
+              <span className="text-xl font-black text-emerald-300">
+                {curriculaList.reduce((acc, c) => acc + c.units.length, 0)} وحدة
+              </span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* ── Features Strip ── */}
+      <div className="flex flex-wrap gap-2 mb-6">
+        {[
+          { icon: <PenTool size={14} />, label: 'قلم تفاعلي على كل الصفحات', color: 'text-blue-700 bg-blue-50 border-blue-200' },
+          { icon: <Layers3 size={14} />, label: 'تصفح فوري بين الصفحات', color: 'text-amber-700 bg-amber-50 border-amber-200' },
+          { icon: <CheckCircle2 size={14} />, label: 'حفظ تلقائي للرسومات', color: 'text-emerald-700 bg-emerald-50 border-emerald-200' },
+          { icon: <GraduationCap size={14} />, label: 'منهج معتمد 1448هـ', color: 'text-indigo-700 bg-indigo-50 border-indigo-200' },
+        ].map((f) => (
+          <span key={f.label} className={`inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-black ${f.color}`}>
+            {f.icon}
+            {f.label}
+          </span>
+        ))}
+      </div>
+
+      {/* ── Search ── */}
+      <div className="relative mb-6">
+        <Search size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+        <input
+          type="text"
+          placeholder="ابحث عن مادة أو كتاب دراسي..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full rounded-2xl border border-slate-200 bg-white py-3 pr-10 pl-4 text-sm font-bold text-slate-900 shadow-sm outline-none focus:border-blue-600 transition"
+        />
+      </div>
+
+      {/* ── Curricula Grid ── */}
+      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        {filtered.map((curriculum) => (
+          <article
+            key={curriculum.slug}
+            className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-lg hover:-translate-y-0.5"
+          >
+            {/* Color Header */}
+            <div
+              className="p-5 text-white relative overflow-hidden"
+              style={{ backgroundColor: curriculum.color }}
+            >
+              <div
+                className="absolute -top-6 -left-6 w-32 h-32 rounded-full opacity-20"
+                style={{ backgroundColor: curriculum.accent }}
+              />
+              <div className="relative z-10">
+                <div className="flex items-start justify-between gap-2 mb-3">
+                  <span className="rounded-full bg-black/25 px-3 py-1 text-xs font-black backdrop-blur-sm">
+                    {curriculum.badge}
+                  </span>
+                  <span className="rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-bold">
+                    {curriculum.pageCount} صفحة
+                  </span>
                 </div>
-                <Badge variant="secondary" className="text-sm px-3 py-1">
-                    {subjects.length} مادة
-                </Badge>
+                <h2 className="text-2xl font-black">{curriculum.title}</h2>
+                <p className="mt-1 text-xs font-bold text-white/80">{curriculum.subtitle}</p>
+              </div>
             </div>
 
-            {subjects.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-20 gap-4">
-                    <BookOpen className="w-16 h-16 text-muted-foreground/40" />
-                    <p className="text-muted-foreground text-lg">لا توجد مواد دراسية مسجلة بعد</p>
-                    <p className="text-sm text-muted-foreground">تواصل مع الإدارة لتسجيلك في الفصل</p>
-                </div>
-            ) : (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {subjects.map((subject, index) => (
-                        <motion.div
-                            key={subject.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.06 }}
-                        >
-                            <Link href={`/student/content?subjectId=${subject.id}`}>
-                                <Card className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden h-full group">
-                                    {/* Color Header */}
-                                    <div className={`h-2 bg-gradient-to-r ${SUBJECT_COLORS[index % SUBJECT_COLORS.length]}`} />
+            {/* Body */}
+            <div className="flex flex-1 flex-col justify-between p-5">
+              <div>
+                <p className="text-xs font-bold leading-6 text-slate-600">{curriculum.promise}</p>
 
-                                    <CardHeader className="pb-3">
-                                        <div className="flex items-start justify-between gap-2">
-                                            <div>
-                                                <CardTitle className="text-lg font-bold group-hover:text-primary transition-colors">
-                                                    {subject.name}
-                                                </CardTitle>
-                                                {subject.className && (
-                                                    <p className="text-xs text-muted-foreground mt-1">
-                                                        📋 {subject.className}
-                                                    </p>
-                                                )}
-                                            </div>
-                                            <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${SUBJECT_COLORS[index % SUBJECT_COLORS.length]} flex items-center justify-center flex-shrink-0 shadow`}>
-                                                <BookOpen className="w-5 h-5 text-white" />
-                                            </div>
-                                        </div>
-                                    </CardHeader>
-
-                                    <CardContent className="space-y-3">
-                                        {subject.teacher && (
-                                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                                <User className="h-4 w-4 flex-shrink-0" />
-                                                <span className="truncate">{subject.teacher.name || subject.teacher.email}</span>
-                                            </div>
-                                        )}
-
-                                        {subject.code && (
-                                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                                <Hash className="h-4 w-4 flex-shrink-0" />
-                                                <span>{subject.code}</span>
-                                            </div>
-                                        )}
-
-                                        {subject._count && (
-                                            <div className="flex gap-3 pt-2 border-t">
-                                                <span className="text-xs bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full font-medium">
-                                                    📖 {subject._count.lessons} درس
-                                                </span>
-                                                <span className="text-xs bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 px-2 py-1 rounded-full font-medium">
-                                                    📝 {subject._count.assignments} واجب
-                                                </span>
-                                            </div>
-                                        )}
-
-                                        <div className="flex items-center justify-between pt-1">
-                                            <Badge variant="default" className="text-xs">نشط</Badge>
-                                            <span className="text-xs font-medium text-primary group-hover:underline">
-                                                عرض المحتوى ←
-                                            </span>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            </Link>
-                        </motion.div>
+                {/* Units preview */}
+                <div className="mt-4 rounded-xl bg-slate-50 p-3 border border-slate-100">
+                  <p className="text-[11px] font-black text-slate-500 mb-1.5">الوحدات والفصول:</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {curriculum.units.map((u) => (
+                      <span
+                        key={u.title}
+                        className="rounded-md bg-white px-2 py-0.5 text-[10px] font-bold text-slate-700 border border-slate-200"
+                      >
+                        {u.title}
+                      </span>
                     ))}
+                  </div>
                 </div>
-            )}
+              </div>
+
+              {/* Actions */}
+              <div className="mt-5 flex items-center gap-2 pt-3 border-t border-slate-100">
+                <Link
+                  href={`/student/subjects/${curriculum.slug}`}
+                  className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-black text-white shadow-sm transition hover:opacity-90"
+                  style={{ backgroundColor: curriculum.color }}
+                >
+                  <BookOpen size={15} />
+                  {curriculum.isQuran ? 'فتح المصحف' : 'فتح الكتاب التفاعلي'}
+                </Link>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      {filtered.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+          <Search size={40} className="mb-3 opacity-40" />
+          <p className="text-sm font-bold">لا توجد مواد تطابق البحث</p>
         </div>
-    );
+      )}
+    </div>
+  )
 }

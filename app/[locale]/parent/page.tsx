@@ -1,7 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { dashboardApi } from '@/lib/api/dashboard'
 import { useRealtimeNotifications, useRealtimeAttendance } from '@/lib/providers/socket-provider'
 import Link from 'next/link'
 import { AiAdvicePanel } from './_components/AiAdvicePanel'
@@ -9,7 +8,7 @@ import { MiniGradeBar, ChildStatCard } from './_components/GradeBar'
 import {
   User, BookOpen, Clock, CreditCard, AlertCircle, Loader2,
   TrendingUp, Bell, Calendar, Shield, BrainCircuit, MessageSquare,
-  CheckCircle2, Star, Trophy
+  CheckCircle2, Star, Trophy, Home, FileText, Archive, HeartHandshake, Send, LayoutDashboard, Users, Medal, X, Send as SendIcon
 } from 'lucide-react'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
@@ -63,14 +62,103 @@ export default function ParentDashboard() {
   const [childrenData, setChildrenData] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedIdx, setSelectedIdx] = useState(0)
+  const [parentDisplayName, setParentDisplayName] = useState('فيصل الغامدي')
   const [liveNotif, setLiveNotif] = useState<string | null>(null)
   const [liveAttendance, setLiveAttendance] = useState<string | null>(null)
 
+
   useEffect(() => {
-    dashboardApi.getParentDashboard()
-      .then((d: any) => { if (d?.children) setChildrenData(d.children) })
-      .catch(() => {})
-      .finally(() => setLoading(false))
+    const load = async () => {
+      try {
+        const { nexusBridge } = await import('@/lib/nexusDataBridge')
+        let linkedStudentId = 'cls-std-2'
+        let currentParentName = 'فيصل الغامدي'
+        try {
+          const stored = localStorage.getItem('nexus_user')
+          if (stored) {
+            const acc = JSON.parse(stored)
+            if (acc.linkedStudentId) linkedStudentId = acc.linkedStudentId
+            if (acc.name) currentParentName = acc.name
+          }
+        } catch {}
+
+        setParentDisplayName(currentParentName)
+
+        const student = nexusBridge.getStudentById(linkedStudentId)
+        const todayAtt = nexusBridge.getTodayAttendance()
+        const myAtt = todayAtt.find(a => a.studentId === linkedStudentId)
+        const hwSubs = nexusBridge.getHomeworkSubmissions().filter(s => s.studentId === linkedStudentId)
+        const allHw = nexusBridge.getHomework()
+        const certs = nexusBridge.getCertificates(linkedStudentId)
+        const obs = nexusBridge.getObservations(linkedStudentId)
+
+        const submittedIds = new Set(hwSubs.map(s => s.assignmentId))
+        const upcomingAssignments = allHw
+          .filter(hw => !submittedIds.has(hw.id))
+          .map(hw => ({
+            id: hw.id,
+            title: hw.title,
+            subject: { name: hw.subject },
+            dueDate: hw.dueDate,
+            status: 'pending',
+          }))
+
+        const subjects = ['اللغة العربية', 'القرآن الكريم', 'الرياضيات', 'العلوم']
+        const recentGrades = subjects.map((s, i) => ({
+          subject: s,
+          score: [95, 98, 92, 90][i],
+          total: 100,
+        }))
+
+        const gradeHistory = [
+          { name: 'سبتمبر', درجة: student?.averageGrade || 95 },
+          { name: 'أكتوبر', درجة: 96 },
+          { name: 'نوفمبر', درجة: 94 },
+          { name: 'ديسمبر', درجة: 97 },
+          { name: 'يناير', درجة: 95 },
+          { name: 'فبراير', درجة: 98 },
+          { name: 'مارس', درجة: 99 },
+        ]
+
+        const presentDays = student?.attendanceRate ? Math.round((student.attendanceRate / 100) * 30) : 29
+        const attendance = {
+          present: presentDays,
+          absent: Math.max(0, 30 - presentDays - 1),
+          late: 1,
+          excused: 0,
+        }
+
+        const childData = {
+          id: linkedStudentId,
+          name: student?.fullName || 'أحمد فيصل الغامدي',
+          class: student?.grade || 'الصف الأول الابتدائي — فصل د. إسماعيل عيسى',
+          gpa: `${((student?.averageGrade || 95) / 10).toFixed(1)}`,
+          attendanceRate: student?.attendanceRate || 97,
+          recentGrades,
+          gradeHistory,
+          upcomingAssignments,
+          attendance,
+          certificates: certs,
+          observations: obs,
+          gamification: {
+            level: 5,
+            achievementsUnlocked: certs.length + (student?.status === 'excellent' ? 2 : 0),
+          },
+        }
+
+        setChildrenData([childData])
+
+
+      } catch (e) {
+        console.error('nexusBridge parent load error:', e)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    load()
+    window.addEventListener('nexus:data-changed', load as any)
+    return () => window.removeEventListener('nexus:data-changed', load as any)
   }, [])
 
   useRealtimeNotifications(useCallback((n: any) => {
@@ -105,25 +193,20 @@ export default function ParentDashboard() {
   const color = CHILD_COLORS[selectedIdx % CHILD_COLORS.length]
   const grades = selected?.recentGrades || []
   
-  // Fallback grade history data if none from API
-  const FALLBACK_GRADE_HISTORY = [
-    { name: 'سبتمبر', درجة: 72 }, { name: 'أكتوبر', درجة: 78 }, { name: 'نوفمبر', درجة: 75 },
-    { name: 'ديسمبر', درجة: 82 }, { name: 'يناير', درجة: 80 }, { name: 'فبراير', درجة: 85 },
-    { name: 'مارس', درجة: 88 },
-  ];
   const gradeHistory = ((selected?.gradeHistory || []).map((g: any) => ({ name: g.label || g.date, درجة: g.value || g.grade })))
     .filter((g: any) => g.درجة > 0);
-  const gradeData = gradeHistory.length > 0 ? gradeHistory : FALLBACK_GRADE_HISTORY;
-
-  // Fallback grades for subjects if none from API
-  const FALLBACK_GRADES = [
-    { subject: 'الرياضيات', score: 85, total: 100 },
-    { subject: 'اللغة العربية', score: 91, total: 100 },
-    { subject: 'الفيزياء', score: 78, total: 100 },
-    { subject: 'الكيمياء', score: 82, total: 100 },
-    { subject: 'الإنجليزية', score: 88, total: 100 },
+  const gradeData = gradeHistory.length > 0 ? gradeHistory : [
+    { name: 'بداية الفصل', درجة: 92 },
+    { name: 'الشهر الحالي', درجة: selected?.attendanceRate || 95 },
   ];
-  const displayGrades = grades.length > 0 ? grades : FALLBACK_GRADES;
+
+  const defaultElementaryGrades = [
+    { subject: 'اللغة العربية (لغتي)', score: 96, total: 100 },
+    { subject: 'القرآن الكريم والتلاوة', score: 98, total: 100 },
+    { subject: 'الرياضيات', score: 92, total: 100 },
+    { subject: 'العلوم', score: 94, total: 100 },
+  ];
+  const displayGrades = grades.length > 0 ? grades : defaultElementaryGrades;
 
   return (
     <div className="space-y-8 pb-12" dir="rtl">
@@ -140,9 +223,10 @@ export default function ParentDashboard() {
         )}
       </AnimatePresence>
 
-      {/* HERO */}
-      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#d97706] via-[#ea580c] to-[#e11d48] p-8 md:p-10 text-white shadow-[0_20px_50px_rgba(234,88,12,0.25)]">
+
+          {/* HERO */}
+          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}
+            className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#d97706] via-[#ea580c] to-[#e11d48] p-8 md:p-10 text-white shadow-[0_20px_50px_rgba(234,88,12,0.25)]">
         <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-40">
           <motion.div animate={{ rotate: 360 }} transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
             className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-yellow-300/30 rounded-full blur-3xl" />
@@ -156,7 +240,7 @@ export default function ParentDashboard() {
               <span className="text-xs font-bold text-amber-100">بوابة المتابعة الأبوية الموحدة</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-black mb-4 tracking-tight leading-[1.2]">
-              أهلاً بك،<br />فيصل الغامدي 👨‍👩‍👧‍👦
+              أهلاً بك،<br />{parentDisplayName} 👨‍👩‍👧‍👦
             </h1>
             <p className="text-white/90 text-sm font-medium mb-6 max-w-xl leading-relaxed">
               تتابع من خلال هذا المركز الأداء الأكاديمي لـ <strong className="text-yellow-200 text-lg px-1">{childrenData.length}</strong>
@@ -193,6 +277,43 @@ export default function ParentDashboard() {
               </div>
             ))}
           </div>
+        </div>
+      </motion.div>
+
+      {/* ─── DR. ISMAIL CLASSROOM HUB BANNER ─── */}
+      <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}
+        className="bg-white/80 dark:bg-[#1e1e2d]/80 backdrop-blur-xl border border-emerald-100 dark:border-white/5 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-600 flex items-center justify-center text-white text-2xl shadow-md shadow-emerald-500/20 flex-shrink-0">
+            👨‍🏫
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-black text-gray-900 dark:text-white">فصل د. إسماعيل عيسى — الصف الأول الابتدائي</h2>
+              <span className="px-2.5 py-0.5 rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 text-xs font-black">
+                حاضر بالبصمة ✅
+              </span>
+            </div>
+            <p className="text-xs text-gray-500 font-medium mt-1">
+              معلم الفصل: <span className="font-bold text-emerald-600">د. إسماعيل عيسى</span> • الطالب: <span className="font-bold text-gray-800 dark:text-gray-200">أحمد فيصل الغامدي</span>
+            </p>
+            <p className="text-xs text-emerald-600 font-bold mt-1.5 flex items-center gap-1.5">
+              <span>💬 آخر ملاحظة من المعلم:</span>
+              <span className="font-normal text-gray-600 dark:text-gray-300">"أحمد متميز اليوم في حفظ وترتيل القرآن الكريم، تم منحه وسام التميز و50 نقطة!"</span>
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2.5 w-full md:w-auto">
+          <Link href="/parent/schedule" className="flex-1 md:flex-none px-4 py-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 font-black text-xs transition-colors text-center">
+            جدول الحصص 📅
+          </Link>
+          <Link href="/parent/attendance" className="flex-1 md:flex-none px-4 py-2.5 rounded-xl bg-amber-50 dark:bg-amber-500/10 hover:bg-amber-100 text-amber-700 dark:text-amber-300 font-black text-xs transition-colors text-center">
+            سجل الحضور 📋
+          </Link>
+          <Link href="/parent/messages" className="flex-1 md:flex-none px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-black text-xs shadow-md shadow-emerald-600/20 transition-all text-center">
+            مراسلة د. إسماعيل 💬
+          </Link>
         </div>
       </motion.div>
 

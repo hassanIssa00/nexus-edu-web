@@ -33,6 +33,10 @@ import {
     BookMarked,
     Star,
     Brain,
+    Target,
+    Camera,
+    Archive,
+    Radio,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -283,39 +287,57 @@ function getNavigationByRole(role: string) {
         case 'student':
             return [
                 { href: '/student' as any, label: 'لوحة التحكم', icon: LayoutDashboard },
-                { href: '/student/assignments' as any, label: 'الواجبات', icon: FileText },
-                { href: '/student/grades' as any, label: 'الدرجات', icon: Award },
-                { href: '/student/million' as any, label: 'مسابقة نكسس', icon: Trophy },
+                { href: '/student/schedule' as any, label: 'جدول الحصص', icon: Calendar },
+                { href: '/student/subjects' as any, label: 'المناهج والكتب الدراسية', icon: BookOpen },
+                { href: '/student/quran' as any, label: 'المصحف الشريف', icon: BookMarked },
+                { href: '/student/assignments' as any, label: 'الواجبات المدرسية', icon: FileText },
+                { href: '/student/attendance' as any, label: 'سجل الحضور والغياب', icon: QrCode },
+                { href: '/student/grades' as any, label: 'الدرجات والتقييم', icon: Award },
+                { href: '/student/certificates' as any, label: 'الإنجازات والشهادات', icon: Trophy },
+                { href: '/student/live' as any, label: 'البث المباشر للحصص', icon: Radio },
                 { href: '/student/games' as any, label: 'الألعاب التعليمية', icon: Gamepad2 },
-                { href: '/student/content' as any, label: 'المكتبة التعليمية', icon: Video },
-                { href: '/student/attendance' as any, label: 'سجل الحضور', icon: QrCode },
-                { href: '/student/messages' as any, label: 'الرسائل', icon: MessageSquare },
-                { href: '/student/profile' as any, label: 'الملف الذكي', icon: Brain },
+                { href: '/student/million' as any, label: 'مسابقة نكسس الكبرى', icon: Star },
+                { href: '/student/photos' as any, label: 'معرض الفعاليات والأنشطة', icon: Camera },
+                { href: '/student/messages' as any, label: 'التواصل والرسائل', icon: MessageSquare },
+                { href: '/student/profile' as any, label: 'الملف الذكي للطالب', icon: Brain },
                 ...settings,
             ]
 
         case 'teacher':
             return [
                 { href: '/teacher' as any, label: 'لوحة التحكم', icon: LayoutDashboard },
-                { href: '/teacher/classes' as any, label: 'فصولي', icon: Users },
-                { href: '/teacher/assignments' as any, label: 'الواجبات', icon: FileText },
-                { href: '/teacher/grading' as any, label: 'التصحيح', icon: ClipboardList },
-                { href: '/teacher/attendance' as any, label: 'الحضور والغياب', icon: Calendar },
-                { href: '/teacher/lessons' as any, label: 'الدروس', icon: BookOpen },
-                { href: '/teacher/messages' as any, label: 'الرسائل', icon: MessageSquare },
-                { href: '/teacher/automation' as any, label: 'أدوات الأتمتة', icon: Zap },
-                { href: '/teacher/notifications' as any, label: 'التنبيهات', icon: Award },
+                { href: '/teacher/classes' as any, label: 'فصولي والطلاب', icon: Users },
+                { href: '/teacher/curriculum' as any, label: 'المناهج والخطط الدراسية', icon: BookMarked },
+                { href: '/teacher/assignments' as any, label: 'الواجبات والتصحيح', icon: FileText },
+                { href: '/teacher/quizzes' as any, label: 'بنك الاختبارات والتقييم', icon: Target },
+                { href: '/teacher/attendance' as any, label: 'رصد الحضور والانضباط', icon: Calendar },
+                { href: '/teacher/reports' as any, label: 'التقارير الأسبوعية الشاملة', icon: BarChart3 },
+                { href: '/teacher/automation/certificates' as any, label: 'الشهادات والأوسمة', icon: Award },
+                { href: '/teacher/meetings' as any, label: 'لقاءات أولياء الأمور', icon: HeartHandshake },
+                { href: '/teacher/live' as any, label: 'البث المباشر للحصص', icon: Radio },
+                { href: '/teacher/community' as any, label: 'ملتقى أولياء الأمور', icon: Users },
+                { href: '/teacher/photos' as any, label: 'معرض الأنشطة والفعاليات', icon: Camera },
+                { href: '/teacher/archive' as any, label: 'الأرشيف المدرسي اليومي', icon: Archive },
+                { href: '/teacher/lessons' as any, label: 'تحضير الدروس', icon: BookOpen },
+                { href: '/teacher/messages' as any, label: 'الرسائل المباشرة', icon: MessageSquare },
+                { href: '/teacher/automation' as any, label: 'أدوات الأتمتة الذكية', icon: Zap },
+                { href: '/teacher/notifications' as any, label: 'التنبيهات', icon: Star },
                 ...settings,
             ]
 
         case 'parent':
             return [
                 { href: '/parent' as any, label: 'لوحة التحكم', icon: LayoutDashboard },
-                { href: '/parent/grades' as any, label: 'درجات الأبناء', icon: Award },
-                { href: '/parent/attendance' as any, label: 'سجل الحضور', icon: Calendar },
-                { href: '/parent/notifications' as any, label: 'الإشعارات', icon: BookOpen },
-                { href: '/parent/payments' as any, label: 'المدفوعات', icon: CreditCard },
-                { href: '/parent/messages' as any, label: 'التواصل مع المعلم', icon: MessageSquare },
+                { href: '/parent/schedule' as any, label: 'جدول الحصص الأسبوعي', icon: Calendar },
+                { href: '/parent/attendance' as any, label: 'سجل الحضور والانضباط', icon: QrCode },
+                { href: '/parent/reports' as any, label: 'التقرير الأكاديمي الشامل', icon: BarChart3 },
+                { href: '/parent/grades' as any, label: 'درجات الأبناء والشهادات', icon: Award },
+                { href: '/parent/meetings' as any, label: 'لقاءات أولياء الأمور', icon: HeartHandshake },
+                { href: '/parent/messages' as any, label: 'التواصل مع د. إسماعيل', icon: MessageSquare },
+                { href: '/parent/community' as any, label: 'ملتقى أولياء الأمور', icon: Users },
+                { href: '/parent/photos' as any, label: 'معرض فعاليات الفصل', icon: Camera },
+                { href: '/parent/payments' as any, label: 'المدفوعات والمستحقات', icon: CreditCard },
+                { href: '/parent/notifications' as any, label: 'الإشعارات والتنبيهات', icon: Star },
                 ...settings,
             ]
 
