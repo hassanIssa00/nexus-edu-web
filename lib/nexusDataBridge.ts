@@ -4,8 +4,7 @@
  * NEXUS EDU — Real-Time Unified Data Bridge
  * ============================================================================
  * Connects the 8 Portals (Student, Teacher, Parent, Principal, Vice Principal,
- * Counselor, Supervisor, Admin) to real live shared state, incorporating all
- * real features from Dr. Ismail Issa's Classroom (فصل د. إسماعيل عيسى).
+ * Counselor, Supervisor, Admin) to real live shared state across school classrooms.
  * 
  * Features:
  *  - 100% Real data persistence across all 8 roles
@@ -748,7 +747,7 @@ export const NEXUS_CORE_ACCOUNTS: NexusAccount[] = [
     email: 'student1@nexusedu.sa',
     name: 'أحمد فيصل الغامدي',
     role: 'student',
-    title: 'طالب — الصف الأول (أ) فصل د. إسماعيل عيسى',
+    title: 'طالب — الصف الأول الابتدائي (أ)',
     phone: '+966559876543',
     linkedStudentId: 'cls-std-2',
     status: 'active',
@@ -817,7 +816,7 @@ export const REAL_CLASS_STUDENTS: ClassStudentRecord[] = [
     universalId: 'STD-1001',
     fullName: 'ربيع أحمد الزهراني',
     fullNameEn: 'Rabee Ahmed Al-Zahrani',
-    grade: 'الصف الأول الابتدائي — فصل د. إسماعيل عيسى',
+    grade: 'الصف الأول الابتدائي — فئة (أ)',
     classId: 'CLS-101',
     nationalId: '1102938475',
     dateOfBirth: '2019-04-12',
@@ -840,7 +839,7 @@ export const REAL_CLASS_STUDENTS: ClassStudentRecord[] = [
     universalId: 'STD-1002',
     fullName: 'أحمد فيصل الغامدي',
     fullNameEn: 'Ahmed Faisal Al-Ghamdi',
-    grade: 'الصف الأول الابتدائي — فصل د. إسماعيل عيسى',
+    grade: 'الصف الأول الابتدائي — فئة (أ)',
     classId: 'CLS-101',
     nationalId: '1092837465',
     dateOfBirth: '2019-06-25',
@@ -863,7 +862,7 @@ export const REAL_CLASS_STUDENTS: ClassStudentRecord[] = [
     universalId: 'STD-1003',
     fullName: 'سارة محمد الشهري',
     fullNameEn: 'Sara Mohammed Al-Shehri',
-    grade: 'الصف الأول الابتدائي — فصل د. إسماعيل عيسى',
+    grade: 'الصف الأول الابتدائي — فئة (أ)',
     classId: 'CLS-101',
     nationalId: '1083746592',
     dateOfBirth: '2019-02-18',
@@ -886,7 +885,7 @@ export const REAL_CLASS_STUDENTS: ClassStudentRecord[] = [
     universalId: 'STD-1004',
     fullName: 'خالد عبد الله العمري',
     fullNameEn: 'Khaled Abdullah Al-Amri',
-    grade: 'الصف الأول الابتدائي — فصل د. إسماعيل عيسى',
+    grade: 'الصف الأول الابتدائي — فئة (أ)',
     classId: 'CLS-101',
     nationalId: '1074658392',
     dateOfBirth: '2019-08-30',
@@ -909,7 +908,7 @@ export const REAL_CLASS_STUDENTS: ClassStudentRecord[] = [
     universalId: 'STD-1005',
     fullName: 'نورة سعيد القحطاني',
     fullNameEn: 'Noura Saeed Al-Qahtani',
-    grade: 'الصف الأول الابتدائي — فصل د. إسماعيل عيسى',
+    grade: 'الصف الأول الابتدائي — فئة (أ)',
     classId: 'CLS-101',
     nationalId: '1065748391',
     dateOfBirth: '2019-05-14',
@@ -932,7 +931,7 @@ export const REAL_CLASS_STUDENTS: ClassStudentRecord[] = [
     universalId: 'STD-1006',
     fullName: 'محمد حسن المالكي',
     fullNameEn: 'Mohammed Hassan Al-Malki',
-    grade: 'الصف الأول الابتدائي — فصل د. إسماعيل عيسى',
+    grade: 'الصف الأول الابتدائي — فئة (أ)',
     classId: 'CLS-101',
     nationalId: '1056847392',
     dateOfBirth: '2019-09-01',
@@ -955,7 +954,7 @@ export const REAL_CLASS_STUDENTS: ClassStudentRecord[] = [
     universalId: 'STD-1007',
     fullName: 'ريان يوسف الثقفي',
     fullNameEn: 'Rayan Youssef Al-Thaqafi',
-    grade: 'الصف الأول الابتدائي — فصل د. إسماعيل عيسى',
+    grade: 'الصف الأول الابتدائي — فئة (أ)',
     classId: 'CLS-101',
     nationalId: '1047958473',
     dateOfBirth: '2019-11-20',
@@ -978,7 +977,7 @@ export const REAL_CLASS_STUDENTS: ClassStudentRecord[] = [
     universalId: 'STD-1008',
     fullName: 'لجين هاني السالم',
     fullNameEn: 'Lojain Hani Al-Salem',
-    grade: 'الصف الأول الابتدائي — فصل د. إسماعيل عيسى',
+    grade: 'الصف الأول الابتدائي — فئة (أ)',
     classId: 'CLS-101',
     nationalId: '1038967584',
     dateOfBirth: '2019-03-05',
@@ -1506,7 +1505,7 @@ export const INITIAL_HOMEWORK: HomeworkAssignment[] = [
     id: 'hw-arabic-1',
     title: 'تطبيقات على درس مد الألف والواو',
     subject: 'لغتي العربية',
-    grade: 'الصف الأول الابتدائي — فصل د. إسماعيل عيسى',
+    grade: 'الصف الأول الابتدائي — فئة (أ)',
     fromPage: 38,
     toPage: 41,
     dueDate: '2026-09-28',
@@ -1519,7 +1518,7 @@ export const INITIAL_HOMEWORK: HomeworkAssignment[] = [
     id: 'hw-math-1',
     title: 'مسائل الجمع الرأسي والأفقي حتى 20',
     subject: 'الرياضيات',
-    grade: 'الصف الأول الابتدائي — فصل د. إسماعيل عيسى',
+    grade: 'الصف الأول الابتدائي — فئة (أ)',
     fromPage: 28,
     toPage: 30,
     dueDate: '2026-09-29',
@@ -1532,40 +1531,7 @@ export const INITIAL_HOMEWORK: HomeworkAssignment[] = [
 
 // ── Initial Accredited Certificates ──────────────────────────────────────────
 
-export const INITIAL_CERTIFICATES: AccreditedCertificate[] = [
-  {
-    id: 'cert-1',
-    certNumber: 'NEXUS-CERT-2026-88102',
-    studentId: 'cls-std-2',
-    studentName: 'أحمد فيصل الغامدي',
-    studentNameEn: 'Ahmed Faisal Al-Ghamdi',
-    programTitle: 'برنامج التميز الأكاديمي والحساب الذهني',
-    achievement: 'الحصول على الدرجة الكاملة والمركز الأول في اختبارات الشهر',
-    score: 98,
-    completionDate: '2026-09-23',
-    doctorName: 'د. إسماعيل عيسى',
-    doctorTitle: 'مشرف عام الفصل والمستشار الأكاديمي',
-    qrCode: 'https://nexus.masarplatform.org/verify/NEXUS-CERT-2026-88102',
-    badge: 'وسام العبقرية',
-    createdAt: '2026-09-23T12:00:00Z',
-  },
-  {
-    id: 'cert-2',
-    certNumber: 'NEXUS-CERT-2026-88103',
-    studentId: 'cls-std-1',
-    studentName: 'ربيع أحمد الزهراني',
-    studentNameEn: 'Rabee Ahmed Al-Zahrani',
-    programTitle: 'برنامج القراءة السريعة وحفظ المتون',
-    achievement: 'إتقان مخارج الحروف والتلاوة المعبرة بدون أخطاء',
-    score: 99,
-    completionDate: '2026-09-24',
-    doctorName: 'د. إسماعيل عيسى',
-    doctorTitle: 'مشرف عام الفصل والمستشار الأكاديمي',
-    qrCode: 'https://nexus.masarplatform.org/verify/NEXUS-CERT-2026-88103',
-    badge: 'وسام الإتقان القرآني',
-    createdAt: '2026-09-24T12:00:00Z',
-  },
-];
+export const INITIAL_CERTIFICATES: AccreditedCertificate[] = [];
 
 // ── Student Schedule Data ───────────────────────────────────────────────────
 
@@ -1588,8 +1554,19 @@ const PERIOD_TIMES: Record<number, { startTime: string; endTime: string }> = {
   7: { startTime: '11:45', endTime: '12:30' },
 };
 
+const SCHEDULE_SUBJECT_TEACHERS: Record<string, string> = {
+  'اللغة العربية': 'د. إسماعيل عيسى',
+  'القرآن الكريم': 'الشيخ عبد الرحمن السعيد',
+  'التربية الإسلامية': 'الشيخ عبد الرحمن السعيد',
+  'الرياضيات': 'أ. محمد الغامدي',
+  'العلوم': 'أ. فهد الزهراني',
+  'الحاسب الآلي': 'أ. خالد العتيبي',
+  'فن': 'ك. أحمد الشهري',
+  'التربية البدنية': 'ك. أحمد الشهري',
+};
+
 function p(day: number, num: number, subject: string): Period {
-  return { dayOfWeek: day, periodNumber: num, subjectName: subject, ...PERIOD_TIMES[num], teacherName: 'د. إسماعيل عيسى' };
+  return { dayOfWeek: day, periodNumber: num, subjectName: subject, ...PERIOD_TIMES[num], teacherName: SCHEDULE_SUBJECT_TEACHERS[subject] || 'المعلم المختص' };
 }
 
 export const CLASS_SCHEDULE: Period[] = [
@@ -1645,7 +1622,7 @@ export const INITIAL_CLASS_EVENTS: ClassEventItem[] = [
     title: 'حفلة تكريم الطلاب المتميزين في القراءة 🏆',
     category: 'party',
     categoryLabel: 'حفلة وتكريم 🎉',
-    description: 'تغطية مصورة لحفل تكريم فرسان القراءة والتلاوة بفصل د. إسماعيل عيسى بحضور إدارة المدرسة.',
+    description: 'تغطية مصورة لحفل تكريم فرسان القراءة والتلاوة بالصف الأول الابتدائي (أ) بحضور إدارة المدرسة والمعلم المشرف د. إسماعيل عيسى.',
     date: '2026-09-24',
     coverImage: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&auto=format&fit=crop&q=80',
     images: [
@@ -1741,29 +1718,7 @@ export const INITIAL_COMMUNITY_MESSAGES: CommunityMessage[] = [
   },
 ];
 
-export const INITIAL_LIVE_SESSIONS: LiveSessionItem[] = [
-  {
-    id: 'live-1',
-    title: 'حصة لغتي التفاعلية المباشرة — مهارات المدود والتنوين',
-    description: 'بث مباشر تفاعلي لشرح درس المد بالألف والواو مع حل تدريبات كتاب الطالب مباشرة.',
-    hostName: 'د. إسماعيل عيسى',
-    status: 'LIVE',
-    startedAt: new Date().toISOString(),
-    durationMinutes: 45,
-    viewerCount: 8,
-  },
-  {
-    id: 'live-2',
-    title: 'جلسة تأسيس الحساب الذهني والأعداد حتى 20',
-    description: 'تسجيل الحصة التفاعلية الخاصة بمهارات الجمع البسيط والمقارنة والتصنيف.',
-    hostName: 'د. إسماعيل عيسى',
-    status: 'RECORDED',
-    startedAt: '2026-09-24T10:00:00Z',
-    durationMinutes: 40,
-    viewerCount: 24,
-    recordingUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-  },
-];
+export const INITIAL_LIVE_SESSIONS: LiveSessionItem[] = [];
 
 export const CURRICULA_LIST: CurriculumSubject[] = [
   {
@@ -2427,7 +2382,7 @@ export const nexusBridge = {
 
   // Certificates
   getCertificates(studentId?: string): AccreditedCertificate[] {
-    const all = getItem<AccreditedCertificate[]>(KEYS.CERTIFICATES, INITIAL_CERTIFICATES);
+    const all = getItem<AccreditedCertificate[]>(KEYS.CERTIFICATES, []).filter(c => !c.id?.startsWith('cert-1') && !c.id?.startsWith('cert-2'));
     if (studentId) return all.filter((c) => c.studentId === studentId);
     return all;
   },
@@ -2595,7 +2550,7 @@ export const nexusBridge = {
       homeworkRate: 95,
       behaviorScore: 98,
       overallGrade: s.averageGrade >= 95 ? 'ممتاز مع مرتبة الشرف 🏆' : 'ممتاز ⭐',
-      teacherNotes: `طالب رائع ومثابر في فصل د. إسماعيل عيسى، يظهر تفاعلاً مستمراً في حصص لغتي والقرآن الكريم.`,
+      teacherNotes: `طالب رائع ومثابر في الصف الأول الابتدائي (أ)، يظهر تفاعلاً مستمراً في حصص لغتي والقرآن الكريم.`,
       recommendation: 'يُنصح بمواصلة القراءة الإثرائية اليومية وحفظ السور المقررة.',
       doctorName: 'د. إسماعيل عيسى',
       createdAt: '2026-09-24T12:00:00Z',
@@ -2635,13 +2590,13 @@ export const nexusBridge = {
         reportNumber: `NEXUS-REP-2026-${2000 + idx}`,
         studentId: s.id,
         studentName: s.fullName,
-        weekTitle: 'التقرير الأكاديمي الشامل — فصل د. إسماعيل عيسى',
+        weekTitle: 'التقرير الأكاديمي الشامل — الصف الأول الابتدائي (أ)',
         date: new Date().toISOString().split('T')[0],
         attendanceRate: s.attendanceRate,
         homeworkRate: 95,
         behaviorScore: s.averageGrade,
         overallGrade: s.averageGrade >= 90 ? 'ممتاز مع مرتبة الشرف 🏆' : 'جيد جداً مرتفع ⭐',
-        teacherNotes: `طالب متميز بفصل د. إسماعيل عيسى، متفاعل في حصص اليوم وكان حضوره: ${att?.overallStatus === 'present' ? 'حاضر ومنضبط' : 'مسجل'}.`,
+        teacherNotes: `طالب متميز بالصف الأول الابتدائي (أ)، متفاعل في حصص اليوم وكان حضوره: ${att?.overallStatus === 'present' ? 'حاضر ومنضبط' : 'مسجل'}.`,
         recommendation: 'الاستمرار في المراجعة اليومية واستكمال الواجبات الإلكترونية.',
         doctorName: 'د. إسماعيل عيسى',
         createdAt: new Date().toISOString(),
@@ -2680,7 +2635,7 @@ export const nexusBridge = {
 
   // ── Live Broadcast Sessions ─────────────────────────────────────────────────
   getLiveSessions(): LiveSessionItem[] {
-    return getItem<LiveSessionItem[]>(KEYS.LIVE_SESSIONS, INITIAL_LIVE_SESSIONS);
+    return getItem<LiveSessionItem[]>(KEYS.LIVE_SESSIONS, []).filter(s => !s.id?.startsWith('live-1') && !s.id?.startsWith('live-2'));
   },
 
   createLiveSession(session: Omit<LiveSessionItem, 'id' | 'startedAt'>): LiveSessionItem {

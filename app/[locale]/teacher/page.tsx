@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 import { useEffect, useState, useCallback } from 'react'
 import { Link } from '@/i18n/routing'
 import { dashboardApi, TeacherDashboardResponse } from '@/lib/api/dashboard'
@@ -85,7 +85,7 @@ export default function TeacherDashboardPage() {
         teacher: {
           name: 'د. إسماعيل عيسى',
           email: 'arabic.teacher@nexusedu.sa',
-          subject: 'لغتي العربية والقرآن الكريم — فصل د. إسماعيل',
+          subject: 'لغتي العربية والقرآن الكريم — الصف الأول (أ)',
         },
         summary: {
           totalStudents: students.length,
@@ -96,7 +96,7 @@ export default function TeacherDashboardPage() {
           attendanceRate: totalAtt > 0 ? Math.round((presentCount / totalAtt) * 100) : 98,
         },
         classPerformance: [
-          { name: 'فصل د. إسماعيل عيسى', averageGrade: 95, studentCount: students.length, subjectCount: 4 },
+          { name: 'الصف الأول الابتدائي (أ)', averageGrade: 95, studentCount: students.length, subjectCount: 4 },
         ],
         recentAssignments: homework.map(h => ({
           id: h.id,

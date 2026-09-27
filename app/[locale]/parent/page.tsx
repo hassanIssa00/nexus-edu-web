@@ -132,7 +132,7 @@ export default function ParentDashboard() {
         const childData = {
           id: linkedStudentId,
           name: student?.fullName || 'أحمد فيصل الغامدي',
-          class: student?.grade || 'الصف الأول الابتدائي — فصل د. إسماعيل عيسى',
+          class: student?.grade || 'الصف الأول الابتدائي — الفئة (أ)',
           gpa: `${((student?.averageGrade || 95) / 10).toFixed(1)}`,
           attendanceRate: student?.attendanceRate || 97,
           recentGrades,
@@ -290,7 +290,7 @@ export default function ParentDashboard() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-black text-gray-900 dark:text-white">فصل د. إسماعيل عيسى — الصف الأول الابتدائي</h2>
+              <h2 className="text-lg font-black text-gray-900 dark:text-white">الصف الأول الابتدائي — الفئة (أ) • رائد الفصل: د. إسماعيل عيسى</h2>
               <span className="px-2.5 py-0.5 rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 text-xs font-black">
                 حاضر بالبصمة ✅
               </span>

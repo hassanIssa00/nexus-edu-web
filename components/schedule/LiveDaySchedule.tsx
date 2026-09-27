@@ -58,7 +58,7 @@ function timeToMinutes(timeStr: string): number {
 export default function LiveDaySchedule({
   role = 'student',
   studentName = 'أحمد فيصل الغامدي',
-  className = 'الصف الأول الابتدائي — فصل د. إسماعيل عيسى',
+  className = 'الصف الأول الابتدائي — الفئة (أ)',
   scheduleUrl = role === 'parent' ? '/parent/schedule' : '/student/schedule',
 }: LiveDayScheduleProps) {
   // Current time state that ticks every 15 seconds

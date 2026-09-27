@@ -84,7 +84,7 @@ export default function AccountantDashboard() {
                             <span className="text-xs font-bold text-emerald-100">الشؤون الإدارية والمالية</span>
                         </div>
                         <h1 className="text-3xl md:text-4xl font-black mb-2 tracking-tight">إدارة الرسوم والمتحصلات المدرسية 💳</h1>
-                        <p className="text-emerald-100 text-sm font-medium">متابعة الأقساط المدرسية وسندات القبض لطلاب فصل د. إسماعيل عيسى</p>
+                        <p className="text-emerald-100 text-sm font-medium">متابعة الأقساط المدرسية وسندات القبض لطلاب الصف الأول الابتدائي (أ)</p>
                     </div>
                     <div className="flex gap-3">
                         <button onClick={() => setExportModalOpen(true)}
@@ -151,7 +151,7 @@ export default function AccountantDashboard() {
                         </div>
                         <div>
                             <h2 className="text-lg font-black text-gray-900 dark:text-white">قائمة رسوم طلاب الفصل</h2>
-                            <p className="text-xs text-gray-500">فصل د. إسماعيل عيسى — الصف الأول الابتدائي</p>
+                            <p className="text-xs text-gray-500">الصف الأول الابتدائي — الفئة (أ)</p>
                         </div>
                     </div>
 
@@ -225,7 +225,7 @@ export default function AccountantDashboard() {
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setExportModalOpen(false)}>
                     <div className="bg-white dark:bg-[#1e1e2d] w-[450px] p-8 rounded-[2rem] shadow-2xl border border-gray-100 dark:border-white/5" onClick={e => e.stopPropagation()}>
                         <h2 className="text-xl font-black text-gray-900 dark:text-white mb-3">تصدير التقرير المالي للفصل</h2>
-                        <p className="text-gray-500 text-sm mb-6">تقرير الأقساط المدرسية وسندات القبض لطلاب فصل د. إسماعيل عيسى.</p>
+                        <p className="text-gray-500 text-sm mb-6">تقرير الأقساط المدرسية وسندات القبض لطلاب الصف الأول الابتدائي (أ).</p>
                         <div className="flex gap-3">
                             <button onClick={() => { window.print(); setExportModalOpen(false); }}
                                 className="flex-1 flex items-center justify-center gap-2 py-3 bg-rose-50 text-rose-600 rounded-2xl font-bold text-sm hover:bg-rose-100">

@@ -93,14 +93,14 @@ export default function TeacherClassesPage() {
       fullName: newName.trim(),
       fullNameEn: newName.trim(),
       classId: selectedClassId,
-      grade: activeClass?.name || 'الصف الأول الابتدائي — فصل د. إسماعيل عيسى',
+      grade: activeClass?.name || 'الصف الأول الابتدائي — الفئة (أ)',
       nationalId: newNationalId.trim() || `10${Math.floor(10000000 + Math.random() * 90000000)}`,
       dateOfBirth: '2019-05-15',
       parentName: newParentName.trim() || `ولي أمر ${newName.trim()}`,
       parentPhone: newParentPhone.trim() || '0500000000',
       parentEmail: `parent.${Date.now()}@nexusedu.sa`,
       photoUrl: '/images/avatars/default.webp',
-      notes: `طالب مسجل حديثاً في ${activeClass?.name || 'فصل د. إسماعيل عيسى'}.`,
+      notes: `طالب مسجل حديثاً في ${activeClass?.name || 'الصف الأول الابتدائي (أ)'}.`,
       averageGrade: 90,
       attendanceRate: 100,
       rank: students.length + 1,
@@ -185,7 +185,7 @@ export default function TeacherClassesPage() {
           <div>
             <div className="flex items-center gap-2">
               <CardTitle className="text-xl font-black text-gray-900 dark:text-white">
-                {activeClass?.name || 'الصف الأول الابتدائي — فصل د. إسماعيل عيسى'}
+                {activeClass?.name || 'الصف الأول الابتدائي — الفئة (أ)'}
               </CardTitle>
               <Badge variant="outline" className="text-xs bg-emerald-50 text-emerald-700 border-emerald-200">
                 الشعبة نشطة
