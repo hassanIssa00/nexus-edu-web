@@ -6,15 +6,13 @@ import { Calendar, Clock, BookOpen, Sparkles, CheckCircle2, User } from 'lucide-
 
 export default function SchedulePage() {
     const [schedule, setSchedule] = useState<any[]>([]);
-    const [timetable, setTimetable] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const load = async () => {
             try {
-                const { nexusBridge, CLASS_SCHEDULE, SCHOOL_TIMETABLE } = await import('@/lib/nexusDataBridge');
+                const { nexusBridge, CLASS_SCHEDULE } = await import('@/lib/nexusDataBridge');
                 setSchedule(CLASS_SCHEDULE || nexusBridge.getClassSchedule() || []);
-                setTimetable(SCHOOL_TIMETABLE || nexusBridge.getSchoolTimetable() || []);
             } catch (err) {
                 console.error(err);
             } finally {
@@ -60,28 +58,6 @@ export default function SchedulePage() {
                 </div>
             </motion.div>
 
-            {/* TIMETABLE BREAKDOWN */}
-            {timetable.length > 0 && (
-                <div className="bg-white/80 dark:bg-[#1e1e2d]/80 backdrop-blur-xl border border-gray-100 dark:border-white/5 rounded-3xl p-6 shadow-sm">
-                    <h3 className="font-black text-gray-900 dark:text-white mb-4 flex items-center gap-2 text-base">
-                        <Clock className="w-5 h-5 text-violet-500" />
-                        توقيت اليوم الدراسي والفترات
-                    </h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2.5">
-                        {timetable.map((slot, i) => (
-                            <div key={i} className={`p-3 rounded-2xl text-center border ${
-                                slot.type === 'break' ? 'bg-amber-50/80 border-amber-200 dark:bg-amber-500/10 dark:border-amber-500/20' :
-                                slot.type === 'prayer' ? 'bg-emerald-50/80 border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/20' :
-                                slot.type === 'dismissal' ? 'bg-rose-50/80 border-rose-200 dark:bg-rose-500/10 dark:border-rose-500/20' :
-                                'bg-gray-50 dark:bg-white/5 border-gray-100 dark:border-white/5'
-                            }`}>
-                                <p className="font-bold text-xs text-gray-900 dark:text-white truncate">{slot.name}</p>
-                                <p className="text-[10px] text-gray-400 font-mono mt-0.5">{slot.startTime} - {slot.endTime}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
 
             {/* WEEKLY GRID */}
             <div className="space-y-6">
