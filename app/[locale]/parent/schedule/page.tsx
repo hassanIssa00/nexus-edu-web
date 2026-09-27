@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Clock, Sparkles, BookOpen, User } from 'lucide-react';
+import LiveDaySchedule from '@/components/schedule/LiveDaySchedule';
 
 export default function ParentSchedulePage() {
     const [schedule, setSchedule] = useState<any[]>([]);
@@ -59,6 +60,11 @@ export default function ParentSchedulePage() {
                     </p>
                 </div>
             </motion.div>
+
+            {/* LIVE TODAY SCHEDULE */}
+            <div className="bg-white dark:bg-[#1e1e2d] border border-gray-100 dark:border-white/5 rounded-[2rem] p-6 shadow-sm">
+                <LiveDaySchedule role="parent" studentName="أحمد فيصل الغامدي" />
+            </div>
 
             {/* TIMETABLE BREAKDOWN */}
             {timetable.length > 0 && (

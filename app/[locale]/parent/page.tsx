@@ -11,6 +11,7 @@ import {
   CheckCircle2, Star, Trophy, Home, FileText, Archive, HeartHandshake, Send, LayoutDashboard, Users, Medal, X, Send as SendIcon
 } from 'lucide-react'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import LiveDaySchedule from '@/components/schedule/LiveDaySchedule'
 
 const CHILD_COLORS = ['#8b5cf6', '#10b981', '#f43f5e', '#f59e0b']
 const GRADIENTS = ['from-violet-500 to-indigo-600', 'from-teal-500 to-emerald-600', 'from-rose-500 to-pink-600', 'from-amber-500 to-orange-500']
@@ -331,6 +332,11 @@ export default function ParentDashboard() {
           className="grid lg:grid-cols-[1fr_360px] gap-6">
 
           <div className="space-y-6">
+            {/* Live Today Schedule for Parent */}
+            <div className="bg-white dark:bg-[#1e1e2d] border border-gray-100 dark:border-white/5 rounded-[2rem] p-6 shadow-sm">
+              <LiveDaySchedule role="parent" studentName={selected.name} />
+            </div>
+
             {/* Grade History Chart */}
             <div className="bg-white dark:bg-[#1e1e2d] border border-gray-100 dark:border-white/5 rounded-[2rem] p-7 shadow-sm">
               <h3 className="font-extrabold text-gray-900 dark:text-white text-base mb-5 flex items-center gap-2">

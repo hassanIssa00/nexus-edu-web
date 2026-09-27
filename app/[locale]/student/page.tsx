@@ -23,6 +23,7 @@ import { PomodoroTimer } from './_components/PomodoroTimer'
 import { AchievementsShowcase } from './_components/AchievementsShowcase'
 import { AssignmentsTimeline } from './_components/AssignmentsTimeline'
 import { QuickNavGrid } from './_components/QuickNavGrid'
+import LiveDaySchedule from '@/components/schedule/LiveDaySchedule'
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload?.length) return (
@@ -292,17 +293,9 @@ export default function StudentDashboardPage() {
         transition={{ duration: 0.6 }}
         className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-[#4c1d95] via-[#6d28d9] to-[#7c3aed] p-8 md:p-12 text-white shadow-[0_24px_70px_rgba(109,40,217,0.35)]"
       >
-        <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30">
-          <motion.div
-            animate={{ rotate: 360, scale: [1, 1.1, 1] }}
-            transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
-            className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-purple-400 rounded-full blur-3xl"
-          />
-          <motion.div
-            animate={{ rotate: -360 }}
-            transition={{ duration: 50, repeat: Infinity, ease: 'linear' }}
-            className="absolute -bottom-40 -left-20 w-[400px] h-[400px] bg-indigo-500 rounded-full blur-3xl"
-          />
+        <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-25">
+          <div className="absolute -top-32 -right-32 w-96 h-96 bg-purple-300 rounded-full blur-3xl" />
+          <div className="absolute -bottom-32 -left-20 w-80 h-80 bg-indigo-400 rounded-full blur-3xl" />
         </div>
 
         <div className="relative z-10 flex flex-col xl:flex-row items-center justify-between gap-8">
@@ -390,11 +383,11 @@ export default function StudentDashboardPage() {
             transition={{ delay: 0.5 }}
             className="flex justify-center gap-6 md:gap-10 bg-black/15 p-7 rounded-[2.5rem] border border-white/10 backdrop-blur-md"
           >
-            <ProgressRing pct={attPct} color="#34d399" label="نسبة الحضور" value={`${attPct}%`} size={95} />
+            <ProgressRing pct={attPct} color="#34d399" label="نسبة الحضور" value={`${attPct}%`} size={95} onDark />
             <div className="w-px h-20 bg-white/10 self-center" />
-            <ProgressRing pct={avgGrade} color="#fcd34d" label="المعدل العام" value={`${avgGrade}%`} size={95} />
+            <ProgressRing pct={avgGrade} color="#fcd34d" label="المعدل العام" value={`${avgGrade}%`} size={95} onDark />
             <div className="w-px h-20 bg-white/10 self-center" />
-            <ProgressRing pct={completionPct} color="#60a5fa" label="إنجاز الواجبات" value={`${completionPct}%`} size={95} />
+            <ProgressRing pct={completionPct} color="#60a5fa" label="إنجاز الواجبات" value={`${completionPct}%`} size={95} onDark />
           </motion.div>
         </div>
       </motion.div>
@@ -422,13 +415,19 @@ export default function StudentDashboardPage() {
               معلم الفصل: <span className="font-bold text-violet-600">د. إسماعيل عيسى</span> • الطالب:{' '}
               <span className="font-bold text-gray-800 dark:text-gray-200">أحمد فيصل الغامدي (#cls-std-2)</span>
             </p>
-            <div className="flex items-center gap-3 mt-2 text-xs">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-2 text-xs">
               <span className="flex items-center gap-1 text-emerald-600 font-bold">
                 <CheckCircle2 className="w-3.5 h-3.5" /> بصمة الوجه (Face ID) معتمدة
               </span>
               <span className="text-gray-400">•</span>
               <span className="text-gray-500 font-medium">
-                الحصة الحالية: <span className="font-black text-violet-600">القرآن الكريم (07:00 - 07:45)</span>
+                {new Date().getDay() === 5 || new Date().getDay() === 6 ? (
+                  <span className="font-bold text-amber-600">اليوم عطلة نهاية الأسبوع 🌴</span>
+                ) : (
+                  <>
+                    الحالة اليومية: <span className="font-black text-violet-600">مباشر حسب جدول الحصص 📅</span>
+                  </>
+                )}
               </span>
             </div>
           </div>
@@ -508,59 +507,14 @@ export default function StudentDashboardPage() {
           </div>
         </motion.div>
 
-        {/* Today's Schedule Preview */}
+        {/* Today's Schedule Preview — LIVE */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
           className="bg-white dark:bg-[#1e1e2d] border border-gray-100 dark:border-white/5 rounded-[2rem] p-6 shadow-sm flex flex-col"
         >
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-black text-gray-900 dark:text-white text-base flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-violet-50 dark:bg-violet-500/10 flex items-center justify-center">
-                <Calendar className="w-4 h-4 text-violet-500" />
-              </div>
-              جدول حصص اليوم الدراسي
-            </h3>
-            <a href="/student/schedule" className="text-xs font-bold text-violet-600 hover:underline">
-              الجدول الأسبوعي ↗
-            </a>
-          </div>
-
-          <div className="space-y-2 flex-1">
-            {[
-              { num: 1, name: 'اللغة العربية', time: '07:00 — 07:45', emoji: '📖', status: 'جارية الآن' },
-              { num: 2, name: 'القرآن الكريم', time: '07:45 — 08:30', emoji: '📿', status: 'قادمة' },
-              { num: 3, name: 'استراحة الفطور', time: '08:30 — 09:15', emoji: '🥪', status: 'استراحة' },
-              { num: 4, name: 'التربية الإسلامية', time: '09:30 — 10:15', emoji: '🕌', status: 'قادمة' },
-              { num: 5, name: 'الرياضيات', time: '10:15 — 11:00', emoji: '🔢', status: 'قادمة' },
-            ].map((period, i) => (
-              <div
-                key={i}
-                className={`p-3 rounded-2xl flex items-center justify-between gap-3 text-xs ${
-                  period.status === 'جارية الآن'
-                    ? 'bg-violet-50 dark:bg-violet-500/10 border border-violet-200 dark:border-violet-500/20'
-                    : 'bg-gray-50 dark:bg-white/5'
-                }`}
-              >
-                <div className="flex items-center gap-2.5">
-                  <span className="text-base">{period.emoji}</span>
-                  <div>
-                    <span className="font-black text-gray-900 dark:text-white">{period.name}</span>
-                    <span className="text-gray-400 mr-2">حصة {period.num}</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-400 font-mono">{period.time}</span>
-                  {period.status === 'جارية الآن' && (
-                    <span className="px-2 py-0.5 rounded-md bg-violet-600 text-white font-bold text-[10px] animate-pulse">
-                      الآن
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+          <LiveDaySchedule />
         </motion.div>
       </div>
 
