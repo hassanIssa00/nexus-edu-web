@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { useToast } from '@/components/ui/use-toast';
 import { Toaster } from '@/components/ui/toaster';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Mail, Lock, AlertCircle, Shield, GraduationCap, BookOpen, Users, UserCheck, Eye, Settings, CreditCard, Sparkles, CheckCircle, Fingerprint } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Mail, Lock, AlertCircle, Shield, GraduationCap, BookOpen, Users, UserCheck, Eye, Settings, CreditCard, Sparkles, CheckCircle, Fingerprint, Calculator } from 'lucide-react';
 import { useTranslations, useLocale } from 'next-intl';
 
 const roleMapping: Record<string, { label: string; color: string; emailPrefix: string; gradient: string; icon: any; features: string[]; welcomeEmoji: string; bgImage: string }> = {
@@ -19,6 +19,7 @@ const roleMapping: Record<string, { label: string; color: string; emailPrefix: s
     counselor: { label: 'الموجه الطلابي', color: '#14B8A6', emailPrefix: 'counselor', gradient: 'from-teal-900/80 via-cyan-900/80 to-teal-950/80', icon: Eye, features: ['متابعة الحالات النفسية', 'خطط الإرشاد الطلابي', 'تحليلات الرفاهية'], welcomeEmoji: '🤝', bgImage: '/images/auth/counselor.webp' },
     supervisor: { label: 'المشرف التربوي', color: '#6366F1', emailPrefix: 'supervisor', gradient: 'from-indigo-900/80 via-violet-900/80 to-indigo-950/80', icon: Eye, features: ['الزيارات الإشرافية', 'تقييم أداء المعلمين', 'خطط التحسين والتطوير'], welcomeEmoji: '👁️', bgImage: '/images/auth/supervisor.webp' },
     admin: { label: 'الشئون الإدارية والمالية', color: '#F43F5E', emailPrefix: 'admin', gradient: 'from-rose-900/80 via-red-900/80 to-rose-950/80', icon: Settings, features: ['إدارة الحسابات المالية', 'شئون الموظفين', 'التقارير الإدارية'], welcomeEmoji: '💼', bgImage: '/images/auth/admin.webp' },
+    accountant: { label: 'المحاسب المالي', color: '#10B981', emailPrefix: 'accountant', gradient: 'from-emerald-900/80 via-teal-900/80 to-emerald-950/80', icon: Calculator, features: ['إدارة الفواتير والمدفوعات', 'التقارير المالية والتحصيل', 'متابعة الرسوم المدرسية'], welcomeEmoji: '💰', bgImage: '/images/auth/admin.webp' },
 };
 
 export default function RoleLoginPage() {
@@ -69,6 +70,7 @@ export default function RoleLoginPage() {
             else if(role === 'admin') router.push(`/${locale}/admin`);
             else if(role === 'supervisor') router.push(`/${locale}/supervisor`);
             else if(role === 'parent') router.push(`/${locale}/parent`);
+            else if(role === 'accountant') router.push(`/${locale}/accountant`);
             else router.push(`/${locale}/student`);
         } catch (error: any) {
             toast({ variant: 'destructive', title: '❌ خطأ', description: tAuth('loginFailed') });
@@ -88,6 +90,7 @@ export default function RoleLoginPage() {
             counselor:      'counselor@nexusedu.sa',
             supervisor:     'supervisor@nexusedu.sa',
             admin:          'admin@nexusedu.sa',
+            accountant:     'accountant@nexusedu.sa',
         };
         setEmail(demoEmails[role] || `${roleConfig.emailPrefix}@nexusedu.sa`);
         setPassword('123456'); // Password set in seed.ts
