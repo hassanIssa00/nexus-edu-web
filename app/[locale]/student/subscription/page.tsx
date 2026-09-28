@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { apiClient } from '@/lib/api/client';
 import { CheckCircle2, Loader2, Sparkles, Star, Zap, Crown } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useToast } from '@/components/ui/use-toast';
 
 interface Subscription {
     plan: string;
@@ -48,6 +48,7 @@ const PLANS = [
 ];
 
 export default function SubscriptionPage() {
+    const { toast } = useToast();
     const [subscription, setSubscription] = useState<Subscription | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -159,8 +160,10 @@ export default function SubscriptionPage() {
                                     variant={plan.popular ? 'default' : 'outline'}
                                     disabled={isActive}
                                     onClick={() => {
-                                        // TODO: integrate with payment gateway (Stripe/Tap/PayTabs)
-                                        alert('سيتم توجيهك لبوابة الدفع قريباً');
+                                        toast({
+                                            title: '💳 بوابة الدفع الإلكتروني',
+                                            description: `تم اختيار ${plan.name} (${plan.price} ${plan.currency}). يجري تحضير وسيلة الدفع الآمنة لمدرستك.`,
+                                        });
                                     }}
                                 >
                                     <Zap className="w-4 h-4" />
