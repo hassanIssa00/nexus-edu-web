@@ -22,16 +22,22 @@ export function LanguageSwitcher() {
     const pathname = usePathname();
 
     const handleLanguageChange = (newLocale: string) => {
+        if (newLocale === locale) return;
+
+        // Set next-intl locale cookie
+        document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000; SameSite=Lax`;
+
         // Remove the current locale from the pathname
         const segments = pathname.split('/').filter(Boolean);
-        if (segments[0] === locale) {
+        if (segments[0] === 'ar' || segments[0] === 'en') {
             segments.shift();
         }
 
         // Build the new path with the new locale
-        const newPath = `/${newLocale}/${segments.join('/')}`;
-        router.push(newPath);
-        router.refresh();
+        const remainder = segments.join('/');
+        const newPath = `/${newLocale}${remainder ? `/${remainder}` : ''}`;
+        
+        window.location.href = newPath;
     };
 
     const currentLanguage = languages.find((lang) => lang.code === locale);

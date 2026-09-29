@@ -486,7 +486,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     schoolName: 'مدارس الإخلاص الأهلية للبنين بجدة',
                     createdAt: new Date().toISOString(),
                 };
-                nexusBridge.saveAccount(newAccount);
+                nexusBridge.saveAccount(newAccount as any);
 
                 const demoProfile: UserProfile = {
                     id: accountId,
