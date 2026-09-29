@@ -378,44 +378,45 @@ export default function StudentDashboardPage() {
       </AnimatePresence>
 
       
-      {/* ─── EDUCATIONAL STAGE SWITCHER (مسار المرحلة الدراسية) ─── */}
+      {/* ─── EDUCATIONAL STAGE STATUS BADGE (المرحلة المقيد بها الطالب) ─── */}
       <motion.div 
         initial={{ opacity: 0, y: -10 }} 
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white/80 dark:bg-[#1e1e2d]/80 backdrop-blur-xl border border-violet-100 dark:border-white/5 rounded-3xl p-3 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3"
+        className="bg-white/80 dark:bg-[#1e1e2d]/80 backdrop-blur-xl border border-violet-100 dark:border-white/5 rounded-3xl p-3.5 px-4 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3"
       >
-        <div className="flex items-center gap-2.5 px-2">
-          <div className="w-8 h-8 rounded-xl bg-violet-600/10 flex items-center justify-center text-violet-600">
-            <GraduationCap className="w-4 h-4" />
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-violet-600/10 flex items-center justify-center text-violet-600 flex-shrink-0">
+            <GraduationCap className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-xs font-black text-gray-900 dark:text-white leading-tight">مسار المرحلة الدراسية</p>
-            <p className="text-[10px] text-gray-400">تخصيص المنهج والأدوات بحسب احتياجات المرحلة</p>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-black text-gray-500 dark:text-gray-400">المرحلة الدراسية المعتمدة:</span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-sm">
+                <span>{
+                  currentStage === 'kindergarten' ? '🧸' :
+                  currentStage === 'middle' ? '🔬' :
+                  currentStage === 'high' ? '🎓' : '📚'
+                }</span>
+                <span>{
+                  currentStage === 'kindergarten' ? 'مرحلة رياض الأطفال' :
+                  currentStage === 'middle' ? 'المرحلة المتوسطة' :
+                  currentStage === 'high' ? 'المرحلة الثانوية' : 'المرحلة الابتدائية'
+                }</span>
+                <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded-full font-bold">
+                  {((student as any)?.grade && !['المرحلة الابتدائية', 'الروضة', 'المرحلة المتوسطة', 'المرحلة الثانوية'].includes((student as any)?.grade))
+                    ? (student as any).grade
+                    : (currentStage === 'kindergarten' ? 'الطفولة المبكرة' : currentStage === 'middle' ? 'معامل وSTEM' : currentStage === 'high' ? 'المسارات والقدرات' : 'الصفوف 1 - 6')}
+                </span>
+              </span>
+            </div>
+            <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">
+              تم تخصيص المقررات والأنشطة والأدوات الرقمية تلقائياً وفق صفك ومرحلتك المعتمدة بمدرسة الإخلاص الأهلية
+            </p>
           </div>
         </div>
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
-          {[
-            { id: 'kindergarten', label: 'رياض الأطفال', emoji: '🧸', tag: 'الطفولة المبكرة' },
-            { id: 'elementary', label: 'المرحلة الابتدائية', emoji: '📚', tag: 'الصفوف 1 - 6' },
-            { id: 'middle', label: 'المرحلة المتوسطة', emoji: '🔬', tag: 'معامل وSTEM' },
-            { id: 'high', label: 'المرحلة الثانوية', emoji: '🎓', tag: 'المسارات والقدرات' },
-          ].map((st) => (
-            <button
-              key={st.id}
-              onClick={() => handleStageChange(st.id as any)}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-black transition-all whitespace-nowrap ${
-                currentStage === st.id
-                  ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-md shadow-violet-600/25 scale-[1.02]'
-                  : 'bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10'
-              }`}
-            >
-              <span className="text-base">{st.emoji}</span>
-              <span>{st.label}</span>
-              <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${currentStage === st.id ? 'bg-white/20 text-white' : 'bg-black/5 dark:bg-white/10 text-gray-500'}`}>
-                {st.tag}
-              </span>
-            </button>
-          ))}
+        <div className="inline-flex items-center gap-2 text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-3.5 py-1.5 rounded-xl border border-emerald-200 dark:border-emerald-800/40 self-end md:self-center">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span>حساب طالب معتمد 1448هـ</span>
         </div>
       </motion.div>
 

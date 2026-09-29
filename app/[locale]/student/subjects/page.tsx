@@ -1,14 +1,33 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import {
-  BookOpen, Search, Sparkles, GraduationCap, Layers3, PenTool, CheckCircle2
-} from 'lucide-react'
+import { BookOpen, Search, Sparkles } from 'lucide-react'
 import { curriculaList } from '@/lib/curriculaData'
 
 export default function StudentSubjectsPage() {
   const [search, setSearch] = useState('')
+  const [studentGrade, setStudentGrade] = useState('الصف الأول الابتدائي')
+
+  useEffect(() => {
+    try {
+      const uStr = localStorage.getItem('nexus_user')
+      if (uStr) {
+        const u = JSON.parse(uStr)
+        if (u.grade && !['المرحلة الابتدائية', 'الروضة', 'المرحلة المتوسطة', 'المرحلة الثانوية'].includes(u.grade)) {
+          setStudentGrade(u.grade)
+        } else if (u.stage) {
+          const stageNames: Record<string, string> = {
+            kindergarten: 'رياض الأطفال',
+            elementary: 'المرحلة الابتدائية',
+            middle: 'المرحلة المتوسطة',
+            high: 'المرحلة الثانوية',
+          }
+          if (stageNames[u.stage]) setStudentGrade(stageNames[u.stage])
+        }
+      }
+    } catch {}
+  }, [])
 
   const filtered = curriculaList.filter((c) => {
     if (!search) return true
@@ -26,35 +45,40 @@ export default function StudentSubjectsPage() {
   return (
     <div className="min-h-screen" dir="rtl">
       {/* ── Hero Banner ── */}
-      <header className="overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-l from-slate-950 via-indigo-950 to-blue-900 p-6 text-white shadow-xl mb-6">
-        <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
+      <header className="overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-l from-slate-950 via-indigo-950 to-blue-950 p-6 sm:p-8 text-white shadow-xl mb-6 relative">
+        <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center relative z-10">
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-3">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-400/20 px-3.5 py-1 text-xs font-black text-amber-300 ring-1 ring-amber-400/40">
                 <Sparkles size={14} />
                 المناهج الرسمية المعتمدة 1448هـ
               </span>
-              <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white/80">
-                الصف الأول الابتدائي
+              <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-bold text-white border border-white/10">
+                {studentGrade}
               </span>
             </div>
-            <h1 className="text-3xl font-black md:text-4xl">مجلد المناهج التعليمية التفاعلية</h1>
-            <p className="mt-3 max-w-2xl text-sm font-bold leading-7 text-slate-300">
+            <h1
+              className="text-3xl font-black md:text-4xl text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)] tracking-tight"
+              style={{ color: '#ffffff' }}
+            >
+              مجلد المناهج التعليمية التفاعلية
+            </h1>
+            <p className="mt-3 max-w-2xl text-sm font-bold leading-7 text-slate-200">
               جميع الكتب المدرسية الرسمية مدمجة بنظام التفاعل — تصفح الصفحات بالقلم، ارسم وعلّق، وانتقل بين الوحدات بضغطة واحدة.
             </p>
           </div>
 
-          <div className="flex flex-col gap-2 rounded-2xl bg-white/10 p-4 backdrop-blur-sm ring-1 ring-white/20 sm:min-w-[240px]">
+          <div className="flex flex-col gap-2 rounded-2xl bg-white/10 p-4 backdrop-blur-md ring-1 ring-white/20 sm:min-w-[240px]">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-white/70">إجمالي المواد</span>
+              <span className="text-xs font-bold text-white/80">إجمالي المواد</span>
               <span className="text-xl font-black text-amber-300">{curriculaList.length} مواد</span>
             </div>
             <div className="flex items-center justify-between border-t border-white/10 pt-2">
-              <span className="text-xs font-bold text-white/70">إجمالي الصفحات</span>
+              <span className="text-xs font-bold text-white/80">إجمالي الصفحات</span>
               <span className="text-xl font-black text-white">{totalPages} صفحة</span>
             </div>
             <div className="flex items-center justify-between border-t border-white/10 pt-2">
-              <span className="text-xs font-bold text-white/70">الوحدات المتاحة</span>
+              <span className="text-xs font-bold text-white/80">الوحدات المتاحة</span>
               <span className="text-xl font-black text-emerald-300">
                 {curriculaList.reduce((acc, c) => acc + c.units.length, 0)} وحدة
               </span>
@@ -62,21 +86,6 @@ export default function StudentSubjectsPage() {
           </div>
         </div>
       </header>
-
-      {/* ── Features Strip ── */}
-      <div className="flex flex-wrap gap-2 mb-6">
-        {[
-          { icon: <PenTool size={14} />, label: 'قلم تفاعلي على كل الصفحات', color: 'text-blue-700 bg-blue-50 border-blue-200' },
-          { icon: <Layers3 size={14} />, label: 'تصفح فوري بين الصفحات', color: 'text-amber-700 bg-amber-50 border-amber-200' },
-          { icon: <CheckCircle2 size={14} />, label: 'حفظ تلقائي للرسومات', color: 'text-emerald-700 bg-emerald-50 border-emerald-200' },
-          { icon: <GraduationCap size={14} />, label: 'منهج معتمد 1448هـ', color: 'text-indigo-700 bg-indigo-50 border-indigo-200' },
-        ].map((f) => (
-          <span key={f.label} className={`inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-black ${f.color}`}>
-            {f.icon}
-            {f.label}
-          </span>
-        ))}
-      </div>
 
       {/* ── Search ── */}
       <div className="relative mb-6">
