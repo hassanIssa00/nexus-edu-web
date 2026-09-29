@@ -7,6 +7,35 @@ import { motion } from 'framer-motion';
 import { User, Calendar, IdCard, Users, ArrowLeft, Camera, Sparkles, CheckCircle2, Upload, Trash2, GraduationCap } from 'lucide-react';
 import type { ClassStudentRecord } from '@/lib/nexusDataBridge';
 
+const STAGE_GRADES: Record<'elementary' | 'kindergarten' | 'middle' | 'high', string[]> = {
+  elementary: [
+    'الصف الأول الابتدائي',
+    'الصف الثاني الابتدائي',
+    'الصف الثالث الابتدائي',
+    'الصف الرابع الابتدائي',
+    'الصف الخامس الابتدائي',
+    'الصف السادس الابتدائي',
+  ],
+  kindergarten: [
+    'الروضة الأولى (KG1)',
+    'الروضة الثانية (KG2)',
+    'التمهيدي (KG3)',
+  ],
+  middle: [
+    'الصف الأول المتوسط',
+    'الصف الثاني المتوسط',
+    'الصف الثالث المتوسط',
+  ],
+  high: [
+    'الصف الأول الثانوي',
+    'الصف الثاني الثانوي (مسار عام)',
+    'الصف الثاني الثانوي (مسار حاسب وهندسة)',
+    'الصف الثاني الثانوي (مسار صحة وحياة)',
+    'الصف الثاني الثانوي (مسار إدارة أعمال)',
+    'الصف الثالث الثانوي',
+  ],
+};
+
 export default function StudentNewPage() {
   const router = useRouter();
   const locale = useLocale();
@@ -16,13 +45,14 @@ export default function StudentNewPage() {
 
   const [student, setStudent] = useState<ClassStudentRecord | null>(null);
   const [nationalId, setNationalId] = useState('');
-  const [dateOfBirth, setDateOfBirth] = useState('2020-04-15');
+  const [dateOfBirth, setDateOfBirth] = useState('2018-01-01');
   const [parentAge, setParentAge] = useState('38');
   const [childrenCount, setChildrenCount] = useState('3');
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [stage, setStage] = useState<'kindergarten' | 'elementary' | 'middle' | 'high'>('elementary');
+  const [grade, setGrade] = useState('الصف الأول الابتدائي');
 
   useEffect(() => {
     const load = async () => {
@@ -45,10 +75,23 @@ export default function StudentNewPage() {
         }
         if (s) {
           setStudent(s);
-          if (s.nationalId) setNationalId(s.nationalId);
+          // Only prefill nationalId if it was a real non-dummy ID
+          if (s.nationalId && !s.nationalId.startsWith('11') && !s.nationalId.startsWith('dummy')) {
+            setNationalId(s.nationalId);
+          } else {
+            setNationalId('');
+          }
           if (s.dateOfBirth) setDateOfBirth(s.dateOfBirth);
-          if (s.notes) setNotes(s.notes);
+          // Keep notes empty by default, never prefill "طالب مسجل حديثاً"
+          if (s.notes && s.notes !== 'طالب مسجل حديثاً') {
+            setNotes(s.notes);
+          } else {
+            setNotes('');
+          }
           if (s.photoUrl) setPhotoUrl(s.photoUrl);
+          if (s.grade && s.grade !== 'المرحلة الابتدائية' && s.grade !== 'الروضة' && s.grade !== 'المرحلة المتوسطة' && s.grade !== 'المرحلة الثانوية') {
+            setGrade(s.grade);
+          }
         }
       } catch (e) {
         console.error(e);
@@ -56,6 +99,11 @@ export default function StudentNewPage() {
     };
     load();
   }, [requestedStudentId]);
+
+  // Reset grade to first option when stage changes
+  useEffect(() => {
+    setGrade(STAGE_GRADES[stage][0]);
+  }, [stage]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,7 +150,7 @@ export default function StudentNewPage() {
         universalId: student?.universalId || nexusBridge.generateUniversalId('STD'),
         fullName: student?.fullName || uName,
         fullNameEn: student?.fullNameEn || '',
-        grade: student?.grade || stageGrade,
+        grade: grade || stageGrade,
         classId: student?.classId || 'CLS-101',
         nationalId: nationalId.trim() || student?.nationalId || '',
         dateOfBirth: dateOfBirth || student?.dateOfBirth || '2018-01-01',
@@ -188,9 +236,18 @@ export default function StudentNewPage() {
               </div>
             ) : (
               <div>
-                <label className="text-xs font-black text-gray-600 dark:text-gray-300 mb-1.5 block">الصف الدراسي</label>
-                <input disabled value="الصف الأول الابتدائي"
-                  className="w-full px-4 py-3 rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-white/10 text-xs font-bold text-gray-700 dark:text-gray-300" />
+                <label className="text-xs font-black text-gray-600 dark:text-gray-300 mb-1.5 block">الصف الدراسي *</label>
+                <select
+                  required
+                  value={grade}
+                  onChange={(e) => setGrade(e.target.value)}
+                  className="w-full px-4 py-3 rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-xs font-bold text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-500/50"
+                  dir="rtl"
+                >
+                  {STAGE_GRADES[stage].map((g) => (
+                    <option key={g} value={g}>{g}</option>
+                  ))}
+                </select>
               </div>
             )}
           </div>

@@ -203,20 +203,22 @@ export default function RegisterPage() {
           localStorage.setItem('nexus_student_photo', regPhoto);
         }
 
+        const defaultGrade = studentStage === 'kindergarten' ? 'الروضة الأولى (KG1)' : studentStage === 'middle' ? 'الصف الأول المتوسط' : studentStage === 'high' ? 'الصف الأول الثانوي' : 'الصف الأول الابتدائي';
+
         const studentRecord: ClassStudentRecord = {
           id: studentRecordId,
           universalId,
           fullName: fullName.trim(),
           fullNameEn: '',
-          grade: stageLabel,
+          grade: defaultGrade,
           classId: 'CLS-101',
-          nationalId: `11${Math.floor(10000000 + Math.random() * 90000000)}`,
-          dateOfBirth: '2016-01-01',
+          nationalId: '',
+          dateOfBirth: '2018-01-01',
           parentName: '',
           parentPhone: phone.trim(),
           parentEmail: '',
           photoUrl: regPhoto || undefined,
-          notes: 'طالب مسجل حديثاً',
+          notes: '',
           averageGrade: 100,
           attendanceRate: 100,
           rank: 1,

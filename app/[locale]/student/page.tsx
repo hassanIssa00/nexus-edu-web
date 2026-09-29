@@ -474,12 +474,17 @@ export default function StudentDashboardPage() {
                   {student.name}
                 </motion.h1>
                 <p className="text-violet-200 text-xs md:text-sm font-medium">
-                  {((student as any).grade || "الصف الأول الابتدائي")} • {
-                    currentStage === 'kindergarten' ? 'مرحلة رياض الأطفال 🧸' :
-                    currentStage === 'middle' ? 'المرحلة المتوسطة 🔬' :
-                    currentStage === 'high' ? 'المرحلة الثانوية 🎓' :
-                    'المرحلة الابتدائية 📚'
-                  }
+                  {(() => {
+                    const g = (student as any).grade;
+                    const stageLabelValues = ['المرحلة الابتدائية', 'الروضة', 'المرحلة المتوسطة', 'المرحلة الثانوية'];
+                    if (g && !stageLabelValues.includes(g)) {
+                      return g;
+                    }
+                    return currentStage === 'kindergarten' ? 'مرحلة رياض الأطفال 🧸' :
+                           currentStage === 'middle' ? 'المرحلة المتوسطة 🔬' :
+                           currentStage === 'high' ? 'المرحلة الثانوية 🎓' :
+                           'المرحلة الابتدائية 📚';
+                  })()}
                 </p>
               </div>
             </div>
