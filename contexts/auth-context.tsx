@@ -113,6 +113,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         sessionStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
         sessionStorage.removeItem(DEMO_FLAG_STORAGE_KEY);
         sessionStorage.removeItem(DEMO_PROFILE_STORAGE_KEY);
+        sessionStorage.removeItem('nexus_user');
+        sessionStorage.removeItem('nexus_role');
         // Also clear localStorage to prevent stale sessions
         localStorage.removeItem('access_token');
         localStorage.removeItem('nexus_role');
