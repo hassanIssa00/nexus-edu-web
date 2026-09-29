@@ -380,6 +380,22 @@ export default function InteractiveStudentGameModal({
         score: finalScore,
       })
       localStorage.setItem('nexus_student_games_history', JSON.stringify(history.slice(0, 20)))
+
+      import('@/lib/notifications').then(({ addNotification }) => {
+        const gameTitles: Record<string, string> = {
+          spelling: 'تحدي الإملاء السريع',
+          math: 'سباق الحساب الذهني',
+          quran: 'ترتيل وتثبيت الآيات',
+          science: 'مستكشف الطبيعة والعلوم',
+          crossword: 'الكلمات المتقاطعة',
+        }
+        addNotification({
+          type: 'EXAM_REMINDER',
+          title: `فوز جديد في واحة الألعاب! (+${finalScore} XP) 🎮`,
+          body: `أحسنت! أكملت بنجاح جولة في لعبة ${gameTitles[normalizedId] || 'الألعاب التعليمية'} وحصلت على ${finalScore} نقطة خبرة.`,
+          actionUrl: '/student/games',
+        })
+      }).catch(() => {})
     } catch {}
 
     if (onAwardXP) onAwardXP(finalScore)

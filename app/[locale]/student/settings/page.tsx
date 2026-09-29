@@ -122,6 +122,16 @@ export default function StudentSettingsPage() {
       setCurrentPw('')
       setNewPw('')
       setConfirmPw('')
+
+      import('@/lib/notifications').then(({ addNotification }) => {
+        addNotification({
+          type: 'EXAM_REMINDER',
+          title: 'تحديث أمان الحساب 🔒',
+          body: 'تم تغيير وتحديث كلمة المرور لحسابك في منصة نكسس بنجاح.',
+          actionUrl: '/student/settings',
+        })
+      }).catch(() => {})
+
       setTimeout(() => setPwSuccess(false), 3000)
     } catch {
       setPwError('حدث خطأ أثناء تغيير كلمة المرور')

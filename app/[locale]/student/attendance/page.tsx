@@ -128,6 +128,15 @@ function AttendancePageInner() {
       })
     }).catch(() => {})
 
+    import('@/lib/notifications').then(({ addNotification }) => {
+      addNotification({
+        type: 'STUDENT_ABSENT',
+        title: 'توثيق الحضور بالنطاق الجغرافي 📍',
+        body: `تم تسجيل وتوثيق حضورك اليوم الساعة ${newRecord.checkInTime} داخل مدارس الإخلاص الأهلية للبنين بجدة بنجاح.`,
+        actionUrl: '/student/attendance',
+      })
+    }).catch(() => {})
+
     setLiveAlert('✅ تم تسجيل حضورك بنجاح!')
     setTimeout(() => setLiveAlert(null), 4000)
     load()

@@ -15,6 +15,13 @@ import { arSA } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { apiClient } from '@/lib/api/client';
 import { useRealtimeNotifications } from '@/lib/providers/socket-provider';
+import {
+    getStoredNotifications,
+    markNotificationAsRead,
+    markAllNotificationsAsRead,
+    dismissNotification,
+    saveStoredNotifications,
+} from '@/lib/notifications';
 
 // ── Types ──────────────────────────────────────────────────
 interface Notification {
@@ -59,29 +66,51 @@ export function EnhancedNotifications() {
 
     const unread = notifications.filter(n => !n.isRead).length;
 
-    // Load from API
+    // Load from local store + API sync
     const loadNotifications = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await apiClient.get('/notifications/my');
-            const items: Notification[] = (res.data?.data || res.data || []).map((n: any) => ({
-                id: n.id,
-                type: n.type || 'ANNOUNCEMENT',
-                title: n.titleAr || n.title || 'إشعار جديد',
-                body: n.bodyAr || n.body || n.message,
-                isRead: n.isRead ?? false,
-                createdAt: n.createdAt,
-                actionUrl: n.data ? JSON.parse(n.data)?.actionUrl : undefined,
-            }));
-            setNotifications(items);
-        } catch {
-            // silently ignore — may not be authenticated yet
+            // First load from local storage
+            const local = getStoredNotifications();
+            setNotifications(local);
+
+            // Attempt to fetch from API if available
+            try {
+                const res = await apiClient.get('/notifications/my');
+                const items: Notification[] = (res.data?.data || res.data || []).map((n: any) => ({
+                    id: n.id,
+                    type: n.type || 'ANNOUNCEMENT',
+                    title: n.titleAr || n.title || 'إشعار جديد',
+                    body: n.bodyAr || n.body || n.message,
+                    isRead: n.isRead ?? false,
+                    createdAt: n.createdAt,
+                    actionUrl: n.data ? JSON.parse(n.data)?.actionUrl : undefined,
+                }));
+                if (items.length > 0) {
+                    setNotifications(items);
+                    saveStoredNotifications(items);
+                }
+            } catch {
+                // Keep local
+            }
         } finally {
             setLoading(false);
         }
     }, []);
 
-    useEffect(() => { loadNotifications(); }, [loadNotifications]);
+    useEffect(() => {
+        loadNotifications();
+        const handleSync = () => {
+            const fresh = getStoredNotifications();
+            setNotifications(fresh);
+        };
+        window.addEventListener('nexus_notifications_updated', handleSync);
+        window.addEventListener('storage', handleSync);
+        return () => {
+            window.removeEventListener('nexus_notifications_updated', handleSync);
+            window.removeEventListener('storage', handleSync);
+        };
+    }, [loadNotifications]);
 
     // Real-time push: prepend incoming notification
     const handleLiveNotif = useCallback((n: any) => {
@@ -95,7 +124,11 @@ export function EnhancedNotifications() {
             actionUrl: n.actionUrl,
             isLive: true,
         };
-        setNotifications(prev => [item, ...prev]);
+        setNotifications(prev => {
+            const updated = [item, ...prev];
+            saveStoredNotifications(updated);
+            return updated;
+        });
         setPulse(true);
         setTimeout(() => setPulse(false), 3000);
     }, []);
@@ -104,27 +137,26 @@ export function EnhancedNotifications() {
 
     // Mark all read
     const markAllRead = async () => {
+        markAllNotificationsAsRead();
+        setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
         try {
             await apiClient.patch('/notifications/mark-all-read');
         } catch { /* ignore */ }
-        setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
     };
 
     // Mark single read
     const markRead = async (id: string) => {
-        if (id.startsWith('live-')) {
-            setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
-            return;
-        }
+        markNotificationAsRead(id);
+        setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
         try {
             await apiClient.patch(`/notifications/${id}/read`);
         } catch { /* ignore */ }
-        setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
     };
 
     // Remove
     const dismiss = (id: string, e: React.MouseEvent) => {
         e.stopPropagation();
+        dismissNotification(id);
         setNotifications(prev => prev.filter(n => n.id !== id));
     };
 
@@ -230,9 +262,12 @@ export function EnhancedNotifications() {
 
                 {/* Footer */}
                 <div className="px-4 py-3 border-t border-border flex items-center justify-between bg-muted/30">
-                    <button onClick={loadNotifications}
-                        className="text-xs text-muted-foreground hover:text-foreground font-bold transition-colors flex items-center gap-1">
-                        <Zap className="w-3 h-3" /> تحديث
+                    <button
+                        type="button"
+                        onClick={loadNotifications}
+                        className="text-xs text-muted-foreground hover:text-foreground font-bold transition-colors flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-muted/80 border-0 outline-none focus:outline-none focus:ring-0 active:scale-95 cursor-pointer"
+                    >
+                        <Zap className="w-3.5 h-3.5 text-violet-500" /> تحديث الإشعارات
                     </button>
                     <a href="/student/notifications"
                         className="text-xs font-bold text-violet-600 hover:text-violet-700 transition-colors">
