@@ -47,6 +47,9 @@ export interface NexusAccount {
   linkedStudentId?: string; // For parents/students
   linkedStudentIds?: string[]; // Multiple children for parents
   linkedParentId?: string;
+  isWaitingForStudent?: boolean;
+  targetChildName?: string;
+  waitingSince?: string;
   schoolName: string;
   employeeId?: string;
   department?: string;

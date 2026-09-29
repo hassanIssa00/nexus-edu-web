@@ -3,12 +3,13 @@ import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRealtimeNotifications, useRealtimeAttendance } from '@/lib/providers/socket-provider'
 import Link from 'next/link'
+import { useLocale } from 'next-intl'
 import { AiAdvicePanel } from './_components/AiAdvicePanel'
 import { MiniGradeBar, ChildStatCard } from './_components/GradeBar'
 import {
   User, BookOpen, Clock, CreditCard, AlertCircle, Loader2,
   TrendingUp, Bell, Calendar, Shield, BrainCircuit, MessageSquare,
-  CheckCircle2, Star, Trophy, Home, FileText, Archive, HeartHandshake, Send, LayoutDashboard, Users, Medal, X, Send as SendIcon
+  CheckCircle2, Star, Trophy, Home, FileText, Archive, HeartHandshake, Send, LayoutDashboard, Users, Medal, X, Send as SendIcon, ArrowLeft
 } from 'lucide-react'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import LiveDaySchedule from '@/components/schedule/LiveDaySchedule'
@@ -60,13 +61,15 @@ function ChildSelector({ children, selectedIdx, onSelect }: { children: any[]; s
 }
 
 export default function ParentDashboard() {
+  const locale = useLocale()
   const [childrenData, setChildrenData] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedIdx, setSelectedIdx] = useState(0)
   const [parentDisplayName, setParentDisplayName] = useState('ولي الأمر')
   const [liveNotif, setLiveNotif] = useState<string | null>(null)
   const [liveAttendance, setLiveAttendance] = useState<string | null>(null)
-
+  const [isWaitingForStudent, setIsWaitingForStudent] = useState(false)
+  const [targetChildName, setTargetChildName] = useState('')
 
   useEffect(() => {
     const load = async () => {
@@ -74,10 +77,15 @@ export default function ParentDashboard() {
         const { nexusBridge } = await import('@/lib/nexusDataBridge')
         let linkedStudentId = ''
         let currentParentName = 'ولي الأمر'
+        let waitingFlag = false
+        let childTarget = ''
+
         try {
           const stored = localStorage.getItem('nexus_user')
           if (stored) {
             const acc = JSON.parse(stored)
+            waitingFlag = !!acc.isWaitingForStudent
+            childTarget = acc.targetChildName || ''
             if (acc.linkedStudentId) linkedStudentId = acc.linkedStudentId
             else if (acc.linkedStudentIds && acc.linkedStudentIds.length > 0) linkedStudentId = acc.linkedStudentIds[0]
             if (acc.name) currentParentName = acc.name
@@ -85,6 +93,46 @@ export default function ParentDashboard() {
         } catch {}
 
         setParentDisplayName(currentParentName)
+        setTargetChildName(childTarget)
+
+        // Try to automatically pair if parent was waiting
+        if (waitingFlag || !linkedStudentId) {
+          const allStds = nexusBridge.getStudents()
+          let storedAcc: any = null
+          try {
+            const sU = localStorage.getItem('nexus_user')
+            if (sU) storedAcc = JSON.parse(sU)
+          } catch {}
+
+          const pPhone = (storedAcc?.phone || '').replace(/\D/g, '')
+          const targetClean = childTarget.toLowerCase().trim()
+
+          const found = allStds.find(s => {
+            const sPhone = (s.parentPhone || '').replace(/\D/g, '')
+            const phoneMatch = pPhone && sPhone && (sPhone.includes(pPhone) || pPhone.includes(sPhone))
+            const nameMatch = targetClean && s.fullName.toLowerCase().includes(targetClean)
+            return phoneMatch || nameMatch
+          })
+
+          if (found) {
+            linkedStudentId = found.id
+            waitingFlag = false
+            setIsWaitingForStudent(false)
+            if (storedAcc) {
+              storedAcc.linkedStudentId = found.id
+              storedAcc.linkedStudentIds = [found.id]
+              storedAcc.isWaitingForStudent = false
+              storedAcc.title = `ولي أمر الطالب ${found.fullName}`
+              localStorage.setItem('nexus_user', JSON.stringify(storedAcc))
+              sessionStorage.setItem('nexus_user', JSON.stringify(storedAcc))
+              nexusBridge.saveAccount(storedAcc)
+            }
+          } else {
+            setIsWaitingForStudent(true)
+          }
+        } else {
+          setIsWaitingForStudent(false)
+        }
 
         if (!linkedStudentId) {
           const allStds = nexusBridge.getStudents()
@@ -232,9 +280,41 @@ export default function ParentDashboard() {
         )}
       </AnimatePresence>
 
+      {/* Waiting List Banner */}
+      {isWaitingForStudent && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="p-5 rounded-3xl bg-amber-500/10 border-2 border-amber-500/30 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm"
+        >
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center font-black text-xl flex-shrink-0 shadow-lg shadow-amber-500/30">
+              ⏳
+            </div>
+            <div>
+              <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 text-[10px] font-black mb-1">
+                <span>قائمة الانتظار المعتمدة</span>
+              </div>
+              <h4 className="text-sm font-black text-gray-900 dark:text-white">
+                حسابك بانتظار تسجيل الطالب: <span className="text-amber-600 dark:text-amber-400">{targetChildName || 'ابنك/ابنتك'}</span>
+              </h4>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                بمجرد تسجيل الطالب حسابه في المنصة، سيقوم النظام بالتعرف التلقائي الفوري وربط البيانات وتفعيل الصلاحيات بدون تدخل منك.
+              </p>
+            </div>
+          </div>
+          <Link
+            href={`/${locale}/parent/waiting`}
+            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-black shadow-lg shadow-amber-500/30 flex items-center gap-2 whitespace-nowrap transition-all"
+          >
+            <span>شاشة متابعة الربط الآلي</span>
+            <ArrowLeft className="w-3.5 h-3.5" />
+          </Link>
+        </motion.div>
+      )}
 
-          {/* HERO */}
-          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}
+      {/* HERO */}
+      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}
             className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#d97706] via-[#ea580c] to-[#e11d48] p-8 md:p-10 text-white shadow-[0_20px_50px_rgba(234,88,12,0.25)]">
         <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-40">
           <motion.div animate={{ rotate: 360 }} transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}

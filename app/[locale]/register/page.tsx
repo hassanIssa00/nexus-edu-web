@@ -157,6 +157,7 @@ export default function RegisterPage() {
         const universalId = nexusBridge.generateUniversalId('PRT');
         const studentId = matchedStudent?.id || '';
         const parentAccId = `acc_parent_${Date.now()}`;
+        const isWaiting = !studentId;
 
         const parentAccount = {
           id: parentAccId,
@@ -168,6 +169,9 @@ export default function RegisterPage() {
           title: matchedStudent ? `ولي أمر الطالب ${matchedStudent.fullName}` : `ولي أمر الطالب ${childName.trim() || fullName.trim()}`,
           linkedStudentId: studentId,
           linkedStudentIds: studentId ? [studentId] : [],
+          targetChildName: childName.trim(),
+          isWaitingForStudent: isWaiting,
+          waitingSince: isWaiting ? new Date().toISOString() : undefined,
           schoolName: 'مدارس الإخلاص الأهلية للبنين بجدة',
           createdAt: new Date().toISOString(),
         };
@@ -182,7 +186,11 @@ export default function RegisterPage() {
         sessionStorage.setItem('is_demo', 'false');
         window.dispatchEvent(new CustomEvent('nexus:data-changed'));
 
-        window.location.href = `/${locale}/parent`;
+        if (matchedStudent) {
+          window.location.href = `/${locale}/student/new?flow=parent&student=${matchedStudent.id}`;
+        } else {
+          window.location.href = `/${locale}/parent/waiting`;
+        }
       } else {
         // Student registration
         const universalId = nexusBridge.generateUniversalId('STD');
@@ -235,6 +243,32 @@ export default function RegisterPage() {
 
         nexusBridge.saveStudent(studentRecord);
         nexusBridge.saveAccount(studentAccount);
+
+        // Automatic smart pairing with any waiting parent!
+        try {
+          const cleanStudentPhone = phone.trim().replace(/\D/g, '');
+          const cleanStudentName = fullName.trim().toLowerCase();
+          const allAccounts = nexusBridge.getAccounts();
+          allAccounts.forEach(acc => {
+            if (acc.role === 'parent' && (acc.isWaitingForStudent || !acc.linkedStudentId)) {
+              const pPhone = (acc.phone || '').replace(/\D/g, '');
+              const targetName = (acc.targetChildName || '').toLowerCase().trim();
+              const phoneMatch = cleanStudentPhone && pPhone && (pPhone.includes(cleanStudentPhone) || cleanStudentPhone.includes(pPhone));
+              const nameMatch = targetName && (cleanStudentName.includes(targetName) || targetName.includes(cleanStudentName));
+
+              if (phoneMatch || nameMatch) {
+                acc.linkedStudentId = studentRecordId;
+                acc.linkedStudentIds = [studentRecordId];
+                acc.isWaitingForStudent = false;
+                acc.title = `ولي أمر الطالب ${fullName.trim()}`;
+                nexusBridge.saveAccount(acc);
+              }
+            }
+          });
+        } catch (e) {
+          console.error('Auto pairing error:', e);
+        }
+
         localStorage.setItem('nexus_user', JSON.stringify(studentAccount));
         localStorage.setItem('access_token', `nexus_live_${studentAccId}`);
         localStorage.setItem('nexus_role', 'student');
@@ -244,7 +278,8 @@ export default function RegisterPage() {
         sessionStorage.setItem('is_demo', 'false');
         window.dispatchEvent(new CustomEvent('nexus:data-changed'));
 
-        window.location.href = `/${locale}/student`;
+        // Forward student to onboarding flow (Step 2: Profile details -> Step 3: Diagnostic Assessment)
+        window.location.href = `/${locale}/student/new?flow=student&student=${studentRecordId}`;
       }
     } catch (err: any) {
       console.error(err);

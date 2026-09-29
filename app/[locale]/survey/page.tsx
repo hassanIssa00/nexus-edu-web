@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import { motion } from 'framer-motion';
 import { HeartHandshake, CheckCircle2, Sparkles, ArrowLeft, ArrowRight, ShieldCheck } from 'lucide-react';
 
@@ -71,6 +72,7 @@ const SURVEY_SECTIONS: SurveySection[] = [
 
 export default function SurveyPage() {
   const router = useRouter();
+  const locale = useLocale();
   const searchParams = useSearchParams();
   const studentId = searchParams.get('student') || 'cls-std-2';
 
@@ -105,14 +107,25 @@ export default function SurveyPage() {
     setSubmitting(true);
     try {
       const { nexusBridge } = await import('@/lib/nexusDataBridge');
+      let studentName = 'طالب مسجل';
+      let parentName = 'ولي أمر الطالب';
+      const sRec = nexusBridge.getStudentById(studentId);
+      if (sRec?.fullName) studentName = sRec.fullName;
+      const uStr = typeof window !== 'undefined' ? localStorage.getItem('nexus_user') : null;
+      if (uStr) {
+        try {
+          const u = JSON.parse(uStr);
+          if (u.name) parentName = u.name;
+        } catch {}
+      }
       
       // Save observation for teacher & counselor
       nexusBridge.saveObservation({
         studentId,
-        studentName: 'أحمد فيصل الغامدي',
-        authorName: 'ولي أمر الطالب',
+        studentName,
+        authorName: parentName,
         authorRole: 'ولي أمر',
-        text: 'أكمل ولي الأمر استبيان القياس التربوي الشامل بنجاح، مما يعكس اهتماماً ودعماً أسرياً عالياً.',
+        text: `أكمل ولي الأمر (${parentName}) استبيان القياس التربوي الشامل بنجاح، مما يعكس اهتماماً ومتابعة أسرية حثيثة.`,
         category: 'guidance',
         severity: 'positive',
       });
@@ -228,7 +241,7 @@ export default function SurveyPage() {
               تم تسليم استبيان ولي الأمر بنجاح إلى د. إسماعيل عيسى والموجه الطلابي لمتابعة مسيرة ابنك الأكاديمية والتربوية.
             </p>
 
-            <button onClick={() => router.push('/parent')}
+            <button onClick={() => { window.location.href = `/${locale}/parent`; }}
               className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-black text-sm shadow-xl shadow-amber-500/30">
               الدخول إلى بوابة ولي الأمر الآن 👨‍👩‍👧‍👦
             </button>

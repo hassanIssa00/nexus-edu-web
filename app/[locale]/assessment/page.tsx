@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, CheckCircle2, Trophy, Clock, ArrowLeft, ArrowRight, Star, Award, RotateCcw } from 'lucide-react';
 
@@ -47,6 +48,7 @@ const ASSESSMENT_QUESTIONS: Question[] = [
 
 export default function AssessmentPage() {
   const router = useRouter();
+  const locale = useLocale();
   const searchParams = useSearchParams();
   const studentId = searchParams.get('student') || 'cls-std-2';
 
@@ -87,11 +89,25 @@ export default function AssessmentPage() {
 
     try {
       const { nexusBridge } = await import('@/lib/nexusDataBridge');
+      let studentName = 'طالب مسجل';
+      const sRec = nexusBridge.getStudentById(studentId);
+      if (sRec?.fullName) {
+        studentName = sRec.fullName;
+      } else if (typeof window !== 'undefined') {
+        try {
+          const uStr = localStorage.getItem('nexus_user');
+          if (uStr) {
+            const u = JSON.parse(uStr);
+            if (u.name) studentName = u.name;
+          }
+        } catch {}
+      }
+
       nexusBridge.issueCertificate({
         studentId,
-        studentName: 'أحمد فيصل الغامدي',
+        studentName,
         programTitle: 'شهادة اجتياز الاختبار التشخيصي للقبول',
-        achievement: `أتم الطالب الاختبار التشخيصي الشامل للصف الأول الابتدائي بمعدل ${calculatedScore}%`,
+        achievement: `أتم الطالب ${studentName} الاختبار التشخيصي الشامل بنجاح بمعدل ${calculatedScore}%`,
         score: calculatedScore,
         completionDate: new Date().toISOString().split('T')[0],
         doctorName: 'د. إسماعيل عيسى',
@@ -201,7 +217,7 @@ export default function AssessmentPage() {
               <span>تم إصدار شهادة اجتياز تشخيصية معتمدة وإضافتها لسجل إنجازاتك تلقائياً!</span>
             </div>
 
-            <button onClick={() => router.push('/student')}
+            <button onClick={() => { window.location.href = `/${locale}/student`; }}
               className="w-full py-4 rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white font-black text-sm shadow-xl shadow-teal-500/30">
               الدخول إلى لوحة تحكم الطالب الآن 🚀
             </button>

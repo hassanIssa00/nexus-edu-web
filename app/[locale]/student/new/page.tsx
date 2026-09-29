@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import { motion } from 'framer-motion';
 import { User, Calendar, IdCard, Users, ArrowLeft, Camera, Sparkles, CheckCircle2, Upload, Trash2, GraduationCap } from 'lucide-react';
 import type { ClassStudentRecord } from '@/lib/nexusDataBridge';
 
 export default function StudentNewPage() {
   const router = useRouter();
+  const locale = useLocale();
   const searchParams = useSearchParams();
   const flow = searchParams.get('flow') || 'parent';
   const requestedStudentId = searchParams.get('student') || 'cls-std-2';
@@ -26,12 +28,27 @@ export default function StudentNewPage() {
     const load = async () => {
       try {
         const { nexusBridge } = await import('@/lib/nexusDataBridge');
-        const s = nexusBridge.getStudentById(requestedStudentId);
+        let s = nexusBridge.getStudentById(requestedStudentId);
+        if (!s) {
+          const userStr = typeof window !== 'undefined' ? localStorage.getItem('nexus_user') : null;
+          if (userStr) {
+            try {
+              const u = JSON.parse(userStr);
+              if (u.linkedStudentId) {
+                s = nexusBridge.getStudentById(u.linkedStudentId);
+              }
+              if (!s && u.id) {
+                s = nexusBridge.getStudents().find(st => st.studentAccountId === u.id || st.id === u.id) || null;
+              }
+            } catch {}
+          }
+        }
         if (s) {
           setStudent(s);
           if (s.nationalId) setNationalId(s.nationalId);
           if (s.dateOfBirth) setDateOfBirth(s.dateOfBirth);
           if (s.notes) setNotes(s.notes);
+          if (s.photoUrl) setPhotoUrl(s.photoUrl);
         }
       } catch (e) {
         console.error(e);
@@ -106,9 +123,9 @@ export default function StudentNewPage() {
       nexusBridge.saveClassStudent(updatedOrNewStudent);
 
       if (flow === 'student') {
-        router.push(`/assessment?student=${requestedStudentId}&flow=student`);
+        window.location.href = `/${locale}/assessment?student=${updatedOrNewStudent.id}&flow=student`;
       } else {
-        router.push(`/survey?student=${requestedStudentId}&flow=parent`);
+        window.location.href = `/${locale}/survey?student=${updatedOrNewStudent.id}&flow=parent`;
       }
     } catch (e) {
       console.error(e);
