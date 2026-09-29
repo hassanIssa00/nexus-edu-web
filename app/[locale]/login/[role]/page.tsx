@@ -55,24 +55,6 @@ export default function RoleLoginPage() {
         );
     }
 
-    const demoCredentials: Record<string, { email: string; label: string }> = {
-        teacher:        { email: 'arabic.teacher@nexusedu.sa', label: 'د. إسماعيل عيسى (رائد الفصل • لغتي)' },
-        student:        { email: 'student1@nexusedu.sa', label: 'أحمد فيصل الغامدي (طالب — الصف الأول)' },
-        parent:         { email: 'parent1@nexusedu.sa', label: 'فيصل الغامدي (ولي أمر)' },
-        principal:      { email: 'principal@nexusedu.sa', label: 'د. خالد العتيبي (مدير المدرسة)' },
-        vice_principal: { email: 'vice.principal@nexusedu.sa', label: 'أ. منصور القحطاني (وكيل المدرسة)' },
-        counselor:      { email: 'counselor@nexusedu.sa', label: 'أ. عبد الله الغامدي (الموجه الطلابي)' },
-        supervisor:     { email: 'supervisor@nexusedu.sa', label: 'د. عبد الرحمن السبيعي (المشرف التربوي)' },
-        admin:          { email: 'admin@nexusedu.sa', label: 'أ. فهد الزهراني (الشؤون الإدارية)' },
-        accountant:     { email: 'accountant@nexusedu.sa', label: 'أ. سليم النجار (المحاسب المالي)' },
-    };
-
-    const fillDemo = () => {
-        const demo = demoCredentials[role] || { email: `${role}@nexusedu.sa`, label: roleConfig.label };
-        setEmail(demo.email);
-        setPassword('123456');
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -283,18 +265,6 @@ export default function RoleLoginPage() {
                             </motion.h1>
                             <p className="text-[14px] text-slate-500 font-medium">أدخل بيانات الاعتماد الخاصة بك للوصول لمنصتك</p>
                         </div>
-
-                        {/* Demo Autofill Button */}
-                        <motion.button 
-                            type="button" 
-                            onClick={fillDemo} 
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="w-full py-3 px-4 mb-6 border-2 border-dashed rounded-2xl text-xs font-bold transition-all bg-emerald-50 dark:bg-emerald-950/20 border-emerald-400 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 flex items-center justify-center gap-2 shadow-sm cursor-pointer"
-                        >
-                            <Sparkles className="w-4 h-4 text-emerald-600" />
-                            <span>🧪 تجربة سريعة: اضغط هنا لملء الحساب التجريبي المعتمد ({demoCredentials[role]?.label || roleConfig.label})</span>
-                        </motion.button>
 
                         <form onSubmit={handleSubmit} className="space-y-5">
                             {/* Email */}

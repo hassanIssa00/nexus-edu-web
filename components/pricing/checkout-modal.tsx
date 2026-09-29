@@ -65,7 +65,7 @@ export function CheckoutModal({ isOpen, onClose, planName, price, onSuccess }: C
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label>رقم البطاقة (وهمي)</Label>
+                                    <Label>رقم البطاقة الائتمانية</Label>
                                     <div className="relative">
                                         <CreditCard className="absolute right-3 top-2.5 h-4 w-4 text-gray-400" />
                                         <Input placeholder="4242 4242 4242 4242" className="pr-9" required />

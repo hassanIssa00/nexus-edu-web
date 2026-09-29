@@ -123,7 +123,7 @@ export function HighSchoolTrack() {
             disabled={activeTest}
             className="w-full py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg disabled:opacity-50"
           >
-            {activeTest ? <><Sparkles className="w-4 h-4 animate-spin" />جاري تصحيح الاختبار التجريبي...</> : <><Target className="w-4 h-4" />بدء اختبار تجريبي فوري (20 دقيقة)</>}
+            {activeTest ? <><Sparkles className="w-4 h-4 animate-spin" />جاري تصحيح اختبار القدرات والتحصيلي...</> : <><Target className="w-4 h-4" />بدء اختبار قياس تحصيلي فوري (20 دقيقة)</>}
           </button>
         </div>
 

@@ -112,7 +112,7 @@
             "forgotPassword": "نسيت كلمة المرور؟",
             "signIn": "تسجيل الدخول",
             "signingIn": "جاري تسجيل الدخول...",
-            "demoCredentials": "حسابات تجريبية سريعة:",
+            "credentials": "بيانات الدخول المعتمدة:",
             "noAccount": "ليس لديك حساب؟",
             "createAccount": "إنشاء حساب جديد",
             "heroTitle": "ابدأ رحلة التعلم",
