@@ -23,6 +23,12 @@ import { PomodoroTimer } from './_components/PomodoroTimer'
 import { AchievementsShowcase } from './_components/AchievementsShowcase'
 import { AssignmentsTimeline } from './_components/AssignmentsTimeline'
 import { QuickNavGrid } from './_components/QuickNavGrid'
+
+import { Camera } from 'lucide-react'
+import { KindergartenTrack } from './_components/KindergartenTrack'
+import { MiddleSchoolTrack } from './_components/MiddleSchoolTrack'
+import { HighSchoolTrack } from './_components/HighSchoolTrack'
+import { PhotoUploadModal } from '@/components/PhotoUploadModal'
 import LiveDaySchedule from '@/components/schedule/LiveDaySchedule'
 
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -41,10 +47,10 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 const FALLBACK_STUDENT_DATA: StudentDashboardResponse = {
   student: {
-    id: 'cls-std-2',
-    name: 'أحمد فيصل الغامدي',
-    email: 'student1@nexusedu.sa',
-    grade: 'الصف الأول الابتدائي — الفئة (أ)',
+    id: 'std-user',
+    name: 'طالب نكسس',
+    email: '',
+    grade: 'المرحلة الدراسية',
   },
   summary: {
     totalSubjects: 6,
@@ -87,6 +93,48 @@ const FALLBACK_STUDENT_DATA: StudentDashboardResponse = {
 
 export default function StudentDashboardPage() {
   const [data, setData] = useState<StudentDashboardResponse | null>(null)
+
+  const [studentPhoto, setStudentPhoto] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('nexus_student_photo') || null
+    }
+    return null
+  })
+  const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false)
+  const [currentStage, setCurrentStage] = useState<'kindergarten' | 'elementary' | 'middle' | 'high'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('nexus_student_stage')
+      if (saved && ['kindergarten', 'elementary', 'middle', 'high'].includes(saved)) {
+        return saved as any
+      }
+    }
+    return 'elementary'
+  })
+
+  const handleSavePhoto = (photoUrl: string) => {
+    setStudentPhoto(photoUrl)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('nexus_student_photo', photoUrl)
+      try {
+        const uStr = localStorage.getItem('nexus_user')
+        if (uStr) {
+          const u = JSON.parse(uStr)
+          u.photoUrl = photoUrl
+          localStorage.setItem('nexus_user', JSON.stringify(u))
+        }
+      } catch {}
+      window.dispatchEvent(new CustomEvent('nexus:data-changed'))
+    }
+    setIsPhotoModalOpen(false)
+  }
+
+  const handleStageChange = (stage: 'kindergarten' | 'elementary' | 'middle' | 'high') => {
+    setCurrentStage(stage)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('nexus_student_stage', stage)
+      window.dispatchEvent(new CustomEvent('nexus:data-changed'))
+    }
+  }
   const [loading, setLoading] = useState(true)
   const [usingFallback, setUsingFallback] = useState(false)
   const [liveAssignments, setLiveAssignments] = useState<any[]>([])
@@ -96,16 +144,42 @@ export default function StudentDashboardPage() {
     const load = async () => {
       try {
         const { nexusBridge } = await import('@/lib/nexusDataBridge')
-        let linkedStudentId = 'cls-std-2'
+        let linkedStudentId = ''
+        let storedAcc: any = null
         try {
           const stored = localStorage.getItem('nexus_user')
           if (stored) {
-            const acc = JSON.parse(stored)
-            if (acc.linkedStudentId) linkedStudentId = acc.linkedStudentId
+            storedAcc = JSON.parse(stored)
+            if (storedAcc.linkedStudentId) linkedStudentId = storedAcc.linkedStudentId
+            else if (storedAcc.role === 'student') linkedStudentId = storedAcc.id
           }
         } catch {}
 
-        const student = nexusBridge.getStudentById(linkedStudentId)
+        let student = linkedStudentId ? nexusBridge.getStudentById(linkedStudentId) : null
+        if (!student && storedAcc && storedAcc.role === 'student') {
+          student = {
+            id: storedAcc.id || 'std_active',
+            universalId: storedAcc.universalId || 'STD-USER',
+            fullName: storedAcc.name || 'طالب نكسس',
+            fullNameEn: '',
+            grade: storedAcc.stage === 'kindergarten' ? 'الروضة' : storedAcc.stage === 'middle' ? 'المرحلة المتوسطة' : storedAcc.stage === 'high' ? 'المرحلة الثانوية' : 'المرحلة الابتدائية',
+            classId: 'CLS-101',
+            nationalId: '',
+            dateOfBirth: '',
+            parentName: '',
+            parentPhone: storedAcc.phone || '',
+            parentEmail: storedAcc.email || '',
+            photoUrl: storedAcc.photoUrl,
+            notes: '',
+            averageGrade: 100,
+            attendanceRate: 100,
+            rank: 1,
+            assignedProgram: storedAcc.stage === 'kindergarten' ? 'رياض الأطفال' : 'المسار العام',
+            status: 'excellent',
+            studentAccountId: storedAcc.id || '',
+            parentAccountId: '',
+          }
+        }
         const allStudents = nexusBridge.getStudents()
         const todayAtt = nexusBridge.getTodayAttendance()
         const myAtt = todayAtt.find(a => a.studentId === linkedStudentId)
@@ -184,7 +258,7 @@ export default function StudentDashboardPage() {
         const weeklyActivity = dayLabels.map((label, dayIdx) => {
           const isWeekend = dayIdx === 5 || dayIdx === 6
           const submissionsOnDay = mySubmissions.filter(s => {
-            const d = new Date(s.submittedAt || s.createdAt)
+            const d = new Date(s.submittedAt || ((s as any).createdAt || s.submittedAt))
             return d.getDay() === dayIdx
           }).length
           const dayAttHistory = storedHistory.find(h => new Date(h.date).getDay() === dayIdx)
@@ -303,6 +377,48 @@ export default function StudentDashboardPage() {
         )}
       </AnimatePresence>
 
+      
+      {/* ─── EDUCATIONAL STAGE SWITCHER (مسار المرحلة الدراسية) ─── */}
+      <motion.div 
+        initial={{ opacity: 0, y: -10 }} 
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white/80 dark:bg-[#1e1e2d]/80 backdrop-blur-xl border border-violet-100 dark:border-white/5 rounded-3xl p-3 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3"
+      >
+        <div className="flex items-center gap-2.5 px-2">
+          <div className="w-8 h-8 rounded-xl bg-violet-600/10 flex items-center justify-center text-violet-600">
+            <GraduationCap className="w-4 h-4" />
+          </div>
+          <div>
+            <p className="text-xs font-black text-gray-900 dark:text-white leading-tight">مسار المرحلة الدراسية</p>
+            <p className="text-[10px] text-gray-400">تخصيص المنهج والأدوات بحسب احتياجات المرحلة</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+          {[
+            { id: 'kindergarten', label: 'رياض الأطفال', emoji: '🧸', tag: 'الطفولة المبكرة' },
+            { id: 'elementary', label: 'المرحلة الابتدائية', emoji: '📚', tag: 'الصفوف 1 - 6' },
+            { id: 'middle', label: 'المرحلة المتوسطة', emoji: '🔬', tag: 'معامل وSTEM' },
+            { id: 'high', label: 'المرحلة الثانوية', emoji: '🎓', tag: 'المسارات والقدرات' },
+          ].map((st) => (
+            <button
+              key={st.id}
+              onClick={() => handleStageChange(st.id as any)}
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-black transition-all whitespace-nowrap ${
+                currentStage === st.id
+                  ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-md shadow-violet-600/25 scale-[1.02]'
+                  : 'bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10'
+              }`}
+            >
+              <span className="text-base">{st.emoji}</span>
+              <span>{st.label}</span>
+              <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${currentStage === st.id ? 'bg-white/20 text-white' : 'bg-black/5 dark:bg-white/10 text-gray-500'}`}>
+                {st.tag}
+              </span>
+            </button>
+          ))}
+        </div>
+      </motion.div>
+
       {/* ─── HERO SECTION ─── */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -317,27 +433,56 @@ export default function StudentDashboardPage() {
 
         <div className="relative z-10 flex flex-col xl:flex-row items-center justify-between gap-8">
           <div className="w-full xl:w-auto">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md mb-4"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-yellow-300 animate-pulse" />
-              <span className="text-xs font-bold text-violet-100">مرحباً بعودتك! 👋</span>
-            </motion.div>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-5 mb-5">
+              {/* Student Photo Avatar / Placeholder */}
+              <div 
+                onClick={() => setIsPhotoModalOpen(true)}
+                title="انقر لتعديل أو إضافة صورتك الشخصية"
+                className="relative group cursor-pointer w-20 h-20 md:w-24 md:h-24 rounded-3xl overflow-hidden border-2 border-white/30 shadow-2xl flex-shrink-0 bg-white/10 backdrop-blur-md flex items-center justify-center transition-all hover:scale-105 hover:border-white"
+              >
+                {studentPhoto ? (
+                  <img src={studentPhoto} alt={student.name} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center p-2 text-center border-2 border-dashed border-white/40 rounded-3xl">
+                    <Camera className="w-6 h-6 text-white/80 group-hover:text-white transition-colors mb-1" />
+                    <span className="text-[10px] font-black text-white/90">أضف صورتك</span>
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white">
+                  <Camera className="w-5 h-5 mb-0.5" />
+                  <span className="text-[9px] font-bold">تعديل</span>
+                </div>
+              </div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="text-4xl md:text-5xl font-black mb-2 tracking-tight"
-            >
-              {student.name}
-            </motion.h1>
-            <p className="text-violet-200 text-sm md:text-base font-medium mb-6">
-              يوم تعليمي رائع بانتظارك! نتمنى لك يوماً دراسياً متميزاً ومليئاً بالإنجاز والتفوق 🌟
-            </p>
+              <div>
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md mb-2"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-yellow-300 animate-pulse" />
+                  <span className="text-xs font-bold text-violet-100">مرحباً بعودتك! 👋</span>
+                </motion.div>
+
+                <motion.h1
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-3xl md:text-5xl font-black mb-1 tracking-tight"
+                >
+                  {student.name}
+                </motion.h1>
+                <p className="text-violet-200 text-xs md:text-sm font-medium">
+                  {((student as any).grade || "الصف الأول الابتدائي")} • {
+                    currentStage === 'kindergarten' ? 'مرحلة رياض الأطفال 🧸' :
+                    currentStage === 'middle' ? 'المرحلة المتوسطة 🔬' :
+                    currentStage === 'high' ? 'المرحلة الثانوية 🎓' :
+                    'المرحلة الابتدائية 📚'
+                  }
+                </p>
+              </div>
+            </div>
 
             {/* Gamification Badges */}
             <motion.div
@@ -409,7 +554,28 @@ export default function StudentDashboardPage() {
         </div>
       </motion.div>
 
-      {/* ─── CLASSROOM & FACE ID STATUS ─── */}
+      {/* ─── DYNAMIC STAGE RENDERING ─── */}
+      {currentStage === 'kindergarten' && (
+        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+          <KindergartenTrack />
+        </motion.div>
+      )}
+
+      {currentStage === 'middle' && (
+        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+          <MiddleSchoolTrack />
+        </motion.div>
+      )}
+
+      {currentStage === 'high' && (
+        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+          <HighSchoolTrack />
+        </motion.div>
+      )}
+
+      {currentStage === 'elementary' && (
+        <div className="space-y-8">
+          {/* ─── CLASSROOM & FACE ID STATUS ─── */}
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
@@ -429,8 +595,8 @@ export default function StudentDashboardPage() {
               </span>
             </div>
             <p className="text-xs text-gray-500 font-medium mt-1">
-              مدارس الإخلاص الأهلية • رائد الفصل: <span className="font-bold text-violet-600">د. إسماعيل عيسى</span> • الطالب:{' '}
-              <span className="font-bold text-gray-800 dark:text-gray-200">أحمد فيصل الغامدي (#cls-std-2)</span>
+              مدارس نكسس التعليمية الأهلية • رائد الفصل: <span className="font-bold text-violet-600">د. إسماعيل عيسى</span> • الطالب:{' '}
+              <span className="font-bold text-gray-800 dark:text-gray-200">{data?.student?.name || 'طالب مسجل'}</span>
             </p>
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-2 text-xs">
               <span className="flex items-center gap-1 text-emerald-600 font-bold">
@@ -676,6 +842,17 @@ export default function StudentDashboardPage() {
         <AssignmentsTimeline assignments={allAssignments} liveCount={liveAssignments.length} />
         <AchievementsShowcase count={gamification.achievementsUnlocked} />
       </div>
+        </div>
+      )}
+
+      {/* Photo Upload Modal */}
+      <PhotoUploadModal
+        isOpen={isPhotoModalOpen}
+        onClose={() => setIsPhotoModalOpen(false)}
+        currentPhoto={studentPhoto}
+        onSave={handleSavePhoto}
+        role="student"
+      />
     </div>
   )
 }

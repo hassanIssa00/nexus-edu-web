@@ -116,7 +116,7 @@ function AttendancePageInner() {
     try { localStorage.setItem('nexus_student_attendance_history', JSON.stringify(stored)) } catch {}
 
     import('@/lib/nexusDataBridge').then(({ nexusBridge }) => {
-      nexusBridge.recordAttendance({
+      (nexusBridge as any).recordAttendance({
         studentId: 'cls-std-2',
         studentName: 'أحمد فيصل الغامدي',
         periodNumber: 1,

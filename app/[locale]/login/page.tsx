@@ -354,6 +354,12 @@ export default function GlobalLoginSelectorPage() {
                         transition={{ delay: 0.8 }}
                         className="mt-10 text-center"
                     >
+                        <p className="text-sm font-bold text-slate-700 mb-2">
+                            ليس لديك حساب بعد؟{' '}
+                            <Link href={`/${locale}/register`} className="text-blue-600 font-black hover:underline mr-1">
+                                إنشاء حساب جديد بالنظام 🚀
+                            </Link>
+                        </p>
                         <p className="text-xs text-slate-400 mb-3">
                             هل تواجه صعوبة في الدخول؟
                             <a href="https://wa.me/201098810794" target="_blank" rel="noopener noreferrer" className="text-primary-500 font-semibold mr-1 hover:underline underline-expand">

@@ -35,17 +35,8 @@ export default function AccountantDashboard() {
         return () => window.removeEventListener('nexus:data-changed', load as any);
     }, []);
 
-    // Payment state per student (initialized with realistic tuition tracking for Dr. Ismail's class)
-    const [paymentStatuses, setPaymentStatuses] = useState<Record<string, { status: 'paid' | 'pending'; paidAmount: number; receiptNo: string; date: string }>>({
-        'cls-std-1': { status: 'paid', paidAmount: 3500, receiptNo: 'REC-1448-001', date: '2026-09-01' },
-        'cls-std-2': { status: 'paid', paidAmount: 3500, receiptNo: 'REC-1448-002', date: '2026-09-02' },
-        'cls-std-3': { status: 'pending', paidAmount: 1750, receiptNo: 'REC-1448-003', date: '2026-09-10' },
-        'cls-std-4': { status: 'paid', paidAmount: 3500, receiptNo: 'REC-1448-004', date: '2026-09-03' },
-        'cls-std-5': { status: 'paid', paidAmount: 3500, receiptNo: 'REC-1448-005', date: '2026-09-04' },
-        'cls-std-6': { status: 'pending', paidAmount: 0, receiptNo: '-', date: '-' },
-        'cls-std-7': { status: 'paid', paidAmount: 3500, receiptNo: 'REC-1448-006', date: '2026-09-05' },
-        'cls-std-8': { status: 'paid', paidAmount: 3500, receiptNo: 'REC-1448-007', date: '2026-09-06' },
-    });
+    // Payment state per student (initialized dynamically as students enroll)
+    const [paymentStatuses, setPaymentStatuses] = useState<Record<string, { status: 'paid' | 'pending'; paidAmount: number; receiptNo: string; date: string }>>({});
 
     const totalTuition = students.length * TERM_FEE;
     const collectedAmount = Object.values(paymentStatuses).reduce((sum, p) => sum + p.paidAmount, 0);

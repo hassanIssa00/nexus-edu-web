@@ -3,14 +3,19 @@
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import { motion } from 'framer-motion';
-import { User, Mail, Lock, Phone, GraduationCap, Users, ShieldCheck, ArrowLeft, Check, Sparkles, AlertCircle, BookOpen, School } from 'lucide-react';
+import { User, Mail, Lock, Phone, GraduationCap, Users, ShieldCheck, ArrowLeft, Check, Sparkles, AlertCircle, BookOpen, School, Camera, Upload, Trash2, Briefcase, Calculator } from 'lucide-react';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { nexusBridge, ClassStudentRecord } from '@/lib/nexusDataBridge';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [accountType, setAccountType] = useState<'parent' | 'student' | 'teacher'>('parent');
+  const locale = useLocale();
+  const [accountType, setAccountType] = useState<'parent' | 'student' | 'teacher' | 'staff'>('parent');
+  const [staffRole, setStaffRole] = useState<'admin' | 'principal' | 'vice_principal' | 'counselor' | 'supervisor' | 'accountant'>('admin');
+  const [staffDepartment, setStaffDepartment] = useState('الشؤون الإدارية والمالية');
+  const [jobTitle, setJobTitle] = useState('');
 
   // Form Fields
   const [fullName, setFullName] = useState('');
@@ -20,6 +25,8 @@ export default function RegisterPage() {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [studentStage, setStudentStage] = useState<'kindergarten' | 'elementary' | 'middle' | 'high'>('elementary');
+  const [regPhoto, setRegPhoto] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [allStudents, setAllStudents] = useState<ClassStudentRecord[]>([]);
@@ -72,10 +79,52 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      if (accountType === 'teacher') {
+      if (accountType === 'staff') {
+        const universalId = nexusBridge.generateUniversalId('ADM');
+        const staffAccId = `acc_${staffRole}_${Date.now()}`;
+        const defaultTitle = 
+          staffRole === 'principal' ? 'مدير عام المدرسة' :
+          staffRole === 'vice_principal' ? 'وكيل المدرسة' :
+          staffRole === 'counselor' ? 'الموجه الطلابي' :
+          staffRole === 'supervisor' ? 'المشرف التربوي' :
+          staffRole === 'accountant' ? 'المحاسب المالي' : 'مدير الشؤون الإدارية والمالية';
+        
+        const finalTitle = jobTitle.trim() || defaultTitle;
+
+        const staffAccount = {
+          id: staffAccId,
+          universalId,
+          name: fullName.trim(),
+          email: email.trim().toLowerCase(),
+          phone: phone.trim(),
+          role: staffRole,
+          title: finalTitle,
+          employeeId: `EMP-${universalId}`,
+          department: staffDepartment,
+          status: 'active' as const,
+          schoolName: 'مدارس الإخلاص الأهلية للبنين بجدة',
+          avatarUrl: regPhoto || undefined,
+          createdAt: new Date().toISOString(),
+        };
+
+        nexusBridge.saveAccount(staffAccount);
+        localStorage.setItem('nexus_user', JSON.stringify(staffAccount));
+        localStorage.setItem('access_token', `nexus_live_${staffAccId}`);
+        localStorage.setItem('nexus_role', staffRole);
+        sessionStorage.setItem('nexus_user', JSON.stringify(staffAccount));
+        sessionStorage.setItem('access_token', `nexus_live_${staffAccId}`);
+        sessionStorage.setItem('demo_profile', JSON.stringify(staffAccount));
+        sessionStorage.setItem('is_demo', 'false');
+        window.dispatchEvent(new CustomEvent('nexus:data-changed'));
+
+        window.location.href = `/${locale}/${staffRole}`;
+      } else if (accountType === 'teacher') {
         const universalId = nexusBridge.generateUniversalId('TCH');
         const teacherAccId = `acc_teacher_${Date.now()}`;
 
+        if (regPhoto) {
+          localStorage.setItem('nexus_teacher_photo', regPhoto);
+        }
         const teacherRecord = {
           id: teacherAccId,
           teacherId: universalId,
@@ -83,6 +132,7 @@ export default function RegisterPage() {
           name: fullName.trim(),
           email: email.trim().toLowerCase(),
           phone: phone.trim(),
+          photoUrl: regPhoto || undefined,
           role: 'teacher' as const,
           title: `معلم ${specialization}`,
           specialization: specialization.trim(),
@@ -91,7 +141,7 @@ export default function RegisterPage() {
           assignedSubjectIds: ['SUB-ARB-1'],
           weeklyPeriodsCount: 15,
           status: 'active' as const,
-          schoolName: 'مدارس نكسس التعليمية الأهلية',
+          schoolName: 'مدارس الإخلاص الأهلية للبنين بجدة',
           employeeId: `EMP-${universalId}`,
           department: specialization,
           hireDate: new Date().toISOString().slice(0, 10),
@@ -99,13 +149,34 @@ export default function RegisterPage() {
         };
 
         nexusBridge.saveTeacher(teacherRecord);
+        nexusBridge.saveAccount({
+          id: teacherAccId,
+          universalId,
+          name: fullName.trim(),
+          email: email.trim().toLowerCase(),
+          phone: phone.trim(),
+          role: 'teacher',
+          title: `معلم ${specialization}`,
+          employeeId: `EMP-${universalId}`,
+          department: specialization,
+          status: 'active',
+          schoolName: 'مدارس الإخلاص الأهلية للبنين بجدة',
+          avatarUrl: regPhoto || undefined,
+          createdAt: new Date().toISOString(),
+        });
         localStorage.setItem('nexus_user', JSON.stringify(teacherRecord));
+        localStorage.setItem('access_token', `nexus_live_${teacherAccId}`);
+        localStorage.setItem('nexus_role', 'teacher');
+        sessionStorage.setItem('nexus_user', JSON.stringify(teacherRecord));
+        sessionStorage.setItem('access_token', `nexus_live_${teacherAccId}`);
+        sessionStorage.setItem('demo_profile', JSON.stringify(teacherRecord));
+        sessionStorage.setItem('is_demo', 'false');
         window.dispatchEvent(new CustomEvent('nexus:data-changed'));
 
-        router.push('/teacher');
+        window.location.href = `/${locale}/teacher`;
       } else if (accountType === 'parent') {
         const universalId = nexusBridge.generateUniversalId('PRT');
-        const studentId = matchedStudent?.id || 'cls-std-2';
+        const studentId = matchedStudent?.id || '';
         const parentAccId = `acc_parent_${Date.now()}`;
 
         const parentAccount = {
@@ -115,22 +186,58 @@ export default function RegisterPage() {
           email: email.trim().toLowerCase(),
           phone: phone.trim(),
           role: 'parent' as const,
-          title: `ولي أمر الطالب ${matchedStudent?.fullName || childName.trim() || 'أحمد'}`,
+          title: matchedStudent ? `ولي أمر الطالب ${matchedStudent.fullName}` : `ولي أمر الطالب ${childName.trim() || fullName.trim()}`,
           linkedStudentId: studentId,
-          linkedStudentIds: [studentId],
-          schoolName: 'مدارس نكسس التعليمية الأهلية',
+          linkedStudentIds: studentId ? [studentId] : [],
+          schoolName: 'مدارس الإخلاص الأهلية للبنين بجدة',
           createdAt: new Date().toISOString(),
         };
 
         nexusBridge.saveAccount(parentAccount);
         localStorage.setItem('nexus_user', JSON.stringify(parentAccount));
+        localStorage.setItem('access_token', `nexus_live_${parentAccId}`);
+        localStorage.setItem('nexus_role', 'parent');
+        sessionStorage.setItem('nexus_user', JSON.stringify(parentAccount));
+        sessionStorage.setItem('access_token', `nexus_live_${parentAccId}`);
+        sessionStorage.setItem('demo_profile', JSON.stringify(parentAccount));
+        sessionStorage.setItem('is_demo', 'false');
         window.dispatchEvent(new CustomEvent('nexus:data-changed'));
 
-        router.push(`/student/new?flow=parent&student=${studentId}`);
+        window.location.href = `/${locale}/parent`;
       } else {
         // Student registration
         const universalId = nexusBridge.generateUniversalId('STD');
         const studentAccId = `acc_student_${Date.now()}`;
+        const studentRecordId = `std_${Date.now()}`;
+        const stageLabel = studentStage === 'kindergarten' ? 'الروضة' : studentStage === 'middle' ? 'المرحلة المتوسطة' : studentStage === 'high' ? 'المرحلة الثانوية' : 'المرحلة الابتدائية';
+
+        localStorage.setItem('nexus_student_stage', studentStage);
+        if (regPhoto) {
+          localStorage.setItem('nexus_student_photo', regPhoto);
+        }
+
+        const studentRecord: ClassStudentRecord = {
+          id: studentRecordId,
+          universalId,
+          fullName: fullName.trim(),
+          fullNameEn: '',
+          grade: stageLabel,
+          classId: 'CLS-101',
+          nationalId: `11${Math.floor(10000000 + Math.random() * 90000000)}`,
+          dateOfBirth: '2016-01-01',
+          parentName: '',
+          parentPhone: phone.trim(),
+          parentEmail: '',
+          photoUrl: regPhoto || undefined,
+          notes: 'طالب مسجل حديثاً',
+          averageGrade: 100,
+          attendanceRate: 100,
+          rank: 1,
+          assignedProgram: studentStage === 'kindergarten' ? 'مسار رياض الأطفال' : studentStage === 'high' ? 'مسار الثانوي التخصصي' : 'المسار العام',
+          status: 'excellent',
+          studentAccountId: studentAccId,
+          parentAccountId: '',
+        };
 
         const studentAccount = {
           id: studentAccId,
@@ -138,17 +245,27 @@ export default function RegisterPage() {
           name: fullName.trim(),
           email: email.trim().toLowerCase(),
           phone: phone.trim(),
+          photoUrl: regPhoto || undefined,
+          stage: studentStage,
           role: 'student' as const,
-          title: 'طالب في مدارس نكسس التعليمية',
-          schoolName: 'مدارس نكسس التعليمية الأهلية',
+          linkedStudentId: studentRecordId,
+          title: `طالب — ${stageLabel}`,
+          schoolName: 'مدارس الإخلاص الأهلية للبنين بجدة',
           createdAt: new Date().toISOString(),
         };
 
+        nexusBridge.saveStudent(studentRecord);
         nexusBridge.saveAccount(studentAccount);
         localStorage.setItem('nexus_user', JSON.stringify(studentAccount));
+        localStorage.setItem('access_token', `nexus_live_${studentAccId}`);
+        localStorage.setItem('nexus_role', 'student');
+        sessionStorage.setItem('nexus_user', JSON.stringify(studentAccount));
+        sessionStorage.setItem('access_token', `nexus_live_${studentAccId}`);
+        sessionStorage.setItem('demo_profile', JSON.stringify(studentAccount));
+        sessionStorage.setItem('is_demo', 'false');
         window.dispatchEvent(new CustomEvent('nexus:data-changed'));
 
-        router.push(`/student/new?flow=student&student=cls-std-2`);
+        window.location.href = `/${locale}/student`;
       }
     } catch (err: any) {
       console.error(err);
@@ -172,7 +289,7 @@ export default function RegisterPage() {
           <div className="text-center mb-6">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-500/10 text-blue-600 text-xs font-bold mb-3">
               <Sparkles className="w-3 h-3" />
-              <span>مدارس نكسس التعليمية الأهلية — العام الدراسي 1448هـ</span>
+              <span>مدارس الإخلاص الأهلية للبنين بجدة — العام الدراسي 1448هـ</span>
             </div>
             <h1 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">تسجيل حساب رسمي بالنظام</h1>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -180,45 +297,90 @@ export default function RegisterPage() {
             </p>
           </div>
 
-          {/* 3 Role Tabs */}
-          <div className="flex gap-2 bg-gray-100 dark:bg-white/5 p-1.5 rounded-2xl mb-6">
+          {/* 4 Role Tabs */}
+          <div className="grid grid-cols-4 gap-1.5 bg-gray-100 dark:bg-white/5 p-1.5 rounded-2xl mb-4">
             <button
               type="button"
               onClick={() => setAccountType('parent')}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl font-bold text-xs transition-all ${
+              className={`flex items-center justify-center gap-1 py-2.5 rounded-xl font-bold text-xs transition-all ${
                 accountType === 'parent'
                   ? 'bg-amber-500 text-white shadow-md shadow-amber-500/30'
                   : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
               }`}
             >
-              <Users className="w-4 h-4" />
+              <Users className="w-3.5 h-3.5" />
               <span>ولي أمر</span>
             </button>
             <button
               type="button"
               onClick={() => setAccountType('student')}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl font-bold text-xs transition-all ${
+              className={`flex items-center justify-center gap-1 py-2.5 rounded-xl font-bold text-xs transition-all ${
                 accountType === 'student'
                   ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/30'
                   : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
               }`}
             >
-              <GraduationCap className="w-4 h-4" />
+              <GraduationCap className="w-3.5 h-3.5" />
               <span>طالب</span>
             </button>
             <button
               type="button"
               onClick={() => setAccountType('teacher')}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl font-bold text-xs transition-all ${
+              className={`flex items-center justify-center gap-1 py-2.5 rounded-xl font-bold text-xs transition-all ${
                 accountType === 'teacher'
                   ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
                   : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
               }`}
             >
-              <BookOpen className="w-4 h-4" />
+              <BookOpen className="w-3.5 h-3.5" />
               <span>معلم</span>
             </button>
+            <button
+              type="button"
+              onClick={() => setAccountType('staff')}
+              className={`flex items-center justify-center gap-1 py-2.5 rounded-xl font-bold text-xs transition-all ${
+                accountType === 'staff'
+                  ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
+                  : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+              }`}
+            >
+              <Briefcase className="w-3.5 h-3.5" />
+              <span>كادر إداري</span>
+            </button>
           </div>
+
+          {/* Sub-Roles Grid for Staff */}
+          {accountType === 'staff' && (
+            <div className="mb-5 p-3.5 rounded-2xl bg-purple-50/80 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-800/30 space-y-2.5">
+              <label className="text-[11px] font-black text-purple-950 dark:text-purple-300 block">
+                اختر الدور الإداري أو القيادي المطلوب:
+              </label>
+              <div className="grid grid-cols-3 gap-1.5">
+                {[
+                  { id: 'principal', label: 'مدير المدرسة', emoji: '🏫' },
+                  { id: 'vice_principal', label: 'وكيل المدرسة', emoji: '📋' },
+                  { id: 'counselor', label: 'الموجه الطلابي', emoji: '🤝' },
+                  { id: 'supervisor', label: 'المشرف التربوي', emoji: '👁️' },
+                  { id: 'admin', label: 'الشؤون الإدارية', emoji: '⚙️' },
+                  { id: 'accountant', label: 'المحاسب المالي', emoji: '💰' },
+                ].map((r) => (
+                  <button
+                    key={r.id}
+                    type="button"
+                    onClick={() => setStaffRole(r.id as any)}
+                    className={`py-2 px-2 rounded-xl text-[11px] font-bold border transition-all flex items-center justify-center gap-1 ${
+                      staffRole === r.id
+                        ? 'bg-purple-600 text-white border-purple-600 shadow-sm'
+                        : 'bg-white dark:bg-white/5 border-purple-200/60 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:bg-purple-100/50'
+                    }`}
+                  >
+                    <span>{r.emoji}</span>
+                    <span>{r.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {error && (
             <div className="mb-4 p-3 rounded-2xl bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 text-rose-600 text-xs font-bold flex items-center gap-2">
@@ -234,6 +396,8 @@ export default function RegisterPage() {
                   ? 'اسم ولي الأمر الكامل *'
                   : accountType === 'teacher'
                   ? 'اسم المعلم كاملاً مع اللقب *'
+                  : accountType === 'staff'
+                  ? 'الاسم الكامل مع اللقب *'
                   : 'اسم الطالب الكامل *'}
               </label>
               <div className="relative">
@@ -246,13 +410,48 @@ export default function RegisterPage() {
                     accountType === 'parent'
                       ? 'مثال: فيصل الغامدي'
                       : accountType === 'teacher'
-                      ? 'مثال: أ. عبد العزيز الدوسري'
+                      ? 'مثال: د. إسماعيل عيسى'
+                      : accountType === 'staff'
+                      ? (staffRole === 'principal' ? 'مثال: د. خالد العتيبي' : 'مثال: أ. منصور القحطاني')
                       : 'مثال: أحمد فيصل الغامدي'
                   }
                   className="w-full pr-10 pl-4 py-3 rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                 />
               </div>
             </div>
+
+            {accountType === 'staff' && (
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-black text-gray-600 dark:text-gray-300 mb-1.5 block">
+                    المسمى الوظيفي
+                  </label>
+                  <input
+                    value={jobTitle}
+                    onChange={(e) => setJobTitle(e.target.value)}
+                    placeholder={
+                      staffRole === 'principal' ? 'مدير عام المدرسة' :
+                      staffRole === 'vice_principal' ? 'وكيل شؤون الطلاب' :
+                      staffRole === 'counselor' ? 'الموجه الطلابي' :
+                      staffRole === 'supervisor' ? 'المشرف التربوي' :
+                      staffRole === 'accountant' ? 'المحاسب المالي' : 'مدير الشؤون الإدارية'
+                    }
+                    className="w-full px-4 py-3 rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-xs font-medium text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-black text-gray-600 dark:text-gray-300 mb-1.5 block">
+                    القسم / الإدارة
+                  </label>
+                  <input
+                    value={staffDepartment}
+                    onChange={(e) => setStaffDepartment(e.target.value)}
+                    placeholder="مثال: الإدارة العامة / الشؤون المالية"
+                    className="w-full px-4 py-3 rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-xs font-medium text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                  />
+                </div>
+              </div>
+            )}
 
             {accountType === 'teacher' && (
               <div>
@@ -268,6 +467,96 @@ export default function RegisterPage() {
                     placeholder="مثال: الرياضيات والحساب الذهني / اللغة الإنجليزية"
                     className="w-full pr-10 pl-4 py-3 rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                   />
+                </div>
+              </div>
+            )}
+
+                        {accountType === 'student' && (
+              <div>
+                <label className="text-xs font-black text-gray-600 dark:text-gray-300 mb-1.5 block">
+                  المرحلة الدراسية للطالب *
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { id: 'kindergarten', label: 'رياض الأطفال', emoji: '🧸' },
+                    { id: 'elementary', label: 'المرحلة الابتدائية', emoji: '📚' },
+                    { id: 'middle', label: 'المرحلة المتوسطة', emoji: '🔬' },
+                    { id: 'high', label: 'المرحلة الثانوية', emoji: '🎓' },
+                  ].map((s) => (
+                    <button
+                      type="button"
+                      key={s.id}
+                      onClick={() => setStudentStage(s.id as any)}
+                      className={`py-2.5 px-3 rounded-2xl text-xs font-black border transition-all flex items-center justify-center gap-1.5 ${
+                        studentStage === s.id
+                          ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-600/20'
+                          : 'bg-gray-50 dark:bg-white/5 border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-100'
+                      }`}
+                    >
+                      <span>{s.emoji}</span>
+                      <span>{s.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Optional Photo Upload */}
+            {(accountType === 'student' || accountType === 'teacher' || accountType === 'staff') && (
+              <div>
+                <label className="text-xs font-black text-gray-600 dark:text-gray-300 mb-1.5 block">
+                  الصورة الشخصية (اختياري — ستظل الخانة مخصصة لتضع صورتك لاحقاً)
+                </label>
+                <div className="flex items-center gap-3.5 p-3.5 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl">
+                  <div className="w-14 h-14 rounded-2xl bg-gray-200 dark:bg-white/10 flex items-center justify-center overflow-hidden border-2 border-dashed border-gray-300 dark:border-white/20 flex-shrink-0 shadow-inner">
+                    {regPhoto ? (
+                      <img src={regPhoto} alt="Photo Preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <Camera className="w-6 h-6 text-gray-400" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-white/10 border border-gray-200 dark:border-white/10 text-xs font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-100 transition-all shadow-sm">
+                        <Upload className="w-3.5 h-3.5 text-blue-600" />
+                        <span>{regPhoto ? 'تغيير الصورة' : 'اختر صورة من جهازك'}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              if (file.size > 5 * 1024 * 1024) {
+                                alert('حجم الصورة كبير جداً، يرجى اختيار صورة أقل من 5 ميجابايت.');
+                                return;
+                              }
+                              const reader = new FileReader();
+                              reader.onload = (ev) => {
+                                if (typeof ev.target?.result === 'string') {
+                                  setRegPhoto(ev.target.result);
+                                }
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                        />
+                      </label>
+                      {regPhoto && (
+                        <button
+                          type="button"
+                          onClick={() => setRegPhoto(null)}
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold text-red-600 bg-red-50 dark:bg-red-950/30 hover:bg-red-100"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>إلغاء</span>
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-[10px] text-gray-400 mt-1">
+                      ستظهر صورتك في الكارد الشخصي بعد الدخول، أو يمكنك إضافتها لاحقاً بنقرة زر.
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
@@ -384,7 +673,7 @@ export default function RegisterPage() {
 
           <div className="mt-6 text-center text-xs text-gray-500">
             لديك حساب بالفعل؟{' '}
-            <Link href="/login" className="font-bold text-blue-600 hover:underline">
+            <Link href={`/${locale}/login`} className="font-bold text-blue-600 hover:underline">
               تسجيل الدخول
             </Link>
           </div>

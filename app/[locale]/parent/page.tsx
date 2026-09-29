@@ -63,7 +63,7 @@ export default function ParentDashboard() {
   const [childrenData, setChildrenData] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedIdx, setSelectedIdx] = useState(0)
-  const [parentDisplayName, setParentDisplayName] = useState('فيصل الغامدي')
+  const [parentDisplayName, setParentDisplayName] = useState('ولي الأمر')
   const [liveNotif, setLiveNotif] = useState<string | null>(null)
   const [liveAttendance, setLiveAttendance] = useState<string | null>(null)
 
@@ -72,20 +72,28 @@ export default function ParentDashboard() {
     const load = async () => {
       try {
         const { nexusBridge } = await import('@/lib/nexusDataBridge')
-        let linkedStudentId = 'cls-std-2'
-        let currentParentName = 'فيصل الغامدي'
+        let linkedStudentId = ''
+        let currentParentName = 'ولي الأمر'
         try {
           const stored = localStorage.getItem('nexus_user')
           if (stored) {
             const acc = JSON.parse(stored)
             if (acc.linkedStudentId) linkedStudentId = acc.linkedStudentId
+            else if (acc.linkedStudentIds && acc.linkedStudentIds.length > 0) linkedStudentId = acc.linkedStudentIds[0]
             if (acc.name) currentParentName = acc.name
           }
         } catch {}
 
         setParentDisplayName(currentParentName)
 
-        const student = nexusBridge.getStudentById(linkedStudentId)
+        if (!linkedStudentId) {
+          const allStds = nexusBridge.getStudents()
+          if (allStds.length > 0) {
+            linkedStudentId = allStds[0].id
+          }
+        }
+
+        const student = linkedStudentId ? nexusBridge.getStudentById(linkedStudentId) : null
         const todayAtt = nexusBridge.getTodayAttendance()
         const myAtt = todayAtt.find(a => a.studentId === linkedStudentId)
         const hwSubs = nexusBridge.getHomeworkSubmissions().filter(s => s.studentId === linkedStudentId)
@@ -130,11 +138,11 @@ export default function ParentDashboard() {
         }
 
         const childData = {
-          id: linkedStudentId,
-          name: student?.fullName || 'أحمد فيصل الغامدي',
-          class: student?.grade || 'الصف الأول الابتدائي — الفئة (أ)',
-          gpa: `${((student?.averageGrade || 95) / 10).toFixed(1)}`,
-          attendanceRate: student?.attendanceRate || 97,
+          id: linkedStudentId || 'std_none',
+          name: student?.fullName || 'لا يوجد طالب مسجل بعد',
+          class: student?.grade || 'بانتظار تسجيل الطالب وربط الحساب',
+          gpa: student ? `${((student.averageGrade || 100) / 10).toFixed(1)}` : '0.0',
+          attendanceRate: student?.attendanceRate || 100,
           recentGrades,
           gradeHistory,
           upcomingAssignments,

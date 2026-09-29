@@ -545,7 +545,7 @@ function PrincipalDashboardInner() {
                  {[
                    { text: 'تسجيل الحضور اليومي لطلاب الصف الأول الابتدائي (أ)', type: 'success', time: 'اليوم' },
                    { text: 'نشر واجب منزلي جديد في مادة لغتي', type: 'info', time: 'أمس' },
-                   { text: 'منح شهادة تميز للطالب أحمد فيصل الغامدي', type: 'success', time: 'هذا الأسبوع' },
+                   { text: 'اعتماد الخطة الأكاديمية وجداول الحصص المدرسية', type: 'success', time: 'هذا الأسبوع' },
                  ].map((item, i) => (
                    <AlertRow key={`act-${i}`}
                      type={item.type}

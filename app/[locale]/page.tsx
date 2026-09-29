@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence, useInView } from 'framer-motion'
-import Link from 'next/link'
+import { Link } from '@/i18n/routing'
 import {
     GraduationCap, BookOpen, Users, Award, ArrowLeft, CheckCircle,
     Star, PlayCircle, Brain, BarChart3, Trophy, ShieldCheck,
@@ -17,10 +17,13 @@ import { AnimatedCounter } from '@/components/ui/animated-counter'
 
 // Hero Images for Carousel
 const heroImages = [
-    { src: '/images/hero-1.webp', alt: 'Nexus EDU - Vision' },
-    { src: '/images/hero-2.webp', alt: 'Nexus EDU - Smart Education' },
-    { src: '/images/hero-3.webp', alt: 'Performance Analytics' },
-    { src: '/images/hero-4.webp', alt: 'Admin Overview' },
+    { src: '/images/nexus-promo-02.webp', alt: 'التعليم الذكي مستقبل يبدأ من هنا - نكسس التعليمية × مدارس الإخلاص' },
+    { src: '/images/nexus-promo-01.webp', alt: 'تعلم ممتع.. إنجاز بلا حدود - نكسس التعليمية' },
+    { src: '/images/nexus-promo-03.webp', alt: 'نحو تعليم أكثر ذكاءً - نكسس التعليمية' },
+    { src: '/images/nexus-promo-04.webp', alt: 'نصنع مستقبل التعليم بالتكنولوجيا - الذكاء الاصطناعي' },
+    { src: '/images/nexus-promo-05.webp', alt: 'نصنع مستقبل التعليم بالتكنولوجيا - رؤية 2030' },
+    { src: '/images/nexus-promo-06.webp', alt: 'بالمعلم يبدأ التغيير - نكسس التعليمية' },
+    { src: '/images/nexus-promo-07.webp', alt: 'إدارة واعية تصنع فرقاً حقيقياً - نكسس التعليمية' },
 ]
 
 // School partner logos (text-based for now)
@@ -496,9 +499,9 @@ export default function LandingPage() {
                         >
                             <div className="rounded-[20px] overflow-hidden h-[400px] relative border border-white/10 parallax-img shadow-2xl">
                                 <div className="absolute inset-0">
-                                    <img src="/images/ai-learning-new.webp" alt="" className="w-full h-full object-cover blur-xl scale-110 opacity-30" />
+                                    <img src="/images/nexus-promo-04.webp" alt="" className="w-full h-full object-cover blur-xl scale-110 opacity-30" />
                                 </div>
-                                <img src="/images/ai-learning-new.webp" alt="AI-Personalized Learning" className="relative z-10 w-full h-full object-contain" />
+                                <img src="/images/nexus-promo-04.webp" alt="تعلم مخصص بالذكاء الاصطناعي - نكسس EDU" className="relative z-10 w-full h-full object-contain" />
                             </div>
                         </motion.div>
                         <motion.div
@@ -578,9 +581,9 @@ export default function LandingPage() {
                         >
                             <div className="rounded-[20px] overflow-hidden h-[400px] relative border border-white/10 parallax-img shadow-2xl">
                                 <div className="absolute inset-0">
-                                    <img src="/images/stats-comparison-new.webp" alt="" className="w-full h-full object-cover blur-xl scale-110 opacity-30" />
+                                    <img src="/images/nexus-promo-03.webp" alt="" className="w-full h-full object-cover blur-xl scale-110 opacity-30" />
                                 </div>
-                                <img src="/images/stats-comparison-new.webp" alt="Performance Statistics" className="relative z-10 w-full h-full object-contain" />
+                                <img src="/images/nexus-promo-03.webp" alt="تحسن ملموس في الأداء وإحصائيات الطلاب - نكسس EDU" className="relative z-10 w-full h-full object-contain" />
                             </div>
                         </motion.div>
                     </div>
@@ -599,9 +602,9 @@ export default function LandingPage() {
                         >
                             <div className="rounded-[20px] overflow-hidden h-[400px] relative border border-white/10 parallax-img shadow-2xl">
                                 <div className="absolute inset-0">
-                                    <img src="/images/leaderboard-new.webp" alt="" className="w-full h-full object-cover blur-xl scale-110 opacity-30" />
+                                    <img src="/images/nexus-promo-01.webp" alt="" className="w-full h-full object-cover blur-xl scale-110 opacity-30" />
                                 </div>
-                                <img src="/images/leaderboard-new.webp" alt="Leaderboard" className="relative z-10 w-full h-full object-contain" />
+                                <img src="/images/nexus-promo-01.webp" alt="لوحة المتصدرين والجوائز - تعلم ممتع وإنجاز بلا حدود" className="relative z-10 w-full h-full object-contain" />
                             </div>
                         </motion.div>
                         <motion.div
@@ -670,9 +673,9 @@ export default function LandingPage() {
                         >
                             <div className="rounded-[20px] overflow-hidden h-[400px] relative border border-white/10 parallax-img shadow-2xl">
                                 <div className="absolute inset-0">
-                                    <img src="/images/parent-monitoring-new.webp" alt="" className="w-full h-full object-cover blur-xl scale-110 opacity-30" />
+                                    <img src="/images/nexus-promo-02.webp" alt="" className="w-full h-full object-cover blur-xl scale-110 opacity-30" />
                                 </div>
-                                <img src="/images/parent-monitoring-new.webp" alt="Parent Monitoring" className="relative z-10 w-full h-full object-contain" />
+                                <img src="/images/nexus-promo-02.webp" alt="اطمئنان تام لأولياء الأمور - متابعة نكسس EDU" className="relative z-10 w-full h-full object-contain" />
                             </div>
                         </motion.div>
                     </div>
@@ -713,9 +716,9 @@ export default function LandingPage() {
                         >
                             <div className="rounded-[20px] overflow-hidden h-[400px] relative border border-white/10 parallax-img shadow-2xl">
                                 <div className="absolute inset-0">
-                                    <img src="/images/vision-2030-new.webp" alt="" className="w-full h-full object-cover blur-xl scale-110 opacity-30" />
+                                    <img src="/images/nexus-promo-05.webp" alt="" className="w-full h-full object-cover blur-xl scale-110 opacity-30" />
                                 </div>
-                                <img src="/images/vision-2030-new.webp" alt="Saudi Vision 2030" className="relative z-10 w-full h-full object-contain" />
+                                <img src="/images/nexus-promo-05.webp" alt="متوافق مع رؤية المملكة 2030 - نكسس التعليمية" className="relative z-10 w-full h-full object-contain" />
                             </div>
                         </motion.div>
                     </div>
@@ -925,7 +928,7 @@ export default function LandingPage() {
                 onClose={() => setIsVideoOpen(false)}
                 videoSrc="/videos/intro.mp4"
                 title="الفيديو التعريفي لنِكْسُس EDU"
-                poster="/images/hero-banner.webp"
+                poster="/images/nexus-promo-04.webp"
             />
         </div>
     )

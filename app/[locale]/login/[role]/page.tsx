@@ -55,46 +55,53 @@ export default function RoleLoginPage() {
         );
     }
 
+    const demoCredentials: Record<string, { email: string; label: string }> = {
+        teacher:        { email: 'arabic.teacher@nexusedu.sa', label: 'د. إسماعيل عيسى (رائد الفصل • لغتي)' },
+        student:        { email: 'student1@nexusedu.sa', label: 'أحمد فيصل الغامدي (طالب — الصف الأول)' },
+        parent:         { email: 'parent1@nexusedu.sa', label: 'فيصل الغامدي (ولي أمر)' },
+        principal:      { email: 'principal@nexusedu.sa', label: 'د. خالد العتيبي (مدير المدرسة)' },
+        vice_principal: { email: 'vice.principal@nexusedu.sa', label: 'أ. منصور القحطاني (وكيل المدرسة)' },
+        counselor:      { email: 'counselor@nexusedu.sa', label: 'أ. عبد الله الغامدي (الموجه الطلابي)' },
+        supervisor:     { email: 'supervisor@nexusedu.sa', label: 'د. عبد الرحمن السبيعي (المشرف التربوي)' },
+        admin:          { email: 'admin@nexusedu.sa', label: 'أ. فهد الزهراني (الشؤون الإدارية)' },
+        accountant:     { email: 'accountant@nexusedu.sa', label: 'أ. سليم النجار (المحاسب المالي)' },
+    };
+
+    const fillDemo = () => {
+        const demo = demoCredentials[role] || { email: `${role}@nexusedu.sa`, label: roleConfig.label };
+        setEmail(demo.email);
+        setPassword('123456');
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
 
         try {
             await signIn(email, password);
-            toast({ title: '✅ تم بنجاح', description: 'مرحباً بك في بوابتك الأمنية' });
+            toast({ title: '✅ تم بنجاح', description: 'مرحباً بك في بوابتك' });
             
-            if(role === 'teacher') router.push(`/${locale}/teacher`);
-            else if(role === 'principal') router.push(`/${locale}/principal`);
-            else if(role === 'vice_principal') router.push(`/${locale}/vice_principal`);
-            else if(role === 'counselor') router.push(`/${locale}/counselor`);
-            else if(role === 'admin') router.push(`/${locale}/admin`);
-            else if(role === 'supervisor') router.push(`/${locale}/supervisor`);
-            else if(role === 'parent') router.push(`/${locale}/parent`);
-            else if(role === 'accountant') router.push(`/${locale}/accountant`);
-            else router.push(`/${locale}/student`);
+            const target = 
+                role === 'teacher' ? 'teacher' :
+                role === 'principal' ? 'principal' :
+                role === 'vice_principal' ? 'vice_principal' :
+                role === 'counselor' ? 'counselor' :
+                role === 'admin' ? 'admin' :
+                role === 'supervisor' ? 'supervisor' :
+                role === 'parent' ? 'parent' :
+                role === 'accountant' ? 'accountant' : 'student';
+
+            // Ensure role is recorded in localStorage
+            localStorage.setItem('nexus_role', role);
+
+            // Direct page transition to ensure full fresh state
+            window.location.href = `/${locale}/${target}`;
         } catch (error: any) {
-            toast({ variant: 'destructive', title: '❌ خطأ', description: tAuth('loginFailed') });
-        } finally {
+            toast({ variant: 'destructive', title: '❌ خطأ', description: error?.message || tAuth('loginFailed') });
             setLoading(false);
         }
     };
 
-    const fillDemo = () => {
-        // These must match the emails created by prisma/seed.ts
-        const demoEmails: Record<string, string> = {
-            teacher:        'arabic.teacher@nexusedu.sa',
-            student:        'student1@nexusedu.sa',
-            parent:         'parent1@nexusedu.sa',
-            principal:      'principal@nexusedu.sa',
-            vice_principal: 'vice.principal@nexusedu.sa',
-            counselor:      'counselor@nexusedu.sa',
-            supervisor:     'supervisor@nexusedu.sa',
-            admin:          'admin@nexusedu.sa',
-            accountant:     'accountant@nexusedu.sa',
-        };
-        setEmail(demoEmails[role] || `${roleConfig.emailPrefix}@nexusedu.sa`);
-        setPassword('123456'); // Password set in seed.ts
-    };
 
     const RoleIcon = roleConfig.icon;
 
@@ -277,15 +284,16 @@ export default function RoleLoginPage() {
                             <p className="text-[14px] text-slate-500 font-medium">أدخل بيانات الاعتماد الخاصة بك للوصول لمنصتك</p>
                         </div>
 
-                        {/* Demo Autofill */}
+                        {/* Demo Autofill Button */}
                         <motion.button 
                             type="button" 
                             onClick={fillDemo} 
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
-                            className="w-full py-[10px] mb-6 border-2 border-dashed rounded-2xl text-sm font-bold transition-all bg-slate-50 border-slate-300 text-slate-500 hover:bg-slate-100 hover:border-slate-400 hover:text-slate-700"
+                            className="w-full py-3 px-4 mb-6 border-2 border-dashed rounded-2xl text-xs font-bold transition-all bg-emerald-50 dark:bg-emerald-950/20 border-emerald-400 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 flex items-center justify-center gap-2 shadow-sm cursor-pointer"
                         >
-                            🧪 تعبئة بيانات تجريبية (Demo)
+                            <Sparkles className="w-4 h-4 text-emerald-600" />
+                            <span>🧪 تجربة سريعة: اضغط هنا لملء الحساب التجريبي المعتمد ({demoCredentials[role]?.label || roleConfig.label})</span>
                         </motion.button>
 
                         <form onSubmit={handleSubmit} className="space-y-5">
@@ -400,6 +408,16 @@ export default function RoleLoginPage() {
                                 </svg>
                                 <span className="text-[14px] font-bold text-slate-700 group-hover:text-slate-900">Microsoft</span>
                             </motion.button>
+                        </div>
+
+                        {/* Register Link */}
+                        <div className="mt-5 text-center">
+                            <p className="text-[13px] text-slate-600 font-medium">
+                                ليس لديك حساب بعد؟{' '}
+                                <Link href={`/${locale}/register`} className="font-bold hover:underline mr-1" style={{ color: roleConfig.color }}>
+                                    إنشاء حساب رسمي جديد بالنظام
+                                </Link>
+                            </p>
                         </div>
                     </motion.div>
 

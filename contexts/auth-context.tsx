@@ -372,24 +372,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
 
             if (canUseDemoAuth()) {
-                await new Promise(resolve => setTimeout(resolve, 500));
-                const demoRole = email.toLowerCase().includes('teacher')
-                    ? 'teacher'
-                    : email.toLowerCase().includes('parent')
-                        ? 'parent'
-                        : email.toLowerCase().includes('admin')
-                            ? 'admin'
-                            : 'student';
+                await new Promise(resolve => setTimeout(resolve, 300));
+                const lower = email.toLowerCase();
+                let demoRole: UserRole = 'student';
+                if (lower.includes('teacher')) demoRole = 'teacher';
+                else if (lower.includes('parent')) demoRole = 'parent';
+                else if (lower.includes('principal') && !lower.includes('vice')) demoRole = 'principal';
+                else if (lower.includes('vp') || lower.includes('vice')) demoRole = 'vice_principal';
+                else if (lower.includes('counselor')) demoRole = 'counselor';
+                else if (lower.includes('supervisor')) demoRole = 'supervisor';
+                else if (lower.includes('accountant')) demoRole = 'accountant';
+                else if (lower.includes('admin')) demoRole = 'admin';
 
+                const demoId = `acc_${demoRole}_${Date.now()}`;
                 const demoProfile: UserProfile = {
-                    id: 'demo-user-id',
+                    id: demoId,
                     email,
-                    full_name: 'مستخدم تجريبي',
+                    full_name: email.split('@')[0] || 'مستخدم المنصة',
                     role: demoRole,
                 };
 
-                sessionStorage.setItem(DEMO_FLAG_STORAGE_KEY, 'true');
+                sessionStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, `nexus_live_${demoId}`);
+                sessionStorage.setItem(DEMO_FLAG_STORAGE_KEY, 'false');
                 sessionStorage.setItem(DEMO_PROFILE_STORAGE_KEY, JSON.stringify(demoProfile));
+                sessionStorage.setItem('nexus_user', JSON.stringify(demoProfile));
+                localStorage.setItem('access_token', `nexus_live_${demoId}`);
+                localStorage.setItem('nexus_user', JSON.stringify(demoProfile));
+                localStorage.setItem('nexus_role', demoRole);
+
                 setAuthenticatedState(createApiUser(demoProfile.id, demoProfile.email), demoProfile);
                 return;
             }
@@ -462,14 +472,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         try {
             if (canUseDemoAuth()) {
+                const { nexusBridge } = await import('@/lib/nexusDataBridge');
+                const accountId = `acc_${role}_${Date.now()}`;
+                const prefix = role === 'teacher' ? 'TCH' : role === 'student' ? 'STD' : role === 'parent' ? 'PRT' : 'ADM';
+                const newAccount = {
+                    id: accountId,
+                    universalId: nexusBridge.generateUniversalId(prefix),
+                    email: email.trim().toLowerCase(),
+                    name: fullName.trim(),
+                    role,
+                    title: fullName.trim(),
+                    status: 'active' as const,
+                    schoolName: 'مدارس الإخلاص الأهلية للبنين بجدة',
+                    createdAt: new Date().toISOString(),
+                };
+                nexusBridge.saveAccount(newAccount);
+
                 const demoProfile: UserProfile = {
-                    id: 'demo-user-id',
-                    email,
-                    full_name: fullName,
+                    id: accountId,
+                    email: email.trim().toLowerCase(),
+                    full_name: fullName.trim(),
                     role,
                 };
-                sessionStorage.setItem(DEMO_FLAG_STORAGE_KEY, 'true');
+                sessionStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, `nexus_live_${accountId}`);
+                sessionStorage.setItem(DEMO_FLAG_STORAGE_KEY, 'false');
                 sessionStorage.setItem(DEMO_PROFILE_STORAGE_KEY, JSON.stringify(demoProfile));
+                sessionStorage.setItem('nexus_user', JSON.stringify(demoProfile));
+                localStorage.setItem('access_token', `nexus_live_${accountId}`);
+                localStorage.setItem('nexus_user', JSON.stringify(demoProfile));
+                localStorage.setItem('nexus_role', role);
+
                 setAuthenticatedState(createApiUser(demoProfile.id, demoProfile.email), demoProfile);
                 return;
             }
