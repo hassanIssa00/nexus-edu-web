@@ -68,8 +68,23 @@ export default function StudentSettingsPage() {
       const raw = localStorage.getItem('nexus_user')
       const u = raw ? JSON.parse(raw) : {}
       const updated = { ...u, name, phone }
-      if (photoUrl) updated.photoUrl = photoUrl
+      if (photoUrl) {
+        updated.photoUrl = photoUrl
+        localStorage.setItem('nexus_student_photo', photoUrl)
+      }
       localStorage.setItem('nexus_user', JSON.stringify(updated))
+      window.dispatchEvent(new CustomEvent('nexus:data-changed'))
+      window.dispatchEvent(new CustomEvent('nexus_student_photo_updated', { detail: photoUrl }))
+
+      import('@/lib/notifications').then(({ addNotification }) => {
+        addNotification({
+          type: 'ANNOUNCEMENT',
+          title: 'تحديث بيانات الملف الشخصي 👤',
+          body: `تم تحديث وحفظ بياناتك الشخصية بنجاح (${name}).`,
+          actionUrl: '/student/profile',
+        })
+      }).catch(() => {})
+
       setSavedProfile(true)
       setTimeout(() => setSavedProfile(false), 2500)
     } catch {}
@@ -91,6 +106,8 @@ export default function StudentSettingsPage() {
           u.photoUrl = dataUrl
           localStorage.setItem('nexus_user', JSON.stringify(u))
         }
+        window.dispatchEvent(new CustomEvent('nexus_student_photo_updated', { detail: dataUrl }))
+        window.dispatchEvent(new CustomEvent('nexus:data-changed'))
       } catch {}
     }
     reader.readAsDataURL(file)

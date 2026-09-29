@@ -54,6 +54,19 @@ export function PhotoUploadModal({
   const handleConfirm = () => {
     if (preview) {
       onSave(preview)
+      if (typeof window !== 'undefined' && role === 'student') {
+        localStorage.setItem('nexus_student_photo', preview)
+        window.dispatchEvent(new CustomEvent('nexus_student_photo_updated', { detail: preview }))
+        window.dispatchEvent(new CustomEvent('nexus:data-changed'))
+        import('@/lib/notifications').then(({ addNotification }) => {
+          addNotification({
+            type: 'ANNOUNCEMENT',
+            title: 'تم تحديث الصورة الشخصية 📸',
+            body: 'تم حفظ وتعميم صورتك الشخصية الجديدة بنجاح على بطاقتك الذكية وحسابك المدرسي.',
+            actionUrl: '/student/profile',
+          })
+        }).catch(() => {})
+      }
       onClose()
     }
   }

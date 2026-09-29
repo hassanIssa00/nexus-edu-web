@@ -77,6 +77,46 @@ export function Sidebar({ role }: SidebarProps) {
         setMobileOpen(false)
     }, [pathname])
 
+    const [studentInfo, setStudentInfo] = useState<{ name: string; photo: string | null }>({ name: '', photo: null })
+
+    useEffect(() => {
+        const fetchInfo = () => {
+            try {
+                const raw = localStorage.getItem('nexus_user')
+                let name = ''
+                let photo = localStorage.getItem('nexus_student_photo') || null
+
+                if (raw) {
+                    const u = JSON.parse(raw)
+                    if (u.name && u.name !== 'طالب' && !u.name.includes('@')) {
+                        name = u.name
+                    } else if (u.fullName) {
+                        name = u.fullName
+                    } else if (u.full_name && !u.full_name.includes('@') && u.full_name !== 'طالب' && !u.full_name.includes('by70406')) {
+                        name = u.full_name
+                    }
+                    if (!photo && u.photoUrl) photo = u.photoUrl
+                }
+
+                if (!name && role === 'student') {
+                    name = 'أحمد فيصل الغامدي'
+                }
+
+                setStudentInfo({ name, photo })
+            } catch {}
+        }
+
+        fetchInfo()
+        window.addEventListener('nexus:data-changed', fetchInfo)
+        window.addEventListener('nexus_student_photo_updated', fetchInfo)
+        window.addEventListener('storage', fetchInfo)
+        return () => {
+            window.removeEventListener('nexus:data-changed', fetchInfo)
+            window.removeEventListener('nexus_student_photo_updated', fetchInfo)
+            window.removeEventListener('storage', fetchInfo)
+        }
+    }, [role])
+
     const SidebarContent = ({ mobile = false }: { mobile?: boolean }) => (
         <div className={cn(
             'flex flex-col h-full',
@@ -94,7 +134,7 @@ export function Sidebar({ role }: SidebarProps) {
                         >
                             <div className="flex items-center gap-1">
                                 <div className="w-8 h-8 rounded-[8px] overflow-hidden shadow-sm flex items-center justify-center bg-white border border-border">
-                                    <img src="/logo_new.webp" alt="Logo" className="w-full h-full object-cover" />
+                                    <img src="/ikhlas-logo.jpg" alt="Logo" className="w-full h-full object-cover" />
                                 </div>
                                 <div className="w-8 h-8 rounded-[8px] overflow-hidden shadow-sm flex items-center justify-center bg-white border border-border">
                                     <img src="/second_logo.webp" alt="Partner Logo" className="w-full h-full object-cover" />
@@ -175,9 +215,15 @@ export function Sidebar({ role }: SidebarProps) {
             <div className="p-3 border-t border-border flex-shrink-0">
                 <div className={cn('flex items-center gap-3', collapsed && !mobile && 'justify-center')}>
                     <div className="relative flex-shrink-0">
-                        <div className={cn('w-9 h-9 rounded-full bg-gradient-to-br flex items-center justify-center text-white font-bold text-sm shadow-sm', colors.gradient)}>
-                            {(profile?.full_name || user?.email || 'U')[0].toUpperCase()}
-                        </div>
+                        {studentInfo.photo ? (
+                            <div className="w-9 h-9 rounded-full overflow-hidden border-2 shadow-sm bg-white" style={{ borderColor: colors.accent }}>
+                                <img src={studentInfo.photo} alt={studentInfo.name || 'صورة الطالب'} className="w-full h-full object-cover" />
+                            </div>
+                        ) : (
+                            <div className={cn('w-9 h-9 rounded-full bg-gradient-to-br flex items-center justify-center text-white font-bold text-sm shadow-sm', colors.gradient)}>
+                                {(studentInfo.name || (role === 'student' ? 'أحمد فيصل' : 'ط'))[0].toUpperCase()}
+                            </div>
+                        )}
                         <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-card rounded-full" />
                     </div>
 
@@ -189,8 +235,8 @@ export function Sidebar({ role }: SidebarProps) {
                                     animate={{ opacity: 1 }}
                                     className="flex-1 min-w-0 cursor-pointer hover:opacity-80 transition-opacity"
                                 >
-                                    <p className="text-sm font-semibold text-foreground truncate">
-                                        {profile?.full_name || user?.email?.split('@')[0] || 'المستخدم'}
+                                    <p className="text-sm font-bold text-foreground truncate">
+                                        {studentInfo.name || (role === 'student' ? 'أحمد فيصل الغامدي' : (profile?.full_name || user?.email?.split('@')[0] || 'المستخدم'))}
                                     </p>
                                     <p className="text-xs text-muted-foreground truncate">{getRoleLabel(role)}</p>
                                 </motion.div>
@@ -210,6 +256,7 @@ export function Sidebar({ role }: SidebarProps) {
             </div>
         </div>
     )
+
 
     return (
         <>

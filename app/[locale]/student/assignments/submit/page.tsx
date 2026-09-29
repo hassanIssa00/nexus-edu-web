@@ -132,6 +132,15 @@ export default function SubmitAssignmentPage() {
                 description: 'تم إرسال إجابتك. سيبدأ التصحيح الذكي قريباً.',
             });
 
+            import('@/lib/notifications').then(({ addNotification }) => {
+                addNotification({
+                    type: 'new_assignment',
+                    title: 'تم تسليم الواجب بنجاح 📝',
+                    body: 'تم استلام تسليمك للواجب المدرسي وإرساله إلى معلم المادة للمراجعة والتقييم.',
+                    actionUrl: '/student/assignments',
+                });
+            }).catch(() => {});
+
             setTimeout(() => router.push('/student/assignments'), 1500);
 
         } catch (error: any) {

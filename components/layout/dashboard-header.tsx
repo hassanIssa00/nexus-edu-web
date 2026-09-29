@@ -26,6 +26,7 @@ const PAGE_TITLES: Record<string, string> = {
     '/student/content': 'المكتبة التعليمية',
     '/student/attendance': 'سجل الحضور',
     '/student/messages': 'الرسائل',
+    '/student/notifications': 'الإشعارات والتنبيهات',
     '/student/settings': 'الإعدادات',
     // Teacher
     '/teacher': 'لوحة التحكم',

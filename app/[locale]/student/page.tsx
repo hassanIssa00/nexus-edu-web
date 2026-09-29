@@ -588,21 +588,39 @@ export default function StudentDashboardPage() {
         className="bg-white/80 dark:bg-[#1e1e2d]/80 backdrop-blur-xl border border-violet-100 dark:border-white/5 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-5"
       >
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center text-white text-2xl shadow-md shadow-violet-500/20 flex-shrink-0">
-            🏫
+          <div className="w-14 h-14 rounded-2xl overflow-hidden border-2 border-violet-200 dark:border-violet-700 shadow-md shadow-violet-500/20 flex-shrink-0 bg-white">
+            <img src="/ikhlas-logo.jpg" alt="مدارس الإخلاص" className="w-full h-full object-cover" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-lg font-black text-gray-900 dark:text-white">
-                الصف الأول الابتدائي — الفئة (أ)
+                {(() => {
+                  try {
+                    const u = JSON.parse(localStorage.getItem('nexus_user') || '{}');
+                    return u.grade || (data?.student?.grade) || 'الصف الأول الابتدائي — الفئة (أ)';
+                  } catch { return data?.student?.grade || 'الصف الأول الابتدائي — الفئة (أ)'; }
+                })()}
               </h2>
               <span className="px-2.5 py-0.5 rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 text-xs font-black">
                 نشط الآن ✅
               </span>
             </div>
             <p className="text-xs text-gray-500 font-medium mt-1">
-              مدارس نكسس التعليمية الأهلية • رائد الفصل: <span className="font-bold text-violet-600">د. إسماعيل عيسى</span> • الطالب:{' '}
-              <span className="font-bold text-gray-800 dark:text-gray-200">{data?.student?.name || 'طالب مسجل'}</span>
+              مدارس الإخلاص الأهلية للبنين بجدة • رائد الفصل: <span className="font-bold text-violet-600">د. إسماعيل عيسى</span> • الطالب:{' '}
+              <span className="font-bold text-gray-800 dark:text-gray-200">
+                {(() => {
+                  try {
+                    const raw = localStorage.getItem('nexus_user');
+                    if (raw) {
+                      const u = JSON.parse(raw);
+                      if (u.name && u.name !== 'طالب' && !u.name.includes('@')) return u.name;
+                      if (u.fullName) return u.fullName;
+                      if (u.full_name && !u.full_name.includes('@') && u.full_name !== 'طالب' && !u.full_name.includes('by70406')) return u.full_name;
+                    }
+                  } catch {}
+                  return data?.student?.name || 'أحمد فيصل الغامدي';
+                })()}
+              </span>
             </p>
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-2 text-xs">
               <span className="flex items-center gap-1 text-emerald-600 font-bold">

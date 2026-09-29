@@ -8,7 +8,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from '@/components/ui/popover';
-import { Bell, FileText, Award, Calendar, CheckCircle2, X, Zap, BrainCircuit, MessageSquare } from 'lucide-react';
+import { Bell, FileText, Award, Calendar, CheckCircle2, X, Zap, BrainCircuit, MessageSquare, CheckCheck, Sparkles, ExternalLink } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
 import { arSA } from 'date-fns/locale';
@@ -21,20 +21,10 @@ import {
     markAllNotificationsAsRead,
     dismissNotification,
     saveStoredNotifications,
+    type AppNotification,
 } from '@/lib/notifications';
-
-// ── Types ──────────────────────────────────────────────────
-interface Notification {
-    id: string;
-    type: string;
-    title: string;
-    body?: string;
-    message?: string;
-    isRead: boolean;
-    createdAt: string;
-    actionUrl?: string;
-    isLive?: boolean;
-}
+import Link from 'next/link';
+import { useLocale } from 'next-intl';
 
 // ── Icon map ───────────────────────────────────────────────
 function NotifIcon({ type }: { type: string }) {
@@ -48,10 +38,10 @@ function NotifIcon({ type }: { type: string }) {
         grade_updated:   { icon: Award, color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
         message:         { icon: MessageSquare, color: 'text-teal-500', bg: 'bg-teal-50 dark:bg-teal-900/20' },
     };
-    const found = map[type] ?? { icon: Bell, color: 'text-muted-foreground', bg: 'bg-muted' };
+    const found = map[type] ?? { icon: Bell, color: 'text-violet-500', bg: 'bg-violet-50 dark:bg-violet-900/20' };
     const Icon = found.icon;
     return (
-        <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0', found.bg)}>
+        <div className={cn('w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-xs', found.bg)}>
             <Icon className={cn('w-4 h-4', found.color)} />
         </div>
     );
@@ -60,9 +50,10 @@ function NotifIcon({ type }: { type: string }) {
 // ── Main Component ─────────────────────────────────────────
 export function EnhancedNotifications() {
     const [open, setOpen] = useState(false);
-    const [notifications, setNotifications] = useState<Notification[]>([]);
+    const [notifications, setNotifications] = useState<AppNotification[]>([]);
     const [loading, setLoading] = useState(false);
     const [pulse, setPulse] = useState(false);
+    const locale = useLocale();
 
     const unread = notifications.filter(n => !n.isRead).length;
 
@@ -70,14 +61,13 @@ export function EnhancedNotifications() {
     const loadNotifications = useCallback(async () => {
         setLoading(true);
         try {
-            // First load from local storage
             const local = getStoredNotifications();
             setNotifications(local);
 
             // Attempt to fetch from API if available
             try {
                 const res = await apiClient.get('/notifications/my');
-                const items: Notification[] = (res.data?.data || res.data || []).map((n: any) => ({
+                const items: AppNotification[] = (res.data?.data || res.data || []).map((n: any) => ({
                     id: n.id,
                     type: n.type || 'ANNOUNCEMENT',
                     title: n.titleAr || n.title || 'إشعار جديد',
@@ -114,7 +104,7 @@ export function EnhancedNotifications() {
 
     // Real-time push: prepend incoming notification
     const handleLiveNotif = useCallback((n: any) => {
-        const item: Notification = {
+        const item: AppNotification = {
             id: n.id || `live-${Date.now()}`,
             type: n.type || 'ANNOUNCEMENT',
             title: n.title || 'إشعار جديد',
@@ -167,8 +157,8 @@ export function EnhancedNotifications() {
     return (
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative h-9 w-9">
-                    <Bell className={cn('h-4 w-4 transition-all', pulse && 'text-violet-600 scale-110')} />
+                <Button variant="ghost" size="icon" className="relative h-9 w-9 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+                    <Bell className={cn('h-4 w-4 transition-all text-slate-600 dark:text-slate-300', pulse && 'text-violet-600 scale-110')} />
                     <AnimatePresence>
                         {unread > 0 && (
                             <motion.span
@@ -176,7 +166,7 @@ export function EnhancedNotifications() {
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
                                 exit={{ scale: 0 }}
-                                className="absolute -top-0.5 -left-0.5 min-w-[18px] h-[18px] bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 shadow-md">
+                                className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-rose-500 text-white text-[10px] font-black rounded-full flex items-center justify-center px-1 shadow-md border-2 border-white dark:border-slate-900">
                                 {unread > 99 ? '99+' : unread}
                             </motion.span>
                         )}
@@ -187,54 +177,71 @@ export function EnhancedNotifications() {
                 </Button>
             </PopoverTrigger>
 
-            <PopoverContent align="end" sideOffset={8} className="w-[380px] p-0 shadow-2xl border-border rounded-2xl overflow-hidden">
-                {/* Header */}
-                <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-violet-600 to-indigo-600 text-white">
-                    <div className="flex items-center gap-2">
-                        <Bell className="w-4 h-4" />
-                        <h3 className="font-bold text-sm">الإشعارات</h3>
-                        {unread > 0 && (
-                            <span className="bg-white/25 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                                {unread} جديد
-                            </span>
-                        )}
-                        {/* Live indicator */}
-                        <span className="flex items-center gap-1 bg-white/15 rounded-full px-2 py-0.5">
-                            <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
-                            <span className="text-[9px] font-bold text-white/80">مباشر</span>
-                        </span>
+            <PopoverContent
+                align="start"
+                sideOffset={10}
+                className="w-[380px] max-w-[calc(100vw-2rem)] p-0 shadow-2xl border border-gray-100 dark:border-white/10 rounded-3xl overflow-hidden bg-white dark:bg-[#1a1a2e]"
+                dir="rtl"
+            >
+                {/* ═══ CLEAN HEADER ═══ */}
+                <div className="flex items-center justify-between px-5 py-4 bg-gradient-to-r from-violet-600 via-indigo-600 to-purple-600 text-white select-none">
+                    <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center">
+                            <Bell className="w-4 h-4 text-white" />
+                        </div>
+                        <div>
+                            <div className="flex items-center gap-2">
+                                <h3 className="font-black text-sm text-white">الإشعارات</h3>
+                                {unread > 0 && (
+                                    <span className="bg-amber-400 text-slate-900 text-[10px] font-black px-2 py-0.5 rounded-full shadow-xs">
+                                        {unread} جديد
+                                    </span>
+                                )}
+                            </div>
+                        </div>
                     </div>
+
                     {unread > 0 && (
-                        <button onClick={markAllRead}
-                            className="text-[11px] text-white/70 hover:text-white font-bold transition-colors">
-                            تحديد الكل كمقروء
+                        <button
+                            type="button"
+                            onClick={markAllRead}
+                            className="text-[11px] font-black bg-white/20 hover:bg-white/30 text-white px-2.5 py-1 rounded-xl transition-all border border-white/20 outline-none focus:outline-none focus:ring-0 active:scale-95 cursor-pointer flex items-center gap-1"
+                        >
+                            <CheckCheck className="w-3.5 h-3.5" />
+                            تحديد الكل
                         </button>
                     )}
                 </div>
 
-                <ScrollArea className="max-h-[420px]">
+                {/* ═══ NOTIFICATIONS LIST ═══ */}
+                <ScrollArea className="max-h-[380px]">
                     {loading ? (
-                        <div className="flex items-center justify-center py-10">
-                            <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                                className="w-6 h-6 border-2 border-violet-500 border-t-transparent rounded-full" />
+                        <div className="flex items-center justify-center py-12">
+                            <motion.div
+                                animate={{ rotate: 360 }}
+                                transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                                className="w-7 h-7 border-2 border-violet-500 border-t-transparent rounded-full"
+                            />
                         </div>
                     ) : recent.length === 0 ? (
-                        <div className="flex flex-col items-center gap-3 py-12">
-                            <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center">
-                                <CheckCircle2 className="w-6 h-6 text-muted-foreground" />
+                        <div className="flex flex-col items-center gap-3 py-12 px-6 text-center">
+                            <div className="w-16 h-16 rounded-3xl bg-violet-50 dark:bg-violet-950/40 flex items-center justify-center text-violet-500">
+                                <CheckCircle2 className="w-8 h-8" />
                             </div>
-                            <p className="text-sm font-bold text-foreground">لا توجد إشعارات</p>
-                            <p className="text-xs text-muted-foreground">ستظهر هنا الإشعارات الجديدة فور وصولها</p>
+                            <p className="text-sm font-black text-gray-900 dark:text-white">لا توجد إشعارات حالياً</p>
+                            <p className="text-xs text-gray-400 leading-relaxed max-w-[240px]">
+                                ستصلك الإشعارات فور تسجيل الحضور، أو تسليم الواجبات، أو التفاعل الصفي.
+                            </p>
                         </div>
                     ) : (
-                        <div dir="rtl">
-                            {/* Unread */}
+                        <div className="p-2 space-y-1">
+                            {/* Unread Section */}
                             {unreadNs.length > 0 && (
                                 <div>
-                                    <p className="text-[10px] font-bold text-muted-foreground px-4 pt-3 pb-1 uppercase tracking-wider">
+                                    <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 px-3 py-1.5 uppercase tracking-wider">
                                         غير مقروء ({unreadNs.length})
                                     </p>
-                                    <div className="divide-y divide-border/50">
+                                    <div className="space-y-1">
                                         <AnimatePresence initial={false}>
                                             {unreadNs.map(n => (
                                                 <NotifRow key={n.id} n={n} onRead={markRead} onDismiss={dismiss} />
@@ -243,13 +250,14 @@ export function EnhancedNotifications() {
                                     </div>
                                 </div>
                             )}
-                            {/* Read */}
+
+                            {/* Read Section */}
                             {readNs.length > 0 && (
-                                <div>
-                                    <p className="text-[10px] font-bold text-muted-foreground px-4 pt-3 pb-1 uppercase tracking-wider">
-                                        مقروء
+                                <div className="pt-2">
+                                    <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 px-3 py-1.5 uppercase tracking-wider">
+                                        سابق ({readNs.length})
                                     </p>
-                                    <div className="divide-y divide-border/50 opacity-60">
+                                    <div className="space-y-1 opacity-70">
                                         {readNs.slice(0, 5).map(n => (
                                             <NotifRow key={n.id} n={n} onRead={markRead} onDismiss={dismiss} />
                                         ))}
@@ -260,19 +268,25 @@ export function EnhancedNotifications() {
                     )}
                 </ScrollArea>
 
-                {/* Footer */}
-                <div className="px-4 py-3 border-t border-border flex items-center justify-between bg-muted/30">
+                {/* ═══ FOOTER ═══ */}
+                <div className="p-3 border-t border-gray-100 dark:border-white/5 flex items-center justify-between bg-gray-50/80 dark:bg-white/[0.02]">
                     <button
                         type="button"
                         onClick={loadNotifications}
-                        className="text-xs text-muted-foreground hover:text-foreground font-bold transition-colors flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-muted/80 border-0 outline-none focus:outline-none focus:ring-0 active:scale-95 cursor-pointer"
+                        className="text-xs text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 font-bold transition-colors flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 border-0 outline-none focus:outline-none focus:ring-0 active:scale-95 cursor-pointer"
                     >
-                        <Zap className="w-3.5 h-3.5 text-violet-500" /> تحديث الإشعارات
+                        <Zap className="w-3.5 h-3.5 text-violet-500" />
+                        <span>تحديث</span>
                     </button>
-                    <a href="/student/notifications"
-                        className="text-xs font-bold text-violet-600 hover:text-violet-700 transition-colors">
-                        عرض الكل
-                    </a>
+
+                    <Link
+                        href={`/${locale}/student/notifications`}
+                        onClick={() => setOpen(false)}
+                        className="text-xs font-black text-violet-600 hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300 transition-colors flex items-center gap-1 px-2.5 py-1.5 rounded-xl hover:bg-violet-50 dark:hover:bg-violet-950/30"
+                    >
+                        <span>عرض جميع الإشعارات</span>
+                        <ExternalLink className="w-3 h-3" />
+                    </Link>
                 </div>
             </PopoverContent>
         </Popover>
@@ -281,7 +295,7 @@ export function EnhancedNotifications() {
 
 // ── Row Component ──────────────────────────────────────────
 function NotifRow({ n, onRead, onDismiss }: {
-    n: Notification;
+    n: AppNotification;
     onRead: (id: string) => void;
     onDismiss: (id: string, e: React.MouseEvent) => void;
 }) {
@@ -293,43 +307,45 @@ function NotifRow({ n, onRead, onDismiss }: {
 
     return (
         <motion.div
-            initial={n.isLive ? { backgroundColor: '#8b5cf610', x: -4 } : { opacity: 0 }}
-            animate={{ backgroundColor: 'transparent', x: 0, opacity: 1 }}
+            initial={n.isLive ? { backgroundColor: '#8b5cf615', scale: 0.98 } : { opacity: 0 }}
+            animate={{ backgroundColor: 'transparent', scale: 1, opacity: 1 }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.4 }}
+            transition={{ duration: 0.3 }}
             onClick={() => { onRead(n.id); if (n.actionUrl) window.location.href = n.actionUrl; }}
             className={cn(
-                'flex items-start gap-3 px-4 py-3 cursor-pointer hover:bg-muted/50 transition-colors relative group',
-                !n.isRead && 'bg-violet-50/50 dark:bg-violet-900/10'
-            )}>
-            {/* Live badge */}
-            {n.isLive && (
-                <span className="absolute top-2 left-4 text-[9px] bg-violet-600 text-white font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1">
-                    <span className="w-1 h-1 bg-white rounded-full animate-pulse" /> مباشر
-                </span>
+                'flex items-start gap-3 p-3 rounded-2xl cursor-pointer transition-all relative group',
+                !n.isRead 
+                    ? 'bg-violet-50/70 dark:bg-violet-950/20 border border-violet-100/80 dark:border-violet-800/30' 
+                    : 'hover:bg-gray-50 dark:hover:bg-white/5 border border-transparent'
             )}
+        >
             <NotifIcon type={n.type} />
+
             <div className="flex-1 min-w-0 pt-0.5">
-                <p className={cn('text-sm leading-snug truncate', !n.isRead ? 'font-bold text-foreground' : 'font-medium text-muted-foreground')}>
-                    {n.title}
-                </p>
-                {(n.body || n.message) && (
-                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2 leading-relaxed">
-                        {n.body || n.message}
+                <div className="flex items-center justify-between gap-2">
+                    <p className={cn('text-xs leading-snug truncate', !n.isRead ? 'font-black text-gray-900 dark:text-white' : 'font-semibold text-gray-600 dark:text-gray-300')}>
+                        {n.title}
+                    </p>
+                    {!n.isRead && (
+                        <span className="w-2 h-2 rounded-full bg-violet-600 flex-shrink-0 animate-pulse" />
+                    )}
+                </div>
+                {n.body && (
+                    <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1 line-clamp-2 leading-relaxed font-medium">
+                        {n.body}
                     </p>
                 )}
-                <p className="text-[10px] text-muted-foreground/60 mt-1">{timeAgo}</p>
+                <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1.5 font-medium">{timeAgo}</p>
             </div>
-            <div className="flex items-center gap-1 flex-shrink-0">
-                {!n.isRead && (
-                    <span className="w-2 h-2 rounded-full bg-violet-500 flex-shrink-0 mt-1" />
-                )}
-                <button
-                    onClick={e => onDismiss(n.id, e)}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded hover:bg-muted">
-                    <X className="w-3 h-3 text-muted-foreground" />
-                </button>
-            </div>
+
+            <button
+                type="button"
+                onClick={e => onDismiss(n.id, e)}
+                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-lg hover:bg-gray-200 dark:hover:bg-white/10 text-gray-400 hover:text-red-500 flex-shrink-0"
+                title="حذف"
+            >
+                <X className="w-3.5 h-3.5" />
+            </button>
         </motion.div>
     );
 }
