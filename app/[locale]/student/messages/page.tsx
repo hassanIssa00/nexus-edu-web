@@ -16,6 +16,7 @@ interface Contact {
   avatar: string
   online: boolean
   lastSeen?: string
+  stage?: string
 }
 
 interface ChatMessage {
@@ -33,6 +34,7 @@ const TEACHER_CONTACTS: Contact[] = [
     subject: 'لغتي العربية',
     avatar: '👨‍🏫',
     online: true,
+    stage: 'elementary',
   },
   {
     id: 't-mohammed',
@@ -41,6 +43,7 @@ const TEACHER_CONTACTS: Contact[] = [
     subject: 'الرياضيات',
     avatar: '📐',
     online: true,
+    stage: 'elementary',
   },
   {
     id: 't-abdulrahman',
@@ -50,6 +53,7 @@ const TEACHER_CONTACTS: Contact[] = [
     avatar: '🕌',
     online: false,
     lastSeen: 'منذ ساعتين',
+    stage: 'elementary',
   },
   {
     id: 't-fahad',
@@ -58,6 +62,7 @@ const TEACHER_CONTACTS: Contact[] = [
     subject: 'العلوم',
     avatar: '🔬',
     online: true,
+    stage: 'elementary',
   },
   {
     id: 't-khaled',
@@ -67,6 +72,7 @@ const TEACHER_CONTACTS: Contact[] = [
     avatar: '💻',
     online: false,
     lastSeen: 'أمس 04:15 م',
+    stage: 'elementary',
   },
   {
     id: 't-ahmed',
@@ -76,7 +82,87 @@ const TEACHER_CONTACTS: Contact[] = [
     avatar: '🎨',
     online: false,
     lastSeen: 'منذ ساعة',
+    stage: 'elementary',
   },
+  // ── روضة ─────────────────────────────────────────────────────────────────
+  {
+    id: 't-kg-sara',
+    name: 'أ. سارة المالكي',
+    role: 'معلمة الروضة',
+    subject: 'التأهيل والمهارات الأساسية',
+    avatar: '🌸',
+    online: true,
+    stage: 'kindergarten',
+  },
+  {
+    id: 't-kg-huda',
+    name: 'أ. هدى الحربي',
+    role: 'معلمة الروضة',
+    subject: 'القراءة والكتابة الأولية',
+    avatar: '📚',
+    online: false,
+    lastSeen: 'منذ 3 ساعات',
+    stage: 'kindergarten',
+  },
+  // ── متوسط ────────────────────────────────────────────────────────────────
+  {
+    id: 't-mid-waleed',
+    name: 'أ. وليد المطيري',
+    role: 'معلم المادة',
+    subject: 'الرياضيات المتوسطة',
+    avatar: '📊',
+    online: true,
+    stage: 'middle',
+  },
+  {
+    id: 't-mid-tariq',
+    name: 'أ. طارق عسيري',
+    role: 'معلم المادة',
+    subject: 'العلوم والأحياء',
+    avatar: '🧬',
+    online: false,
+    lastSeen: 'أمس',
+    stage: 'middle',
+  },
+  {
+    id: 't-mid-ibrahim',
+    name: 'أ. إبراهيم القحطاني',
+    role: 'معلم المادة',
+    subject: 'اللغة الإنجليزية',
+    avatar: '🇬🇧',
+    online: true,
+    stage: 'middle',
+  },
+  // ── ثانوي ────────────────────────────────────────────────────────────────
+  {
+    id: 't-hi-nasser',
+    name: 'د. ناصر الدوسري',
+    role: 'معلم المادة',
+    subject: 'الفيزياء والكيمياء',
+    avatar: '⚗️',
+    online: true,
+    stage: 'high',
+  },
+  {
+    id: 't-hi-bandar',
+    name: 'أ. بندر السبيعي',
+    role: 'معلم المادة',
+    subject: 'الرياضيات المتقدمة',
+    avatar: '📐',
+    online: false,
+    lastSeen: 'منذ ساعة',
+    stage: 'high',
+  },
+  {
+    id: 't-hi-abdulaziz',
+    name: 'أ. عبدالعزيز الشمري',
+    role: 'معلم المادة',
+    subject: 'التاريخ والجغرافيا',
+    avatar: '🗺️',
+    online: true,
+    stage: 'high',
+  },
+  // ── الإدارة (تظهر للجميع) ─────────────────────────────────────────────
   {
     id: 'admin-office',
     name: 'إدارة شؤون الطلاب',
@@ -84,8 +170,20 @@ const TEACHER_CONTACTS: Contact[] = [
     subject: 'مدارس الإخلاص الأهلية',
     avatar: '🏫',
     online: true,
+    stage: 'all',
   },
 ]
+
+// Map Arabic stage names → contact stage keys
+function resolveStageKey(stage: string): string {
+  if (!stage) return 'elementary'
+  const s = stage.toLowerCase()
+  if (s.includes('روض') || s.includes('kg') || s.includes('kindergarten')) return 'kindergarten'
+  if (s.includes('ابتدائ') || s.includes('elementary')) return 'elementary'
+  if (s.includes('متوسط') || s.includes('middle')) return 'middle'
+  if (s.includes('ثانو') || s.includes('high')) return 'high'
+  return 'elementary'
+}
 
 export default function StudentMessagesPage() {
   const [selectedContact, setSelectedContact] = useState<Contact>(TEACHER_CONTACTS[0])
@@ -93,14 +191,31 @@ export default function StudentMessagesPage() {
   const [chatThreads, setChatThreads] = useState<Record<string, ChatMessage[]>>({})
   const [input, setInput] = useState('')
   const [showCallAlert, setShowCallAlert] = useState<string | null>(null)
+  const [studentStage, setStudentStage] = useState<string>('elementary')
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  // Load chat history from localStorage
+  // Load chat history and student stage from localStorage
   useEffect(() => {
     try {
       const saved = localStorage.getItem('nexus_student_chat_threads')
-      if (saved) {
-        setChatThreads(JSON.parse(saved))
+      if (saved) setChatThreads(JSON.parse(saved))
+    } catch {}
+
+    try {
+      let resolved = 'elementary'
+      const raw = localStorage.getItem('nexus_user')
+      if (raw) {
+        const u = JSON.parse(raw)
+        const stage = u.stage || localStorage.getItem('nexus_student_stage') || 'elementary'
+        resolved = resolveStageKey(stage)
+      } else {
+        const stageDirect = localStorage.getItem('nexus_student_stage')
+        if (stageDirect) resolved = resolveStageKey(stageDirect)
+      }
+      setStudentStage(resolved)
+      const valid = TEACHER_CONTACTS.filter(c => c.stage === resolved || c.stage === 'all')
+      if (valid.length > 0) {
+        setSelectedContact(valid[0])
       }
     } catch {}
   }, [])
@@ -137,9 +252,12 @@ export default function StudentMessagesPage() {
     setInput('')
   }
 
-  const filteredContacts = TEACHER_CONTACTS.filter(c =>
+  // Filter by student stage: show only teachers of same stage + admin (all)
+  const stageContacts = TEACHER_CONTACTS.filter(c => c.stage === studentStage || c.stage === 'all')
+  const filteredContacts = stageContacts.filter(c =>
     c.name.includes(searchQuery) || c.subject.includes(searchQuery) || c.role.includes(searchQuery)
   )
+
 
   return (
     <div className="space-y-6 pb-12" dir="rtl">

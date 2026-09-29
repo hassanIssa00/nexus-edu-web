@@ -7,6 +7,7 @@ import {
   Flame, Crown, Award, Play, CheckCircle2, Target
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import InteractiveStudentGameModal from '@/components/InteractiveStudentGameModal'
 
 const GAMES = [
   {
@@ -110,6 +111,7 @@ const GAMES = [
 
 export default function StudentGamesPage() {
   const [stats, setStats] = useState({ completed: 5, points: 1450, rank: '#2', streak: 4 })
+  const [activeGameId, setActiveGameId] = useState<string | null>(null)
 
   useEffect(() => {
     const load = async () => {
@@ -262,13 +264,14 @@ export default function StudentGamesPage() {
                   </span>
                 </div>
 
-                <a
-                  href={game.link}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${game.lightBg} ${game.textColor} hover:scale-105`}
+                <button
+                  type="button"
+                  onClick={() => setActiveGameId(game.id)}
+                  className={`px-3.5 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${game.lightBg} ${game.textColor} hover:scale-105 cursor-pointer`}
                 >
                   <Play className="w-3 h-3 fill-current" />
                   العب الآن
-                </a>
+                </button>
               </div>
             </motion.div>
           ))}
@@ -295,6 +298,16 @@ export default function StudentGamesPage() {
           ))}
         </div>
       </div>
+
+      {/* ── INTERACTIVE GAME MODAL ── */}
+      <InteractiveStudentGameModal
+        isOpen={activeGameId !== null}
+        gameId={activeGameId || ''}
+        onClose={() => setActiveGameId(null)}
+        onAwardXP={(xp) => {
+          setStats(prev => ({ ...prev, points: prev.points + xp, completed: prev.completed + 1 }))
+        }}
+      />
     </div>
   )
 }

@@ -22,18 +22,25 @@ export default function SmartProfilePage() {
   const [certs, setCerts] = useState<any[]>([])
   const [submissions, setSubmissions] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null)
+  const [userName, setUserName] = useState<string>('')
 
   useEffect(() => {
     const loadData = async () => {
       try {
         const { nexusBridge } = await import('@/lib/nexusDataBridge')
         let linkedStudentId = 'cls-std-2'
+
         try {
           const stored = localStorage.getItem('nexus_user')
           if (stored) {
             const acc = JSON.parse(stored)
             if (acc.linkedStudentId) linkedStudentId = acc.linkedStudentId
+            if (acc.name) setUserName(acc.name)
+            if (acc.photoUrl) setPhotoUrl(acc.photoUrl)
           }
+          const dedicatedPhoto = localStorage.getItem('nexus_student_photo')
+          if (dedicatedPhoto) setPhotoUrl(dedicatedPhoto)
         } catch {}
 
         const s = nexusBridge.getStudentById(linkedStudentId)
@@ -85,15 +92,19 @@ export default function SmartProfilePage() {
       >
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
           <div className="flex items-center gap-6">
-            <div className="w-24 h-24 rounded-3xl bg-white/20 backdrop-blur-md flex items-center justify-center text-5xl flex-shrink-0 border-2 border-white/30 shadow-xl">
-              👦
+            <div className="w-24 h-24 rounded-3xl bg-white/20 backdrop-blur-md flex items-center justify-center text-5xl flex-shrink-0 border-2 border-white/30 shadow-xl overflow-hidden">
+              {photoUrl ? (
+                <img src={photoUrl} alt="صورة الطالب" className="w-full h-full object-cover" />
+              ) : (
+                <span>👦</span>
+              )}
             </div>
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md mb-2">
                 <Sparkles className="w-3.5 h-3.5 text-yellow-300 animate-pulse" />
                 <span className="text-xs font-bold text-teal-100">الملف الأكاديمي الذكي (AI Profile)</span>
               </div>
-              <h1 className="text-3xl md:text-4xl font-black">{student?.fullName || 'أحمد فيصل الغامدي'}</h1>
+              <h1 className="text-3xl md:text-4xl font-black">{student?.fullName || userName || 'الطالب'}</h1>
               <p className="text-teal-100 text-sm mt-1">
                 {student?.grade || 'الصف الأول الابتدائي — الفئة (أ)'}
               </p>

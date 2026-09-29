@@ -6,9 +6,10 @@ import { apiClient } from '@/lib/api/client'
 import { SocketProvider, useRealtimeAttendance } from '@/lib/providers/socket-provider'
 import {
   Calendar, CheckCircle2, XCircle, AlertCircle, Clock, TrendingUp,
-  Loader2, RefreshCw, Bell, Award, QrCode, Camera
+  Loader2, RefreshCw, Bell, Award, QrCode, Camera, MapPin
 } from 'lucide-react'
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts'
+import InteractiveGeofenceModal from '@/components/InteractiveGeofenceModal'
 
 // Status mapping
 const STATUS_CONFIG = {
@@ -32,6 +33,8 @@ function AttendancePageInner() {
   const [loading, setLoading] = useState(true)
   const [liveAlert, setLiveAlert] = useState<string | null>(null)
   const [monthFilter, setMonthFilter] = useState<number>(new Date().getMonth())
+  const [geofenceOpen, setGeofenceOpen] = useState(false)
+  const [pendingMethod, setPendingMethod] = useState<'FACE_ID' | 'QR_SCAN'>('FACE_ID')
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -200,40 +203,50 @@ function AttendancePageInner() {
               ))}
             </div>
             
-            {/* Actions: QR and Face ID check-in */}
-            <div className="mt-6 flex flex-wrap items-center gap-2">
-              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md p-1.5 rounded-xl">
-                <input 
-                  type="text" 
-                  id="qrCodeInput"
-                  placeholder="أدخل رمز QR المدرسي..."
-                  className="bg-transparent border-none outline-none text-white placeholder-teal-100/70 text-xs px-2 w-44"
-                />
-                <button 
-                  onClick={() => {
-                    const inputEl = document.getElementById('qrCodeInput') as HTMLInputElement
-                    if (inputEl && inputEl.value.trim()) {
-                      recordAttendanceNow('QR_SCAN')
-                      inputEl.value = ''
-                    } else {
-                      setLiveAlert('⚠️ يرجى إدخال رمز QR صالح')
-                      setTimeout(() => setLiveAlert(null), 3000)
-                    }
-                  }}
-                  className="bg-white text-teal-700 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-teal-50 transition-colors flex items-center gap-1"
-                >
-                  <QrCode className="w-3.5 h-3.5" />
-                  تأكيد الحضور
-                </button>
+            {/* Actions: QR and Face ID check-in with Geofence Protection */}
+            <div className="mt-5 space-y-2.5">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-[11px] font-bold text-teal-100">
+                <MapPin className="w-3.5 h-3.5 text-yellow-300" />
+                <span>النطاق الجغرافي: مدارس الإخلاص الأهلية للبنين بجدة (مفعل 🔒)</span>
               </div>
 
-              <button
-                onClick={() => recordAttendanceNow('FACE_ID')}
-                className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-xl text-xs font-black transition-colors flex items-center gap-1.5 shadow-md"
-              >
-                <Camera className="w-3.5 h-3.5" />
-                تسجيل حضور ببصمة الوجه 📸
-              </button>
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md p-1.5 rounded-xl">
+                  <input 
+                    type="text" 
+                    id="qrCodeInput"
+                    placeholder="أدخل رمز QR المدرسي..."
+                    className="bg-transparent border-none outline-none text-white placeholder-teal-100/70 text-xs px-2 w-44"
+                  />
+                  <button 
+                    onClick={() => {
+                      const inputEl = document.getElementById('qrCodeInput') as HTMLInputElement
+                      if (inputEl && inputEl.value.trim()) {
+                        setPendingMethod('QR_SCAN')
+                        setGeofenceOpen(true)
+                      } else {
+                        setLiveAlert('⚠️ يرجى إدخال رمز QR صالح')
+                        setTimeout(() => setLiveAlert(null), 3000)
+                      }
+                    }}
+                    className="bg-white text-teal-700 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-teal-50 transition-colors flex items-center gap-1 cursor-pointer"
+                  >
+                    <QrCode className="w-3.5 h-3.5" />
+                    تأكيد الحضور
+                  </button>
+                </div>
+
+                <button
+                  onClick={() => {
+                    setPendingMethod('FACE_ID')
+                    setGeofenceOpen(true)
+                  }}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-xl text-xs font-black transition-colors flex items-center gap-1.5 shadow-md cursor-pointer"
+                >
+                  <Camera className="w-3.5 h-3.5" />
+                  تسجيل حضور ببصمة الوجه 📸
+                </button>
+              </div>
             </div>
           </div>
 
@@ -409,6 +422,18 @@ function AttendancePageInner() {
           </div>
         )}
       </motion.div>
+
+      {/* Geofence GPS Verification Modal */}
+      <InteractiveGeofenceModal
+        isOpen={geofenceOpen}
+        onClose={() => setGeofenceOpen(false)}
+        method={pendingMethod}
+        onSuccess={(method, coords) => {
+          recordAttendanceNow(`${method}_GPS_VERIFIED`)
+          const inputEl = document.getElementById('qrCodeInput') as HTMLInputElement
+          if (inputEl) inputEl.value = ''
+        }}
+      />
     </div>
   )
 }
