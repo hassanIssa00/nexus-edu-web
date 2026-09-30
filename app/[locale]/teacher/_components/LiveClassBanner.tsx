@@ -1,12 +1,26 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Video, Users, Clock, X, Radio } from 'lucide-react'
 import { Link } from '@/i18n/routing'
+import { nexusBridge, LiveSessionItem } from '@/lib/nexusDataBridge'
 
 export function LiveClassBanner() {
   const [dismissed, setDismissed] = useState(false)
-  if (dismissed) return null
+  const [activeSession, setActiveSession] = useState<LiveSessionItem | null>(null)
+
+  useEffect(() => {
+    try {
+      const sessions = nexusBridge.getLiveSessions()
+      const live = sessions.find(s => s.status === 'LIVE')
+      if (live) {
+        setActiveSession(live)
+      }
+    } catch {}
+  }, [])
+
+  if (dismissed || !activeSession) return null
+
   return (
     <AnimatePresence>
       <motion.div initial={{ opacity: 0, y: -20, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -20 }}
@@ -23,16 +37,16 @@ export function LiveClassBanner() {
             <div>
               <div className="flex items-center gap-2 mb-0.5">
                 <span className="w-2 h-2 bg-red-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(248,113,113,0.8)]" />
-                <p className="font-black text-sm">فصل الرياضيات - الصف 10 (مباشر)</p>
+                <p className="font-black text-sm">{activeSession.title} ({activeSession.gradeLevel})</p>
               </div>
               <p className="text-emerald-100 text-xs flex items-center gap-3">
-                <span className="flex items-center gap-1"><Users className="w-3 h-3" /> 28 طالب متصل</span>
-                <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> بدأ منذ 15 دقيقة</span>
+                <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {activeSession.viewerCount || 0} طالب متصل</span>
+                <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> بث مباشر قيد التشغيل</span>
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Link href="/teacher/lessons">
+            <Link href="/teacher/live">
               <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
                 className="flex items-center gap-2 bg-white text-emerald-700 px-4 py-2 rounded-xl font-bold text-sm shadow-lg">
                 <Video className="w-4 h-4" /> انضم الآن

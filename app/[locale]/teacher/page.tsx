@@ -46,24 +46,12 @@ function KpiCard({ label, value, icon: Icon, color, sub }: { label: string; valu
 
 // Fallback data when API is unavailable
 const FALLBACK_DATA: TeacherDashboardResponse = {
-  teacher: { name: 'فاطمة الزهراني', email: 'teacher@nexusedu.sa', subject: 'الرياضيات' },
-  summary: { totalStudents: 120, totalClasses: 5, totalAssignments: 18, totalLessons: 42, pendingSubmissions: 7 },
-  classPerformance: [
-    { name: 'الصف 10-أ', averageGrade: 82, studentCount: 28 },
-    { name: 'الصف 10-ب', averageGrade: 74, studentCount: 25 },
-    { name: 'الصف 11-أ', averageGrade: 88, studentCount: 30 },
-    { name: 'الصف 11-ب', averageGrade: 69, studentCount: 22 },
-    { name: 'الصف 12-أ', averageGrade: 91, studentCount: 27 },
-  ],
-  recentAssignments: [
-    { id: '1', title: 'حل معادلات من الدرجة الثانية', subject: 'الرياضيات', submissions: 18 },
-    { id: '2', title: 'تدريبات المتتاليات والمتسلسلات', subject: 'الرياضيات', submissions: 12 },
-    { id: '3', title: 'مسائل الاحتمالات التطبيقية', subject: 'الرياضيات', submissions: 9 },
-  ],
-  attendanceSummary: { totalRecords: 120, present: 108, absent: 12 },
-  interventionAlerts: [
-    { id: '1', title: 'تنبيه: 3 طلاب بحاجة متابعة', body: 'انخفاض في الدرجات خلال الأسبوعين الماضيين في الصف 11-ب' },
-  ],
+  teacher: { name: 'المعلم', email: '', subject: 'كادر تعليمي' },
+  summary: { totalStudents: 0, totalClasses: 1, totalAssignments: 0, totalLessons: 0, pendingSubmissions: 0 },
+  classPerformance: [],
+  recentAssignments: [],
+  attendanceSummary: { totalRecords: 0, present: 0, absent: 0 },
+  interventionAlerts: [],
   gradingQueue: [],
 } as any;
 
@@ -85,7 +73,12 @@ export default function TeacherDashboardPage() {
   }, [searchParams])
   const [teacherPhoto, setTeacherPhoto] = useState<string | null>(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('nexus_teacher_photo') || null
+      try {
+        const u = JSON.parse(localStorage.getItem('nexus_user') || '{}')
+        return u.avatarUrl || u.photoUrl || null
+      } catch {
+        return null
+      }
     }
     return null
   })
@@ -100,6 +93,7 @@ export default function TeacherDashboardPage() {
         if (uStr) {
           const u = JSON.parse(uStr)
           u.photoUrl = photoUrl
+          u.avatarUrl = photoUrl
           localStorage.setItem('nexus_user', JSON.stringify(u))
         }
       } catch {}
@@ -129,11 +123,33 @@ export default function TeacherDashboardPage() {
       const presentCount = attendance.filter(a => a.overallStatus === 'present').length
       const totalAtt = attendance.length || students.length
 
+      let currentTeacherName = 'المعلم'
+      let currentTeacherEmail = ''
+      let currentTeacherSubject = 'كادر تعليمي'
+      let currentTeacherPhoto: string | null = null
+
+      try {
+        const storedUser = localStorage.getItem('nexus_user')
+        if (storedUser) {
+          const parsed = JSON.parse(storedUser)
+          if (parsed.name) currentTeacherName = parsed.name
+          if (parsed.email) currentTeacherEmail = parsed.email
+          if (parsed.specialization || parsed.department || parsed.title) {
+            currentTeacherSubject = parsed.specialization || parsed.department || parsed.title
+          }
+          if (parsed.avatarUrl || parsed.photoUrl) {
+            currentTeacherPhoto = parsed.avatarUrl || parsed.photoUrl
+          }
+        }
+      } catch {}
+
+      setTeacherPhoto(currentTeacherPhoto)
+
       const realData: any = {
         teacher: {
-          name: 'د. إسماعيل عيسى',
-          email: 'arabic.teacher@nexusedu.sa',
-          subject: 'لغتي العربية والقرآن الكريم — الصف الأول (أ)',
+          name: currentTeacherName,
+          email: currentTeacherEmail,
+          subject: currentTeacherSubject,
         },
         summary: {
           totalStudents: students.length,
@@ -295,9 +311,13 @@ export default function TeacherDashboardPage() {
                 {teacherPhoto ? (
                   <img src={teacherPhoto} alt={teacher.name} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center p-2 text-center border-2 border-dashed border-white/40 rounded-3xl">
-                    <Camera className="w-6 h-6 text-white/80 group-hover:text-white transition-colors mb-1" />
-                    <span className="text-[10px] font-black text-white/90">أضف صورتك</span>
+                  <div className="w-full h-full flex flex-col items-center justify-center p-2 text-center border-2 border-dashed border-white/40 rounded-3xl bg-white/10">
+                    <span className="text-2xl font-black text-white mb-0.5">
+                      {(teacher.name || 'م')[0]}
+                    </span>
+                    <span className="text-[10px] font-bold text-teal-100 flex items-center gap-1">
+                      <Camera className="w-3 h-3" /> أضف صورتك
+                    </span>
                   </div>
                 )}
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white">
@@ -312,10 +332,10 @@ export default function TeacherDashboardPage() {
                   <span className="text-xs font-bold text-teal-100">بوابة المعلم الذكية</span>
                 </div>
                 <h1 className="text-3xl md:text-5xl font-black mb-1 tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white to-teal-200 leading-[1.3]">
-                  أهلاً بك، أ. {teacher.name}
+                  أهلاً بك، {teacher.name?.startsWith('د.') || teacher.name?.startsWith('أ.') ? teacher.name : `أ. ${teacher.name}`}
                 </h1>
                 <p className="text-xs md:text-sm text-teal-100 font-medium">
-                  {(teacher as any).role === 'teacher' ? 'معلم معتمد في منصة نكسس التعليمية' : 'كادر تعليمي'}
+                  {teacher.subject || 'معلم معتمد في منصة نكسس التعليمية'}
                 </p>
               </div>
             </div>
@@ -368,15 +388,24 @@ export default function TeacherDashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
          <div className="bg-gradient-to-br from-teal-500/10 to-teal-600/5 border border-teal-500/20 p-5 rounded-3xl flex gap-4 items-center shadow-sm">
             <div className="w-12 h-12 rounded-full bg-teal-500/20 flex items-center justify-center flex-shrink-0"><TrendingUp className="text-teal-600 w-6 h-6"/></div>
-            <div><p className="text-sm font-extrabold text-gray-900 dark:text-white">أداء متميز للفصل 10-أ</p><p className="text-xs text-gray-500 font-medium">ارتفاع في متوسط الدرجات بنسبة 12% هذا الأسبوع</p></div>
+            <div>
+              <p className="text-sm font-extrabold text-gray-900 dark:text-white">حالة الحضور والانضباط</p>
+              <p className="text-xs text-gray-500 font-medium">نسبة الحضور المباشر اليوم {attPct}% بالفصول المسندة</p>
+            </div>
          </div>
          <div className="bg-gradient-to-br from-amber-500/10 to-amber-600/5 border border-amber-500/20 p-5 rounded-3xl flex gap-4 items-center shadow-sm">
             <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0"><AlertCircle className="text-amber-600 w-6 h-6"/></div>
-            <div><p className="text-sm font-extrabold text-gray-900 dark:text-white">3 طلاب يحتاجون للمتابعة</p><p className="text-xs text-gray-500 font-medium">انخفاض في مستوى التفاعل في مادة الرياضيات</p></div>
+            <div>
+              <p className="text-sm font-extrabold text-gray-900 dark:text-white">متابعة الواجبات والتسليمات</p>
+              <p className="text-xs text-gray-500 font-medium">{summary.pendingSubmissions > 0 ? `${summary.pendingSubmissions} واجبات بانتظار تصحيحك واعتمادها` : 'جميع تسليمات الطلاب مصححة ومحدثة'}</p>
+            </div>
          </div>
          <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border border-blue-500/20 p-5 rounded-3xl flex gap-4 items-center shadow-sm">
             <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0"><BrainCircuit className="text-blue-600 w-6 h-6"/></div>
-            <div><p className="text-sm font-extrabold text-gray-900 dark:text-white">تحليل الذكاء الاصطناعي</p><p className="text-xs text-gray-500 font-medium">تم تجهيز 5 خطط علاجية مقترحة للطلاب المتعثرين</p></div>
+            <div>
+              <p className="text-sm font-extrabold text-gray-900 dark:text-white">المساعد الأكاديمي الذكي</p>
+              <p className="text-xs text-gray-500 font-medium">توليد الاختبارات والخطط الدراسية بضغطة زر عبر الذكاء الاصطناعي</p>
+            </div>
          </div>
       </div>
 
