@@ -333,9 +333,15 @@ export default function RegisterPage() {
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-[520px] my-auto">
         <div className="bg-white/90 dark:bg-[#1e1e2d]/90 backdrop-blur-2xl border border-gray-100 dark:border-white/10 rounded-[2.5rem] p-8 shadow-2xl">
           <div className="flex justify-between items-center mb-6">
-            <Link href="/" className="flex items-center gap-2">
-              <img src="/logo_new.webp" alt="Nexus EDU" className="w-10 h-10 rounded-2xl shadow-sm object-cover" />
-              <span className="font-black text-gray-900 dark:text-white text-base">Nexus EDU</span>
+            <Link href="/" className="flex items-center gap-2.5">
+              <div className="flex items-center gap-2">
+                <img src="/logo_new.webp" alt="Nexus EDU" className="w-10 h-10 rounded-2xl shadow-sm object-cover border border-gray-100 dark:border-white/10" />
+                <img src="/ikhlas-logo.jpg" alt="مدارس الإخلاص الأهلية" className="w-10 h-10 rounded-2xl shadow-sm object-cover border border-gray-100 dark:border-white/10" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-black text-gray-900 dark:text-white text-sm leading-tight">Nexus EDU</span>
+                <span className="text-[10px] text-gray-400 font-bold leading-tight">مدارس الإخلاص</span>
+              </div>
             </Link>
             <LanguageSwitcher />
           </div>

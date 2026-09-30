@@ -162,7 +162,7 @@ export default function RoleLoginPage() {
                     <div className="flex items-center gap-3 mb-2">
                         <div className="flex items-center gap-2">
                             <img src="/logo_new.webp" alt="Nexus EDU" className="w-12 h-12 rounded-2xl object-cover shadow-lg border-2 border-white/20" />
-                            <img src="/second_logo.webp" alt="Partner Logo" className="w-12 h-12 rounded-2xl object-cover shadow-lg border-2 border-white/20 bg-white" />
+                            <img src="/ikhlas-logo.jpg" alt="مدارس الإخلاص" className="w-12 h-12 rounded-2xl object-cover shadow-lg border-2 border-white/20 bg-white" />
                         </div>
                         <div>
                             <span className="text-2xl font-bold text-white">نِكْسُس</span>

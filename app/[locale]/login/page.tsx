@@ -160,7 +160,7 @@ export default function GlobalLoginSelectorPage() {
                         >
                             <div className="relative flex items-center gap-2">
                                 <img src="/logo_new.webp" alt="Nexus EDU" className="w-12 h-12 rounded-[14px] object-cover shadow-md bg-white border border-border" />
-                                <img src="/second_logo.webp" alt="Partner Logo" className="w-12 h-12 rounded-[14px] object-cover shadow-md bg-white border border-border" />
+                                <img src="/ikhlas-logo.jpg" alt="مدارس الإخلاص" className="w-12 h-12 rounded-[14px] object-cover shadow-md bg-white border border-border" />
                                 <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
                             </div>
                             <div>
