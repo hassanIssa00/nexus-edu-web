@@ -77,32 +77,53 @@ export function Sidebar({ role }: SidebarProps) {
         setMobileOpen(false)
     }, [pathname])
 
-    const [studentInfo, setStudentInfo] = useState<{ name: string; photo: string | null }>({ name: '', photo: null })
+    const [currentUserInfo, setCurrentUserInfo] = useState<{ name: string; photo: string | null }>({ name: '', photo: null })
 
     useEffect(() => {
         const fetchInfo = () => {
             try {
                 const raw = localStorage.getItem('nexus_user')
                 let name = ''
-                let photo = localStorage.getItem('nexus_student_photo') || null
+                let photo: string | null = null
 
                 if (raw) {
                     const u = JSON.parse(raw)
-                    if (u.name && u.name !== 'طالب' && !u.name.includes('@')) {
-                        name = u.name
-                    } else if (u.fullName) {
-                        name = u.fullName
-                    } else if (u.full_name && !u.full_name.includes('@') && u.full_name !== 'طالب' && !u.full_name.includes('by70406')) {
-                        name = u.full_name
+                    // Match current role
+                    if (!u.role || u.role === role) {
+                        name = u.name || u.fullName || u.full_name || ''
+                        if (role === 'teacher') {
+                            const p = u.photoUrl || u.avatarUrl || localStorage.getItem('nexus_teacher_photo') || null
+                            // Guard against student demo photo leaking to teacher
+                            if (p && !p.includes('dr-ismail-student')) {
+                                photo = p
+                            }
+                        } else if (role === 'parent') {
+                            photo = u.photoUrl || u.avatarUrl || localStorage.getItem('nexus_parent_photo') || null
+                        } else if (role === 'student') {
+                            photo = u.photoUrl || u.avatarUrl || localStorage.getItem('nexus_student_photo') || null
+                        } else {
+                            photo = u.photoUrl || u.avatarUrl || null
+                        }
                     }
-                    if (!photo && u.photoUrl) photo = u.photoUrl
                 }
 
-                if (!name && role === 'student') {
-                    name = 'أحمد فيصل الغامدي'
+                // Fallback to auth profile if available and name still empty
+                if (!name && profile?.full_name && profile.full_name !== 'طالب' && !profile.full_name.includes('@')) {
+                    name = profile.full_name
+                }
+                if (!photo && profile?.avatar_url && !profile.avatar_url.includes('dr-ismail-student')) {
+                    photo = profile.avatar_url
                 }
 
-                setStudentInfo({ name, photo })
+                // Default fallbacks per role
+                if (!name) {
+                    if (role === 'student') name = 'أحمد فيصل الغامدي'
+                    else if (role === 'teacher') name = 'المعلم المشرف'
+                    else if (role === 'parent') name = 'ولي أمر الطالب'
+                    else name = profile?.full_name || user?.email?.split('@')[0] || getRoleLabel(role)
+                }
+
+                setCurrentUserInfo({ name, photo })
             } catch {}
         }
 
@@ -115,7 +136,7 @@ export function Sidebar({ role }: SidebarProps) {
             window.removeEventListener('nexus_student_photo_updated', fetchInfo)
             window.removeEventListener('storage', fetchInfo)
         }
-    }, [role])
+    }, [role, profile, user])
 
     const SidebarContent = ({ mobile = false }: { mobile?: boolean }) => (
         <div className={cn(
@@ -215,13 +236,13 @@ export function Sidebar({ role }: SidebarProps) {
             <div className="p-3 border-t border-border flex-shrink-0">
                 <div className={cn('flex items-center gap-3', collapsed && !mobile && 'justify-center')}>
                     <div className="relative flex-shrink-0">
-                        {studentInfo.photo ? (
+                        {currentUserInfo.photo ? (
                             <div className="w-9 h-9 rounded-full overflow-hidden border-2 shadow-sm bg-white" style={{ borderColor: colors.accent }}>
-                                <img src={studentInfo.photo} alt={studentInfo.name || 'صورة الطالب'} className="w-full h-full object-cover" />
+                                <img src={currentUserInfo.photo} alt={currentUserInfo.name || 'الصورة الشخصية'} className="w-full h-full object-cover" />
                             </div>
                         ) : (
                             <div className={cn('w-9 h-9 rounded-full bg-gradient-to-br flex items-center justify-center text-white font-bold text-sm shadow-sm', colors.gradient)}>
-                                {(studentInfo.name || (role === 'student' ? 'أحمد فيصل' : 'ط'))[0].toUpperCase()}
+                                {(currentUserInfo.name || getRoleLabel(role))[0]?.toUpperCase()}
                             </div>
                         )}
                         <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-card rounded-full" />
@@ -236,7 +257,7 @@ export function Sidebar({ role }: SidebarProps) {
                                     className="flex-1 min-w-0 cursor-pointer hover:opacity-80 transition-opacity"
                                 >
                                     <p className="text-sm font-bold text-foreground truncate">
-                                        {studentInfo.name || (role === 'student' ? 'أحمد فيصل الغامدي' : (profile?.full_name || user?.email?.split('@')[0] || 'المستخدم'))}
+                                        {currentUserInfo.name || (profile?.full_name || user?.email?.split('@')[0] || getRoleLabel(role))}
                                     </p>
                                     <p className="text-xs text-muted-foreground truncate">{getRoleLabel(role)}</p>
                                 </motion.div>

@@ -74,8 +74,13 @@ export default function TeacherDashboardPage() {
   const [teacherPhoto, setTeacherPhoto] = useState<string | null>(() => {
     if (typeof window !== 'undefined') {
       try {
+        const localTch = localStorage.getItem('nexus_teacher_photo')
+        if (localTch && !localTch.includes('dr-ismail-student')) return localTch
+
         const u = JSON.parse(localStorage.getItem('nexus_user') || '{}')
-        return u.avatarUrl || u.photoUrl || null
+        const p = u.avatarUrl || u.photoUrl || null
+        if (p && !p.includes('dr-ismail-student')) return p
+        return null
       } catch {
         return null
       }
@@ -327,13 +332,18 @@ export default function TeacherDashboardPage() {
               </div>
 
               <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/10 backdrop-blur-md mb-2">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/10 backdrop-blur-md mb-3">
                   <Sparkles className="w-3 h-3 text-yellow-300 animate-pulse" />
                   <span className="text-xs font-bold text-teal-100">بوابة المعلم الذكية</span>
                 </div>
-                <h1 className="text-3xl md:text-5xl font-black mb-1 tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white to-teal-200 leading-[1.3]">
-                  أهلاً بك، {teacher.name?.startsWith('د.') || teacher.name?.startsWith('أ.') ? teacher.name : `أ. ${teacher.name}`}
+                <p className="text-sm md:text-base text-teal-200 font-medium mb-1 tracking-widest">أهـلاً بك،</p>
+                <h1
+                  className="text-4xl md:text-6xl font-black tracking-wide leading-tight mb-2 text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-200 to-white drop-shadow"
+                  style={{ fontFamily: "'Amiri', 'Cairo', serif", textShadow: '0 2px 24px rgba(255,220,80,0.25)' }}
+                >
+                  {teacher.name?.startsWith('د.') || teacher.name?.startsWith('أ.') ? teacher.name : `أ. ${teacher.name}`}
                 </h1>
+                <div className="h-[3px] w-28 md:w-40 bg-gradient-to-r from-amber-400 via-yellow-300 to-transparent rounded-full mb-2 opacity-80" />
                 <p className="text-xs md:text-sm text-teal-100 font-medium">
                   {teacher.subject || 'معلم معتمد في منصة نكسس التعليمية'}
                 </p>
