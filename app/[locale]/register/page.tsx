@@ -5,9 +5,18 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { motion } from 'framer-motion';
-import { User, Mail, Lock, Phone, GraduationCap, Users, ArrowLeft, Check, Sparkles, AlertCircle, BookOpen, Camera, Upload, Trash2 } from 'lucide-react';
+import { User, Mail, Lock, Phone, GraduationCap, Users, ArrowLeft, Check, Sparkles, AlertCircle, BookOpen, Camera, Upload, Trash2, KeyRound } from 'lucide-react';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { nexusBridge, ClassStudentRecord } from '@/lib/nexusDataBridge';
+
+const VALID_TEACHER_CODES = [
+  'TCH-2026',
+  'IKHLAS-2026',
+  'IKHLAS-TCH',
+  'TCH-1448',
+  'NEXUS-TCH',
+  '123456',
+];
 
 const SAUDI_SUBJECTS = [
   'لغتي الجميلة (اللغة العربية)',
@@ -36,6 +45,7 @@ export default function RegisterPage() {
   const [fullName, setFullName] = useState('');
   const [childName, setChildName] = useState('');
   const [specialization, setSpecialization] = useState('لغتي الجميلة (اللغة العربية)');
+  const [teacherCode, setTeacherCode] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
@@ -95,6 +105,28 @@ export default function RegisterPage() {
 
     try {
       if (accountType === 'teacher') {
+        if (!teacherCode.trim()) {
+          setError('يرجى إدخال كود المعلم المعتمد من شؤون المدرسة للتحقق من هويتك');
+          setLoading(false);
+          return;
+        }
+
+        const cleanCode = teacherCode.trim().toUpperCase();
+        const isValidTeacherCode = VALID_TEACHER_CODES.includes(cleanCode) || (() => {
+          try {
+            const customCodes = JSON.parse(localStorage.getItem('nexus_valid_teacher_codes') || '[]');
+            return Array.isArray(customCodes) && customCodes.some((c: string) => c.toUpperCase() === cleanCode);
+          } catch {
+            return false;
+          }
+        })();
+
+        if (!isValidTeacherCode) {
+          setError('كود المعلم غير صحيح أو غير معتمد. يرجى الحصول على كود الاعتماد الرسمي من إدارة وشؤون المدرسة (كود التجربة: TCH-2026)');
+          setLoading(false);
+          return;
+        }
+
         const finalSpecialization = specialization === 'أخرى (إدخال تخصص مخصص)'
           ? (customSpecialization.trim() || 'تخصص آخر')
           : specialization;
@@ -108,6 +140,7 @@ export default function RegisterPage() {
           id: teacherAccId,
           teacherId: universalId,
           universalId,
+          teacherCode: cleanCode,
           name: fullName.trim(),
           email: email.trim().toLowerCase(),
           phone: phone.trim(),
@@ -131,6 +164,7 @@ export default function RegisterPage() {
         const teacherAccountObj = {
           id: teacherAccId,
           universalId,
+          teacherCode: cleanCode,
           name: fullName.trim(),
           email: email.trim().toLowerCase(),
           phone: phone.trim(),
@@ -393,34 +427,62 @@ export default function RegisterPage() {
             </div>
 
             {accountType === 'teacher' && (
-              <div>
-                <label className="text-xs font-black text-gray-600 dark:text-gray-300 mb-1.5 block">
-                  التخصص التعليمي / المادة المسندة *
-                </label>
-                <div className="relative">
-                  <BookOpen className="w-4 h-4 text-gray-400 absolute right-3.5 top-3.5 pointer-events-none z-10" />
-                  <select
-                    required
-                    value={specialization}
-                    onChange={(e) => setSpecialization(e.target.value)}
-                    className="w-full pr-10 pl-4 py-3 rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-sm font-medium text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none"
-                    dir="rtl"
-                  >
-                    {SAUDI_SUBJECTS.map((subj) => (
-                      <option key={subj} value={subj}>{subj}</option>
-                    ))}
-                  </select>
+              <>
+                <div>
+                  <label className="text-xs font-black text-gray-600 dark:text-gray-300 mb-1.5 block">
+                    التخصص التعليمي / المادة المسندة *
+                  </label>
+                  <div className="relative">
+                    <BookOpen className="w-4 h-4 text-gray-400 absolute right-3.5 top-3.5 pointer-events-none z-10" />
+                    <select
+                      required
+                      value={specialization}
+                      onChange={(e) => setSpecialization(e.target.value)}
+                      className="w-full pr-10 pl-4 py-3 rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-sm font-medium text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none"
+                      dir="rtl"
+                    >
+                      {SAUDI_SUBJECTS.map((subj) => (
+                        <option key={subj} value={subj}>{subj}</option>
+                      ))}
+                    </select>
+                  </div>
+                  {specialization === 'أخرى (إدخال تخصص مخصص)' && (
+                    <input
+                      required
+                      value={customSpecialization}
+                      onChange={(e) => setCustomSpecialization(e.target.value)}
+                      placeholder="اكتب تخصصك هنا..."
+                      className="mt-2 w-full px-4 py-3 rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                    />
+                  )}
                 </div>
-                {specialization === 'أخرى (إدخال تخصص مخصص)' && (
-                  <input
-                    required
-                    value={customSpecialization}
-                    onChange={(e) => setCustomSpecialization(e.target.value)}
-                    placeholder="اكتب تخصصك هنا..."
-                    className="mt-2 w-full px-4 py-3 rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                  />
-                )}
-              </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-xs font-black text-gray-600 dark:text-gray-300 block">
+                      كود المعلم المعتمد *
+                    </label>
+                    <span className="text-[10px] text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-200 dark:border-blue-500/20">
+                      رمز شؤون المعلمين
+                    </span>
+                  </div>
+                  <div className="relative">
+                    <KeyRound className="w-4 h-4 text-gray-400 absolute right-3.5 top-3.5" />
+                    <input
+                      required
+                      value={teacherCode}
+                      onChange={(e) => setTeacherCode(e.target.value)}
+                      placeholder="أدخل كود المعلم (مثال: TCH-2026)"
+                      dir="ltr"
+                      className="w-full pr-10 pl-4 py-3 rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-sm font-mono font-medium text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 uppercase tracking-wide"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between mt-1 text-[11px] text-gray-400 px-1">
+                    <span>رمز سري مخصص من إدارة المدرسة للتحقق من هوية المعلم</span>
+                    <span className="font-mono text-blue-600 dark:text-blue-400 font-bold">كود التجربة: TCH-2026</span>
+                  </div>
+                </div>
+              </>
             )}
 
             {accountType === 'student' && (
