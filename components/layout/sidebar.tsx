@@ -132,12 +132,12 @@ export function Sidebar({ role }: SidebarProps) {
                             exit={{ opacity: 0, x: 10 }}
                             className="flex items-center gap-2.5"
                         >
-                            <div className="flex items-center gap-1">
+                            <div className="flex items-center gap-1.5">
                                 <div className="w-8 h-8 rounded-[8px] overflow-hidden shadow-sm flex items-center justify-center bg-white border border-border">
-                                    <img src="/ikhlas-logo.jpg" alt="Logo" className="w-full h-full object-cover" />
+                                    <img src="/logo_new.webp" alt="Nexus EDU" className="w-full h-full object-cover" />
                                 </div>
                                 <div className="w-8 h-8 rounded-[8px] overflow-hidden shadow-sm flex items-center justify-center bg-white border border-border">
-                                    <img src="/second_logo.webp" alt="Partner Logo" className="w-full h-full object-cover" />
+                                    <img src="/ikhlas-logo.jpg" alt="Ikhlas School" className="w-full h-full object-cover" />
                                 </div>
                             </div>
                             <div>
