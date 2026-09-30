@@ -1,12 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import {
-  Bell, CheckCircle2, AlertTriangle, BookOpen,
-  Trophy, Clock, Sparkles, CheckCheck
-} from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
+import { Bell, CheckCheck, Sparkles, InboxIcon } from 'lucide-react'
 
 interface Notification {
   id: string
@@ -14,65 +10,37 @@ interface Notification {
   body: string
   time: string
   isRead: boolean
-  type: 'attendance' | 'homework' | 'certificate' | 'grade' | 'general'
+  type: string
 }
 
-const DEFAULT_NOTIFICATIONS: Notification[] = [
-  {
-    id: 'n1',
-    title: 'تسجيل حضور ذكي (Face ID) ✅',
-    body: 'تم تسجيل حضور الطالب أحمد فيصل الغامدي في طابور الصباح والحصة الأولى بنجاح.',
-    time: 'اليوم — 07:05 ص',
-    isRead: false,
-    type: 'attendance',
-  },
-  {
-    id: 'n2',
-    title: 'واجب جديد من د. إسماعيل عيسى 📚',
-    body: 'أضاف الدكتور إسماعيل عيسى واجب "قراءة درس المد بالألف وكتابة 3 كلمات" في مادة لغتي.',
-    time: 'اليوم — 08:30 ص',
-    isRead: false,
-    type: 'homework',
-  },
-  {
-    id: 'n3',
-    title: 'اعتماد وسام التميز وشهادة تقدير 🏆',
-    body: 'منح المعلم د. إسماعيل وسام رواد الفصاحة وشهادة تفوق لأحمد لتميزه في تسميع سورة الناس.',
-    time: 'أمس — 12:15 م',
-    isRead: true,
-    type: 'certificate',
-  },
-  {
-    id: 'n4',
-    title: 'رصد درجة اختبار مادة الرياضيات 🔢',
-    body: 'حصل أحمد على درجة 95/100 في الاختبار الدوري القصير للفصل الثاني — أداء ممتاز!',
-    time: 'منذ يومين',
-    isRead: true,
-    type: 'grade',
-  },
-  {
-    id: 'n5',
-    title: 'تذكير بموعد الأنشطة اللاصفية 🎨',
-    body: 'يوم الخميس القادم مخصص لمعرض الفنون البصرية والتشكيلية، يرجى إحضار كراسة الرسم.',
-    time: 'منذ 3 أيام',
-    isRead: true,
-    type: 'general',
-  },
-]
-
 export default function ParentNotificationsPage() {
-  const [notifications, setNotifications] = useState<Notification[]>(DEFAULT_NOTIFICATIONS)
+  const [notifications, setNotifications] = useState<Notification[]>([])
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('nexus_parent_notifications')
+      if (raw) {
+        setNotifications(JSON.parse(raw))
+      }
+    } catch {}
+  }, [])
 
   const unreadCount = notifications.filter(n => !n.isRead).length
 
   const markAllRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })))
+    const updated = notifications.map(n => ({ ...n, isRead: true }))
+    setNotifications(updated)
+    try {
+      localStorage.setItem('nexus_parent_notifications', JSON.stringify(updated))
+    } catch {}
   }
 
   const toggleRead = (id: string) => {
-    setNotifications(prev =>
-      prev.map(n => (n.id === id ? { ...n, isRead: !n.isRead } : n))
-    )
+    const updated = notifications.map(n => (n.id === id ? { ...n, isRead: !n.isRead } : n))
+    setNotifications(updated)
+    try {
+      localStorage.setItem('nexus_parent_notifications', JSON.stringify(updated))
+    } catch {}
   }
 
   return (
@@ -91,7 +59,7 @@ export default function ParentNotificationsPage() {
             </div>
             <h1 className="text-3xl md:text-5xl font-black mb-2 tracking-tight">الإشعارات والتنبيهات 🔔</h1>
             <p className="text-amber-100 text-sm md:text-base max-w-xl font-medium">
-              متابعة فورية ومباشرة لكافة مستجدات الحضور والواجبات والتوجيهات من د. إسماعيل عيسى.
+              متابعة فورية ومباشرة لكافة مستجدات الحضور والواجبات والتوجيهات.
             </p>
           </div>
 
@@ -103,8 +71,9 @@ export default function ParentNotificationsPage() {
             {unreadCount > 0 && (
               <button
                 onClick={markAllRead}
-                className="px-4 py-3 rounded-2xl bg-white text-amber-800 font-black text-xs shadow-lg hover:bg-amber-50 transition-colors"
+                className="px-4 py-3 rounded-2xl bg-white text-amber-800 font-black text-xs shadow-lg hover:bg-amber-50 transition-colors flex items-center gap-2"
               >
+                <CheckCheck className="w-4 h-4" />
                 تحديد الكل كمقروء
               </button>
             )}
@@ -112,20 +81,27 @@ export default function ParentNotificationsPage() {
         </div>
       </motion.div>
 
-      {/* ── NOTIFICATIONS LIST ── */}
-      <div className="space-y-3.5">
-        {notifications.map((notif, i) => {
-          const typeIcons = {
-            attendance: { icon: CheckCircle2, color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-500/10' },
-            homework: { icon: BookOpen, color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-500/10' },
-            certificate: { icon: Trophy, color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-500/10' },
-            grade: { icon: Sparkles, color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-500/10' },
-            general: { icon: Bell, color: 'text-teal-500', bg: 'bg-teal-50 dark:bg-teal-500/10' },
-          }
-          const cfg = typeIcons[notif.type] || typeIcons.general
-          const Icon = cfg.icon
+      {/* ── EMPTY STATE ── */}
+      {notifications.length === 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col items-center justify-center py-24 gap-4 text-center"
+        >
+          <div className="w-24 h-24 rounded-3xl bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center">
+            <InboxIcon className="w-12 h-12 text-amber-400" />
+          </div>
+          <h3 className="text-xl font-black text-gray-900 dark:text-white">لا توجد إشعارات</h3>
+          <p className="text-sm text-gray-500 font-medium max-w-xs">
+            ستظهر هنا إشعارات الحضور والواجبات والدرجات فور وصولها
+          </p>
+        </motion.div>
+      )}
 
-          return (
+      {/* ── NOTIFICATIONS LIST ── */}
+      {notifications.length > 0 && (
+        <div className="space-y-3.5">
+          {notifications.map((notif, i) => (
             <motion.div
               key={notif.id}
               initial={{ opacity: 0, y: 15 }}
@@ -138,10 +114,9 @@ export default function ParentNotificationsPage() {
                   : 'bg-white/95 dark:bg-[#1e1e2d]/95 border-amber-200 dark:border-amber-500/30 shadow-md ring-1 ring-amber-500/10'
               }`}
             >
-              <div className={`w-12 h-12 rounded-2xl ${cfg.bg} flex items-center justify-center flex-shrink-0 ${cfg.color}`}>
-                <Icon className="w-6 h-6" />
+              <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center flex-shrink-0 text-amber-500">
+                <Bell className="w-5 h-5" />
               </div>
-
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2 mb-1">
                   <h3 className={`font-black text-sm ${notif.isRead ? 'text-gray-800 dark:text-gray-200' : 'text-gray-900 dark:text-white'}`}>
@@ -149,18 +124,15 @@ export default function ParentNotificationsPage() {
                   </h3>
                   <span className="text-[10px] text-gray-400 font-mono whitespace-nowrap">{notif.time}</span>
                 </div>
-                <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed font-medium">
-                  {notif.body}
-                </p>
+                <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed font-medium">{notif.body}</p>
               </div>
-
               {!notif.isRead && (
                 <div className="w-2.5 h-2.5 rounded-full bg-amber-500 flex-shrink-0 mt-2 shadow-sm" />
               )}
             </motion.div>
-          )
-        })}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
