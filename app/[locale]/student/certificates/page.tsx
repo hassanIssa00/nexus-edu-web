@@ -1,49 +1,68 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
-import { Trophy, Award, Sparkles, Printer, CheckCircle2, ShieldCheck } from 'lucide-react'
+import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import { Trophy, Award, Sparkles, Printer, CheckCircle2, ShieldCheck, Eye } from 'lucide-react';
+import StudentCertificateModal from '@/components/certificates/StudentCertificateModal';
 
 export default function StudentCertificatesPage() {
-  const [certificates, setCertificates] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
+  const [certificates, setCertificates] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [studentName, setStudentName] = useState('الطالب المتميز');
+  const [studentPhoto, setStudentPhoto] = useState<string | undefined>(undefined);
+  const [gradeLabel, setGradeLabel] = useState('الصف الأول الابتدائي — فئة (أ)');
+  const [selectedCert, setSelectedCert] = useState<any | null>(null);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const { nexusBridge } = await import('@/lib/nexusDataBridge')
-        const certs = nexusBridge.getCertificates('cls-std-2')
-        setCertificates(certs || [])
+        let currentStudentId = '';
+        const userJson = localStorage.getItem('nexus_user');
+        if (userJson) {
+          const user = JSON.parse(userJson);
+          if (user.name) setStudentName(user.name);
+          if (user.photoUrl || user.avatarUrl) setStudentPhoto(user.photoUrl || user.avatarUrl);
+          if (user.grade) setGradeLabel(user.grade);
+          currentStudentId = user.id || user.studentId || '';
+        }
+
+        const { nexusBridge } = await import('@/lib/nexusDataBridge');
+        const certs = nexusBridge.getCertificates(currentStudentId || undefined);
+        setCertificates(certs || []);
       } catch (e) {
-        console.error(e)
+        console.error(e);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
-    load()
-  }, [])
+    };
+    load();
+  }, []);
 
   if (loading) {
     return (
       <div className="flex h-[60vh] items-center justify-center">
         <div className="w-12 h-12 rounded-full border-4 border-amber-500/20 border-t-amber-500 animate-spin" />
       </div>
-    )
+    );
   }
 
   return (
     <div className="space-y-8 pb-16" dir="rtl">
       {/* HERO */}
-      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-amber-500 via-yellow-500 to-orange-600 p-8 text-white shadow-2xl">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-amber-500 via-yellow-500 to-orange-600 p-8 text-white shadow-2xl"
+      >
         <div className="relative z-10">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md mb-3">
             <Sparkles className="w-3.5 h-3.5 text-yellow-200" />
-            <span className="text-xs font-bold text-amber-100">الصف الأول الابتدائي • مدارس الإخلاص الأهلية</span>
+            <span className="text-xs font-bold text-amber-100">{gradeLabel} • مدارس الإخلاص الأهلية</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-black mb-2 tracking-tight">سجل الإنجازات والشهادات 🏆</h1>
           <p className="text-amber-100 text-sm max-w-xl font-medium">
-            جميع شهادات التميز وأوسمة الشرف المعتمدة رقمياً للطالب <span className="font-bold underline">أحمد فيصل الغامدي</span>
+            جميع شهادات التميز وأوسمة الشرف المعتمدة رقمياً للطالب{' '}
+            <span className="font-bold underline">{studentName}</span> بشعار منصة نِكْسَس ومدارس الإخلاص.
           </p>
         </div>
       </motion.div>
@@ -76,14 +95,19 @@ export default function StudentCertificatesPage() {
             <Trophy className="w-16 h-16 text-amber-400/40 mx-auto" />
             <h4 className="font-black text-lg text-gray-800 dark:text-gray-200">لا توجد شهادات صادرة حتى الآن</h4>
             <p className="text-xs text-gray-500 max-w-md mx-auto leading-relaxed">
-              تصدر الشهادات الرسمية من إدارة المدرسة تلقائياً بعد إتمام البرامج التعليمية والاختبارات الفصلية المعتمدة.
+              تصدر الشهادات الرسمية من معلم الفصل وإدارة المدرسة تلقائياً بعد إتمام البرامج التعليمية والواجبات المعتمدة.
             </p>
           </div>
         ) : (
           certificates.map((cert, i) => (
-            <motion.div key={cert.id || i} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
+            <motion.div
+              key={cert.id || i}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.06 }}
               whileHover={{ y: -2 }}
-              className="bg-white/80 dark:bg-[#1e1e2d]/80 backdrop-blur-xl border border-amber-200/60 dark:border-amber-500/20 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5">
+              className="bg-white/80 dark:bg-[#1e1e2d]/80 backdrop-blur-xl border border-amber-200/60 dark:border-amber-500/20 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5"
+            >
               <div className="flex items-start gap-4">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-yellow-500 flex items-center justify-center text-3xl shadow-md shadow-amber-500/20 text-white flex-shrink-0">
                   🏆
@@ -91,15 +115,21 @@ export default function StudentCertificatesPage() {
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <h4 className="font-black text-base text-gray-900 dark:text-white">{cert.programTitle || cert.title}</h4>
-                    <span className="px-2.5 py-0.5 rounded-lg bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 text-xs font-black">
+                    <span className="px-2.5 py-0.5 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-400 text-xs font-black">
                       معتمدة برقم تسلسلي
                     </span>
                   </div>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 max-w-xl leading-relaxed">{cert.achievementText || cert.description}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 max-w-xl leading-relaxed">
+                    {cert.achievement || cert.achievementText || cert.description}
+                  </p>
                   <div className="flex items-center gap-3 mt-2 text-[11px] text-gray-400 font-mono">
-                    <span className="font-bold text-amber-700 dark:text-amber-400">كود الاعتماد: #{cert.serialNumber || cert.id}</span>
+                    <span className="font-bold text-amber-700 dark:text-amber-400">
+                      كود التوثيق: #{cert.certNumber || cert.serialNumber || cert.id}
+                    </span>
                     <span>•</span>
-                    <span>تاريخ الإصدار: {new Date(cert.createdAt).toLocaleDateString('ar-SA')}</span>
+                    <span>المعلم المعتمد: {cert.doctorName || 'معلم الفصل'}</span>
+                    <span>•</span>
+                    <span>تاريخ الإصدار: {cert.completionDate || new Date(cert.createdAt).toLocaleDateString('ar-SA')}</span>
                   </div>
                 </div>
               </div>
@@ -109,15 +139,41 @@ export default function StudentCertificatesPage() {
                   <p className="text-2xl font-black text-amber-600">{cert.score}%</p>
                   <p className="text-[10px] text-gray-500 font-bold">الدرجة</p>
                 </div>
-                <button onClick={() => window.print()}
-                  className="px-4 py-3 rounded-2xl bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-gray-800 dark:text-white text-xs font-bold transition-colors flex items-center gap-1.5 shadow-sm">
-                  <Printer className="w-4 h-4" /> طباعة
+                <button
+                  onClick={() =>
+                    setSelectedCert({
+                      id: cert.id,
+                      studentName: cert.studentName || studentName,
+                      studentPhoto: studentPhoto,
+                      grade: gradeLabel,
+                      trackTitle: cert.programTitle || cert.title,
+                      score: cert.score || 98,
+                      ratingText: cert.badge || 'ممتاز مع مرتبة الشرف 🏆',
+                      date: cert.completionDate || new Date().toLocaleDateString('ar-SA'),
+                      certNumber: cert.certNumber || cert.serialNumber || cert.id,
+                      notes: cert.notes || 'شهادة تميز معتمدة رسمياً وموثقة رقمياً بكود QR.',
+                      teacherName: cert.doctorName || 'المعلم المشرف',
+                      teacherRole: cert.doctorTitle || 'معلم الفصل والمشرف الأكاديمي',
+                    })
+                  }
+                  className="px-4 py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-black transition-colors flex items-center gap-1.5 shadow-sm cursor-pointer"
+                >
+                  <Eye className="w-4 h-4" /> عرض وطباعة
                 </button>
               </div>
             </motion.div>
           ))
         )}
       </div>
+
+      {/* Interactive Certificate View & Print Modal */}
+      {selectedCert && (
+        <StudentCertificateModal
+          isOpen={!!selectedCert}
+          onClose={() => setSelectedCert(null)}
+          certificate={selectedCert}
+        />
+      )}
     </div>
-  )
+  );
 }

@@ -1,287 +1,662 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { Award, ArrowLeft, Printer, Download, CheckCircle2, UserCheck, Star, Sparkles } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import Link from 'next/link'
+import { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
+import {
+  Award,
+  ArrowLeft,
+  Printer,
+  CheckCircle2,
+  UserCheck,
+  Star,
+  Sparkles,
+  Send,
+  Users,
+  ShieldCheck,
+  RefreshCw,
+  Eye,
+} from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
+import {
+  OfficialCertificateDesign,
+  type CertData,
+} from '@/components/certificates/OfficialCertificateDesign';
 
-const classes = [
-    { id: 'dr-ismail-1', name: 'الصف الأول الابتدائي — الفئة (أ)' },
-]
+/* ── Suggested Achievement Presets ── */
+const SUGGESTED_ACHIEVEMENTS = [
+  'التفوق الدراسي والأكاديمي العام',
+  'التميز في القراءة والوعي الصوتي',
+  'التقدم الملحوظ في مهارات التعلم الذكي',
+  'التفوق والتميز في الرياضيات والحساب الذهني',
+  'مهارات التواصل والانضباط الصفي الرفيع',
+  'الالتزام والمداومة والتفوق المستمر',
+];
 
-const templates = [
-    { id: 'classic', name: 'الكلاسيكي الذهبي', colors: 'from-amber-600 to-yellow-500' },
-    { id: 'modern', name: 'العصري الأزرق', colors: 'from-blue-600 to-indigo-600' },
-    { id: 'creative', name: 'المبتكر الأخضر', colors: 'from-emerald-500 to-teal-500' },
-]
+const GRADE_PRESETS = [
+  'الصف الأول الابتدائي — فئة (أ)',
+  'الصف الأول الابتدائي — فئة (ب)',
+  'الصف الثاني الابتدائي',
+  'الصف الثالث الابتدائي',
+  'الصف الرابع الابتدائي',
+  'الصف الخامس الابتدائي',
+  'الصف السادس الابتدائي',
+];
 
-function getTemplateAccentColors(gradient: string) {
-    const colorStops = gradient.split(' ')
-    const start = colorStops.find(stop => stop.startsWith('from-'))?.replace('from-', '') ?? 'amber-600'
-    const end = colorStops.find(stop => stop.startsWith('to-'))?.replace('to-', '') ?? start
-
-    return { start, end }
-}
+const THEMES = [
+  { id: 'emerald', name: 'الزمردي المدرسي (الإخلاص)', color: 'bg-emerald-600', border: 'border-emerald-600' },
+  { id: 'gold', name: 'الكلاسيكي الذهبي الفاخر', color: 'bg-amber-500', border: 'border-amber-500' },
+  { id: 'blue', name: 'العصري الأزرق الملكي', color: 'bg-blue-600', border: 'border-blue-600' },
+];
 
 export default function CertificatesAutomation() {
-    const [selectedClass, setSelectedClass] = useState<string>('dr-ismail-1')
-    const [selectedTemplate, setSelectedTemplate] = useState<(typeof templates)[number]>(templates[0]!)
-    const [studentList, setStudentList] = useState<any[]>([])
-    const [isGenerating, setIsGenerating] = useState(false)
-    const [issuedAlert, setIssuedAlert] = useState<string | null>(null)
-    const templateAccentColors = getTemplateAccentColors(selectedTemplate.colors)
+  const [students, setStudents] = useState<any[]>([]);
+  const [selectedStudentId, setSelectedStudentId] = useState<string>('');
+  const [themeColor, setThemeColor] = useState<'emerald' | 'gold' | 'blue'>('emerald');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isBroadcasting, setIsBroadcasting] = useState(false);
+  const [statusAlert, setStatusAlert] = useState<string | null>(null);
+  const [previewModal, setPreviewModal] = useState(false);
+  const printContainerRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        const load = async () => {
-            try {
-                const { nexusBridge } = await import('@/lib/nexusDataBridge')
-                const students = nexusBridge.getStudents()
-                setStudentList(students.map((s, idx) => ({
-                    id: s.id,
-                    name: s.fullName,
-                    score: s.averageGrade,
-                    isSelected: idx < 3,
-                })))
-            } catch (e) {
-                console.error('load students for certs error:', e)
-            }
+  // Initial Certificate Form State with Dynamic Teacher Fallback
+  const [form, setForm] = useState<CertData>({
+    certTitle: 'شـهـادة شـكـر وتـقـديـر',
+    subTitle: 'تمنحها منصة نِكْسَس التعليمية الذكية بالتعاون مع مدارس الإخلاص الأهلية للبنين بجدة',
+    teacherName: 'المعلم المشرف',
+    teacherTitle: 'معلم الفصل والمشرف الأكاديمي',
+    studentPrefix: 'يُسعدنا أن نتقدم بخالص الشكر والتقدير للطالب المتميز',
+    studentName: 'علي إبراهيم سيد أحمد',
+    gradeLabel: 'الصف الأول الابتدائي — فئة (أ)',
+    achievementIntro: 'وذلك لتميزه الدراسي وتفوقه وجدارة الأداء العالي في:',
+    achievement: 'التفوق والتميز في مهارات القراءة والحساب الذهني',
+    score: 98,
+    ratingText: 'ممتاز مع مرتبة الشرف 🏆',
+    date: new Date().toLocaleDateString('ar-SA'),
+    note: 'طالب متميز ومتفوق أظهر التزاماً استثنائياً ومهارات أكاديمية ملهمة.',
+    certNumber: `NEXUS-CERT-2026-${Math.floor(10000 + Math.random() * 90000)}`,
+    themeColor: 'emerald',
+  });
+
+  // Load teacher from localStorage and real class students
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        // 1. Load logged in teacher info
+        let teacherName = 'المعلم المشرف';
+        let teacherTitle = 'معلم الفصل والمشرف الأكاديمي';
+        const userJson = localStorage.getItem('nexus_user');
+        if (userJson) {
+          const user = JSON.parse(userJson);
+          if (user.name) {
+            teacherName = user.name;
+          }
+          if (user.specialization) {
+            teacherTitle = `معلم مادة ${user.specialization} والمشرف الأكاديمي`;
+          } else if (user.title) {
+            teacherTitle = user.title;
+          }
         }
-        load()
-    }, [])
 
-    const toggleStudent = (id: string | number) => {
-        setStudentList(studentList.map(s => s.id === id ? { ...s, isSelected: !s.isSelected } : s))
-    }
+        // 2. Load real students from nexusBridge
+        const { nexusBridge } = await import('@/lib/nexusDataBridge');
+        const stList = nexusBridge.getStudents();
+        setStudents(stList);
 
-    const selectAll = () => {
-        setStudentList(studentList.map(s => ({ ...s, isSelected: true })))
-    }
-
-    const deselectAll = () => {
-        setStudentList(studentList.map(s => ({ ...s, isSelected: false })))
-    }
-
-    const selectedCount = studentList.filter(s => s.isSelected).length
-
-    const handleGenerate = async () => {
-        setIsGenerating(true)
-        try {
-            const { nexusBridge } = await import('@/lib/nexusDataBridge')
-            const selectedStudents = studentList.filter(s => s.isSelected)
-            selectedStudents.forEach(st => {
-                nexusBridge.issueCertificate({
-                    studentId: String(st.id),
-                    studentName: st.name,
-                    programTitle: 'التميز الأكاديمي والانضباط الصفي',
-                    achievement: 'التفوق الاستثنائي في تطبيقات اللغة العربية والقرآن الكريم والحساب الذهني',
-                    score: st.score || 98,
-                    completionDate: new Date().toISOString().split('T')[0],
-                    doctorName: 'د. إسماعيل عيسى',
-                    doctorTitle: 'المشرف الأكاديمي ومعلم الفصل',
-                    badge: 'وسام الشرف والامتياز',
-                })
-            })
-            setIssuedAlert(`تم إصدار ${selectedStudents.length} شهادات معتمدة برقم تسلسلي وباركود توثيق بنجاح!`)
-            setTimeout(() => setIssuedAlert(null), 5000)
-            window.print()
-        } catch (e) {
-            console.error('issue cert error:', e)
-        } finally {
-            setIsGenerating(false)
+        if (stList.length > 0) {
+          const first = stList[0];
+          setSelectedStudentId(first.id);
+          setForm((prev) => ({
+            ...prev,
+            teacherName,
+            teacherTitle,
+            studentName: first.fullName,
+            gradeLabel: first.grade || prev.gradeLabel,
+          }));
+        } else {
+          setForm((prev) => ({
+            ...prev,
+            teacherName,
+            teacherTitle,
+          }));
         }
-    }
+      } catch (err) {
+        console.error('Error loading certificate page data:', err);
+      }
+    };
 
-    return (
-        <div className="space-y-6 max-w-6xl mx-auto pb-10">
-            {/* Header */}
-            <div className="flex items-center gap-4 mb-6">
-                <Link href="/teacher/automation">
-                    <Button variant="outline" size="icon" className="rounded-full shadow-sm hover:bg-muted border-border">
-                        <ArrowLeft className="w-5 h-5 text-muted-foreground" />
-                    </Button>
-                </Link>
-                <div>
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-md">
-                            <Award className="w-5 h-5 text-white" />
-                        </div>
-                        <h1 className="text-2xl font-bold text-foreground">شهادات التقدير التلقائية</h1>
-                    </div>
-                    <p className="text-muted-foreground text-sm mt-1 mr-14">توليد وطباعة شهادات تقدير لمجموعة طلاب بضغطة زر واحدة.</p>
-                </div>
+    loadData();
+  }, []);
+
+  const handleStudentSelect = (id: string) => {
+    setSelectedStudentId(id);
+    const st = students.find((s) => s.id === id);
+    if (st) {
+      setForm((prev) => ({
+        ...prev,
+        studentName: st.fullName,
+        gradeLabel: st.grade || prev.gradeLabel,
+        certNumber: `NEXUS-CERT-2026-${Math.floor(10000 + Math.random() * 90000)}`,
+      }));
+    }
+  };
+
+  const generateNewSerial = () => {
+    setForm((prev) => ({
+      ...prev,
+      certNumber: `NEXUS-CERT-2026-${Math.floor(10000 + Math.random() * 90000)}`,
+    }));
+  };
+
+  // Direct print modal function with A4 landscape standard
+  const handlePrint = () => {
+    const win = window.open('', '_blank');
+    if (!win) return;
+
+    const styles = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
+      .map((node) => node.outerHTML)
+      .join('\n');
+
+    const content = document.getElementById('printable-certificate')?.outerHTML;
+    if (!content) return;
+
+    win.document.write(`<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8"/>
+  <title>شهادة تفوق - ${form.studentName} - مدارس الإخلاص الأهلية ومنصة نكسس</title>
+  ${styles}
+  <style>
+    @page { size: 297mm 210mm; margin: 0; }
+    * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    html, body {
+      width: 297mm;
+      height: 210mm;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #ffffff;
+      font-family: 'Cairo', 'Amiri', Arial, sans-serif;
+    }
+    .cert-print-container {
+      width: 297mm;
+      height: 210mm;
+      padding: 7mm;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+    }
+  </style>
+</head>
+<body>
+  <div class="cert-print-container">
+    <div style="width: 100%; height: 100%;">${content}</div>
+  </div>
+  <script>
+    window.addEventListener('load', function() {
+      setTimeout(function() { window.print(); }, 400);
+    });
+  </script>
+</body>
+</html>`);
+    win.document.close();
+  };
+
+  // Send certificate directly to Student & Parent Portal
+  const handleSendToPortal = async () => {
+    setIsGenerating(true);
+    try {
+      const { nexusBridge } = await import('@/lib/nexusDataBridge');
+      nexusBridge.issueCertificate({
+        studentId: selectedStudentId || `std-${Date.now()}`,
+        studentName: form.studentName,
+        programTitle: form.certTitle,
+        achievement: form.achievement,
+        score: form.score,
+        completionDate: form.date,
+        doctorName: form.teacherName,
+        doctorTitle: form.teacherTitle,
+        badge: form.ratingText,
+      });
+
+      setStatusAlert(`تم إصدار الشهادة واعتمادها رسمياً للطالب (${form.studentName}) وإرسالها لبوابة الطالب وولي الأمر! 🚀`);
+      setTimeout(() => setStatusAlert(null), 5000);
+    } catch (e) {
+      console.error(e);
+      setStatusAlert('حدث خطأ أثناء اعتماد الشهادة.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // Send WhatsApp notification to Parent
+  const handleSendWhatsApp = () => {
+    const student = students.find((s) => s.id === selectedStudentId);
+    const parentPhone = student?.parentPhone ? student.parentPhone.replace(/\+/g, '') : '966500000000';
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://nexus.masarplatform.org';
+    const verifyUrl = `${origin}/verify/${form.certNumber}?name=${encodeURIComponent(form.studentName)}&prog=${encodeURIComponent(form.achievement)}&score=${form.score}&date=${encodeURIComponent(form.date)}`;
+
+    const text =
+      `🎖️ *شهادة تفوق وتكريم رقمية معتمدة — مدارس الإخلاص الأهلية ومنصة نِكْسَس*%0A%0A` +
+      `👨‍👧‍👦 *المكرم ولي أمر الطالب البطل:* ${encodeURIComponent(student?.parentName || `ولي أمر ${form.studentName}`)}%0A` +
+      `👤 *الطالب المتميز:* ${encodeURIComponent(form.studentName)}%0A` +
+      `🏆 *الشهادة:* ${encodeURIComponent(form.certTitle)}%0A` +
+      `🎯 *مجال التميز:* ${encodeURIComponent(form.achievement)}%0A` +
+      `🌟 *التقدير المستحق:* ${encodeURIComponent(form.ratingText)} (بنسبة %${form.score})%0A` +
+      `👨‍🏫 *المعلم المعتمد:* ${encodeURIComponent(form.teacherName)}%0A` +
+      `✍️ *رقم التوثيق الرقمي:* ${form.certNumber}%0A%0A` +
+      `💬 *ملاحظة المعلم:*%0A"${encodeURIComponent(form.note)}"%0A%0A` +
+      `🔗 *رابط فحص واستعراض الشهادة الرقمية المعتمدة:*%0A${encodeURIComponent(verifyUrl)}`;
+
+    window.open(`https://wa.me/${parentPhone}?text=${text}`, '_blank');
+  };
+
+  // Broadcast certificates to ALL students in the class
+  const handleBroadcastAll = async () => {
+    if (students.length === 0) return;
+    setIsBroadcasting(true);
+    try {
+      const { nexusBridge } = await import('@/lib/nexusDataBridge');
+      students.forEach((st, idx) => {
+        nexusBridge.issueCertificate({
+          studentId: st.id,
+          studentName: st.fullName,
+          programTitle: form.certTitle,
+          achievement: form.achievement,
+          score: st.averageGrade || form.score,
+          completionDate: form.date,
+          doctorName: form.teacherName,
+          doctorTitle: form.teacherTitle,
+          badge: form.ratingText,
+        });
+      });
+      setStatusAlert(`تم إصدار الشهادات المعتمدة بنجاح لجميع طلاب الفصل (${students.length} طالب) مع التوثيق الرقمي! 🎓`);
+      setTimeout(() => setStatusAlert(null), 5000);
+    } catch (e) {
+      console.error(e);
+      setStatusAlert('حدث خطأ أثناء إصدار الشهادات.');
+    } finally {
+      setIsBroadcasting(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6 max-w-7xl mx-auto pb-16" dir="rtl">
+      {/* Header */}
+      <div className="flex items-center justify-between flex-wrap gap-4 mb-2">
+        <div className="flex items-center gap-4">
+          <Link href="/teacher/automation">
+            <Button variant="outline" size="icon" className="rounded-2xl border-gray-200 dark:border-white/10">
+              <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+            </Button>
+          </Link>
+          <div>
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-500 via-orange-500 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20 text-white">
+                <Award className="w-6 h-6" />
+              </div>
+              <h1 className="text-2xl font-black text-gray-900 dark:text-white">شهادات التقدير والاعتماد الرقمية</h1>
             </div>
-
-            {/* Selection Controls */}
-            <Card className="border-border shadow-sm bg-card">
-                <CardContent className="p-6">
-                    <div className="space-y-2 max-w-md">
-                        <label className="text-sm font-semibold text-foreground">الفصل الدراسي</label>
-                        <Select value={selectedClass} onValueChange={setSelectedClass}>
-                            <SelectTrigger className="h-10 rounded-md mt-1 border-border focus:ring-amber-500">
-                                <SelectValue placeholder="اختر الفصل..." />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {classes.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </CardContent>
-            </Card>
-
-            {selectedClass && (
-                <div className="grid lg:grid-cols-5 gap-6">
-                    {/* Left Column: Settings */}
-                    <div className="lg:col-span-2 space-y-6">
-                        <Card className="border-border shadow-sm bg-card">
-                            <CardContent className="p-5">
-                                <h3 className="text-base font-bold mb-4 flex items-center gap-2 text-foreground">
-                                    <Star className="w-4 h-4 text-amber-500" />
-                                    تصميم الشهادة
-                               </h3>
-                                <div className="space-y-3">
-                                    {templates.map(tpl => (
-                                        <div 
-                                            key={tpl.id}
-                                            onClick={() => setSelectedTemplate(tpl)}
-                                            className={`p-3 rounded-lg border-2 cursor-pointer transition-all flex items-center gap-3 ${selectedTemplate.id === tpl.id ? 'border-amber-500 bg-amber-50 dark:bg-amber-950/30' : 'border-transparent bg-muted/50 hover:border-border hover:bg-muted'}`}
-                                        >
-                                            <div className={`w-5 h-5 rounded-full bg-gradient-to-br ${tpl.colors} flex-shrink-0 shadow-sm border border-background/20`}></div>
-                                            <span className="font-semibold text-sm text-foreground flex-1">{tpl.name}</span>
-                                            {selectedTemplate.id === tpl.id && <CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0" />}
-                                        </div>
-                                    ))}
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        <Card className="border-border shadow-sm bg-card flex flex-col h-[360px]">
-                            <CardContent className="p-5 flex-1 flex flex-col">
-                                <div className="flex items-center justify-between mb-4 border-b border-border pb-3">
-                                    <h3 className="text-base font-bold flex items-center gap-2 text-foreground">
-                                        <UserCheck className="w-4 h-4 text-muted-foreground" />
-                                        اختيار الطلاب ({selectedCount})
-                                    </h3>
-                                    <div className="flex gap-2 text-xs">
-                                        <button onClick={selectAll} className="font-semibold text-amber-600 dark:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950/50 px-2 py-1.5 rounded transition-colors">تحديد الكل</button>
-                                        <button onClick={deselectAll} className="font-semibold text-muted-foreground hover:bg-muted px-2 py-1.5 rounded transition-colors">إلغاء الكل</button>
-                                    </div>
-                                </div>
-                                <div className="flex-1 space-y-1 overflow-y-auto pr-2 custom-scrollbar -mr-2">
-                                    {studentList.map(student => (
-                                        <div 
-                                            key={student.id}
-                                            onClick={() => toggleStudent(student.id)}
-                                            className="flex items-center gap-3 p-2.5 rounded-md hover:bg-muted/60 cursor-pointer transition-colors"
-                                        >
-                                            <div className={`w-4 h-4 rounded border transition-colors flex items-center justify-center shrink-0 ${student.isSelected ? 'bg-amber-500 border-amber-500' : 'border-muted-foreground/40'}`}>
-                                                {student.isSelected && <CheckCircle2 className="w-3 h-3 text-white" />}
-                                            </div>
-                                            <span className="font-medium text-sm text-foreground truncate">{student.name}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </div>
-
-                    {/* Right Column: Preview & Print */}
-                    <div className="lg:col-span-3">
-                        <Card className="border-border shadow-md bg-muted/30 overflow-hidden sticky top-6 flex flex-col h-full min-h-[500px]">
-                            <div className="p-4 border-b border-border flex flex-col sm:flex-row justify-between items-center bg-background gap-4">
-                                <h3 className="font-bold flex items-center gap-2 text-sm text-foreground">
-                                    معاينة الطباعة <Badge variant="secondary" className="mr-1">{selectedCount} شهادات</Badge>
-                                </h3>
-                                <div className="flex gap-2">
-                                    <Button 
-                                        variant="outline" 
-                                        size="sm"
-                                        className="font-semibold hover:bg-muted border-border h-9"
-                                        disabled={selectedCount === 0}
-                                    >
-                                        <Download className="w-4 h-4 ml-1.5" /> PDF
-                                    </Button>
-                                    <Button 
-                                        size="sm"
-                                        onClick={handleGenerate}
-                                        disabled={selectedCount === 0 || isGenerating}
-                                        className="font-semibold bg-amber-500 hover:bg-amber-600 text-white h-9 shadow-sm"
-                                    >
-                                        {isGenerating ? (
-                                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                        ) : (
-                                            <>
-                                                <Printer className="w-4 h-4 ml-1.5" /> استخراج وطباعة
-                                            </>
-                                        )}
-                                    </Button>
-                                </div>
-                            </div>
-                            
-                            <CardContent className="p-6 md:p-8 flex justify-center items-center flex-1 bg-muted/20">
-                                {selectedCount > 0 ? (
-                                    <motion.div 
-                                        key={selectedTemplate.id}
-                                        initial={{ opacity: 0, scale: 0.95 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        className="w-full max-w-2xl bg-white aspect-[1.414/1] shadow-xl relative border border-gray-200 flex flex-col items-center justify-center p-8 sm:p-12 overflow-hidden mx-auto"
-                                    >
-                                        {/* Certificate Design Details */}
-                                        <div className={`absolute top-0 left-0 w-full h-3 bg-gradient-to-r ${selectedTemplate.colors}`}></div>
-                                        <div className={`absolute bottom-0 left-0 w-full h-3 bg-gradient-to-r ${selectedTemplate.colors}`}></div>
-                                        <div className={`absolute top-4 left-4 border-t-8 border-l-8 w-12 h-12 border-t-${templateAccentColors.start} border-l-${templateAccentColors.start} opacity-80`}></div>
-                                        <div className={`absolute bottom-4 right-4 border-b-8 border-r-8 w-12 h-12 border-b-${templateAccentColors.end} border-r-${templateAccentColors.end} opacity-80`}></div>
-                                        
-                                        <Award className={`w-16 h-16 md:w-20 md:h-20 mb-6 text-${templateAccentColors.start} opacity-10 absolute top-8 right-8`} />
-                                        
-                                        <div className="text-center z-10 w-full space-y-6 md:space-y-8">
-                                            <div>
-                                                <h1 className="text-3xl md:text-4xl font-black text-gray-800 tracking-wide mb-2">شـهـادة شـكـر وتـقـديـر</h1>
-                                                <div className={`h-1 w-24 bg-gradient-to-r ${selectedTemplate.colors} mx-auto mt-3 opacity-80`}></div>
-                                            </div>
-                                            
-                                            <div className="space-y-4">
-                                                <p className="text-lg md:text-xl text-gray-600 font-medium">يُسعدنا أن نتقدم بخالص الشكر والتقدير للطالب المتميز</p>
-                                                <h2 className="text-3xl md:text-4xl font-black text-gray-900 pb-2 border-b border-dashed border-gray-300 inline-block px-8">
-                                                    {studentList.find(s => s.isSelected)?.name || 'اسم الطالب'}
-                                                </h2>
-                                                <p className="text-base md:text-lg text-gray-600 font-medium max-w-sm md:max-w-md mx-auto leading-relaxed px-4">
-                                                    وذلك لتميزه الدراسي وتفوقه الملحوظ خلال الفصل الدراسي الحالي، متمنين له دوام التوفيق والنجاح.
-                                                </p>
-                                            </div>
-
-                                            <div className="flex justify-between items-end w-full px-4 sm:px-12 pt-8 md:pt-12">
-                                                <div className="text-center">
-                                                    <p className="text-gray-500 text-xs md:text-sm font-bold mb-1">التاريخ</p>
-                                                    <p className="font-bold text-gray-800 text-sm">{new Date().toLocaleDateString('ar-SA')}</p>
-                                                </div>
-                                                <div className="text-center relative">
-                                                    <div className="w-24 h-24 md:w-28 md:h-28 rounded-full border-2 border-amber-500/20 flex flex-col items-center justify-center -rotate-12 absolute bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 opacity-20">
-                                                        <Star className="w-6 h-6 md:w-8 md:h-8 text-amber-500" />
-                                                        <span className="font-black text-[10px] md:text-xs mt-1">NEXUS EDU</span>
-                                                    </div>
-                                                </div>
-                                                <div className="text-center">
-                                                    <p className="text-gray-500 text-xs md:text-sm font-bold mb-1">توقيع المعلم والمشرف</p>
-                                                    <p className="font-black text-gray-800 font-serif italic text-lg md:text-xl relative z-10">د. إسماعيل عيسى</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </motion.div>
-                                ) : (
-                                    <div className="text-center text-muted-foreground flex flex-col items-center justify-center w-full h-full">
-                                        <Award className="w-12 h-12 mx-auto mb-3 opacity-20" />
-                                        <p className="font-semibold text-sm">اختر طالباً واحداً على الأقل لمعاينة الشهادة</p>
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
-                    </div>
-                </div>
-            )}
+            <p className="text-gray-500 text-xs mt-1 mr-14 font-medium">
+              نظام إصدار وطباعة شهادات التميز المعتمدة بشعار مدارس الإخلاص ومنصة نِكْسَس وتوقيع المعلم.
+            </p>
+          </div>
         </div>
-    )
+
+        {/* Global Action Bar */}
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={handleBroadcastAll}
+            disabled={isBroadcasting || students.length === 0}
+            className="rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-xs h-10 px-4 shadow-sm"
+          >
+            {isBroadcasting ? (
+              <Sparkles className="w-4 h-4 ml-1.5 animate-spin" />
+            ) : (
+              <Users className="w-4 h-4 ml-1.5" />
+            )}
+            منح الشهادة لجميع طلاب الفصل ({students.length})
+          </Button>
+        </div>
+      </div>
+
+      {statusAlert && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 text-xs font-black flex items-center gap-3"
+        >
+          <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+          <span>{statusAlert}</span>
+        </motion.div>
+      )}
+
+      {/* Main Studio Grid: Form (5 Cols) + Live Preview (7 Cols) */}
+      <div className="grid lg:grid-cols-12 gap-6 items-start">
+        {/* Left Column: Form Controls & Customization */}
+        <div className="lg:col-span-5 space-y-5">
+          {/* Card 1: Student Selection */}
+          <Card className="rounded-3xl border border-gray-100 dark:border-white/5 bg-white/80 dark:bg-[#1e1e2d]/80 shadow-sm backdrop-blur-xl">
+            <CardContent className="p-5 space-y-4">
+              <div className="flex items-center justify-between border-b border-gray-100 dark:border-white/5 pb-3">
+                <span className="text-xs font-black text-gray-900 dark:text-white flex items-center gap-2">
+                  <UserCheck className="w-4 h-4 text-amber-500" />
+                  اختيار الطالب المكرم
+                </span>
+                <span className="text-[10px] font-bold text-gray-400 bg-gray-100 dark:bg-white/5 px-2.5 py-0.5 rounded-full">
+                  {students.length} طلاب مسجلين
+                </span>
+              </div>
+
+              <div>
+                <select
+                  value={selectedStudentId}
+                  onChange={(e) => handleStudentSelect(e.target.value)}
+                  className="w-full rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-[#252538] px-3.5 py-2.5 text-xs font-black text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                >
+                  <option value="">-- اضغط لاختيار الطالب --</option>
+                  {students.map((st) => (
+                    <option key={st.id} value={st.id}>
+                      👨‍🎓 {st.fullName} — (المعدل: {st.averageGrade || 98}%)
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Student Name Manual Override */}
+              <div>
+                <label className="block text-[11px] font-black text-gray-600 dark:text-gray-300 mb-1">
+                  اسم الطالب بالشهادة (يمكنك تعديله يدوياً):
+                </label>
+                <input
+                  type="text"
+                  value={form.studentName}
+                  onChange={(e) => setForm((p) => ({ ...p, studentName: e.target.value }))}
+                  className="w-full rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#252538] px-3.5 py-2 text-xs font-bold text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                />
+              </div>
+
+              {/* Grade */}
+              <div>
+                <label className="block text-[11px] font-black text-gray-600 dark:text-gray-300 mb-1">
+                  الصف والمرحلة الدراسية:
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={form.gradeLabel}
+                    onChange={(e) => setForm((p) => ({ ...p, gradeLabel: e.target.value }))}
+                    className="flex-1 rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#252538] px-3.5 py-2 text-xs font-bold text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  />
+                  <select
+                    onChange={(e) => e.target.value && setForm((p) => ({ ...p, gradeLabel: e.target.value }))}
+                    className="rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-[#252538] px-2 py-2 text-xs font-bold text-gray-700 dark:text-gray-300 focus:outline-none"
+                  >
+                    <option value="">اقتراحات...</option>
+                    {GRADE_PRESETS.map((g) => (
+                      <option key={g} value={g}>{g}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Card 2: Teacher & Signature Info */}
+          <Card className="rounded-3xl border border-gray-100 dark:border-white/5 bg-white/80 dark:bg-[#1e1e2d]/80 shadow-sm backdrop-blur-xl">
+            <CardContent className="p-5 space-y-3">
+              <div className="flex items-center justify-between border-b border-gray-100 dark:border-white/5 pb-2">
+                <span className="text-xs font-black text-gray-900 dark:text-white flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-emerald-500" />
+                  بيانات المعلم والاعتماد (تظهر في الختم والتوقيع)
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-black text-gray-600 dark:text-gray-300 mb-1">
+                    اسم المعلم المعتمد:
+                  </label>
+                  <input
+                    type="text"
+                    value={form.teacherName}
+                    onChange={(e) => setForm((p) => ({ ...p, teacherName: e.target.value }))}
+                    className="w-full rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#252538] px-3 py-2 text-xs font-black text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-black text-gray-600 dark:text-gray-300 mb-1">
+                    الصفة والمسمى الوظيفي:
+                  </label>
+                  <input
+                    type="text"
+                    value={form.teacherTitle}
+                    onChange={(e) => setForm((p) => ({ ...p, teacherTitle: e.target.value }))}
+                    className="w-full rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#252538] px-3 py-2 text-xs font-bold text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 pt-1">
+                <div>
+                  <label className="block text-[11px] font-black text-gray-600 dark:text-gray-300 mb-1">
+                    تاريخ الإصدار:
+                  </label>
+                  <input
+                    type="text"
+                    value={form.date}
+                    onChange={(e) => setForm((p) => ({ ...p, date: e.target.value }))}
+                    className="w-full rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#252538] px-3 py-2 text-xs font-bold text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-[11px] font-black text-gray-600 dark:text-gray-300">الرقم التسلسلي:</label>
+                    <button
+                      onClick={generateNewSerial}
+                      className="text-[10px] text-amber-600 hover:underline flex items-center gap-0.5 font-bold"
+                    >
+                      <RefreshCw size={10} /> جديد
+                    </button>
+                  </div>
+                  <input
+                    type="text"
+                    value={form.certNumber}
+                    onChange={(e) => setForm((p) => ({ ...p, certNumber: e.target.value }))}
+                    className="w-full rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#252538] px-3 py-2 text-xs font-mono font-bold text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Card 3: Achievement, Rating & Color Theme */}
+          <Card className="rounded-3xl border border-gray-100 dark:border-white/5 bg-white/80 dark:bg-[#1e1e2d]/80 shadow-sm backdrop-blur-xl">
+            <CardContent className="p-5 space-y-4">
+              <div>
+                <label className="block text-[11px] font-black text-gray-600 dark:text-gray-300 mb-1">
+                  مجال التفوق والتميز (حر أو اختيارات):
+                </label>
+                <textarea
+                  value={form.achievement}
+                  onChange={(e) => setForm((p) => ({ ...p, achievement: e.target.value }))}
+                  rows={2}
+                  className="w-full rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#252538] px-3.5 py-2 text-xs font-bold text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none"
+                />
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {SUGGESTED_ACHIEVEMENTS.map((item) => (
+                    <button
+                      key={item}
+                      onClick={() => setForm((p) => ({ ...p, achievement: item }))}
+                      className="rounded-xl bg-gray-100 dark:bg-white/5 hover:bg-amber-50 hover:text-amber-700 dark:hover:bg-amber-950/40 border border-gray-200/80 dark:border-white/10 px-2.5 py-1 text-[10px] font-bold text-gray-600 dark:text-gray-300 transition"
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Score Slider & Rating Select */}
+              <div className="space-y-3 rounded-2xl bg-gray-50 dark:bg-white/5 p-3.5 border border-gray-200/60 dark:border-white/5">
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs font-black text-gray-700 dark:text-gray-200">نسبة التميز والتفوق</label>
+                    <span className="text-xs font-black text-amber-600 dark:text-amber-400 font-mono bg-white dark:bg-[#1e1e2d] px-2.5 py-0.5 rounded-lg border border-gray-200 dark:border-white/10">
+                      %{form.score}
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="75"
+                    max="100"
+                    value={form.score}
+                    onChange={(e) => {
+                      const s = Number(e.target.value);
+                      const rating =
+                        s >= 95
+                          ? 'ممتاز مع مرتبة الشرف 🏆'
+                          : s >= 90
+                          ? 'ممتاز مرتفع ⭐'
+                          : s >= 80
+                          ? 'جيد جداً مرتفع 🌟'
+                          : 'جيد مرتفع ✨';
+                      setForm((p) => ({ ...p, score: s, ratingText: rating }));
+                    }}
+                    className="w-full accent-amber-500 cursor-pointer"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-black text-gray-600 dark:text-gray-300 mb-1">
+                    نص التقدير الشرفي:
+                  </label>
+                  <select
+                    value={form.ratingText}
+                    onChange={(e) => setForm((p) => ({ ...p, ratingText: e.target.value }))}
+                    className="w-full rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#252538] px-3 py-2 text-xs font-bold text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  >
+                    <option value="ممتاز مع مرتبة الشرف 🏆">ممتاز مع مرتبة الشرف 🏆</option>
+                    <option value="ممتاز مرتفع ⭐">ممتاز مرتفع ⭐</option>
+                    <option value="جيد جداً مرتفع 🌟">جيد جداً مرتفع 🌟</option>
+                    <option value="تفوق وجدارة استثنائية 🎖️">تفوق وجدارة استثنائية 🎖️</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Theme Colors */}
+              <div>
+                <label className="block text-[11px] font-black text-gray-600 dark:text-gray-300 mb-1.5">
+                  طابع ولون الشهادة:
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {THEMES.map((t) => (
+                    <button
+                      key={t.id}
+                      onClick={() => {
+                        setThemeColor(t.id as any);
+                        setForm((p) => ({ ...p, themeColor: t.id as any }));
+                      }}
+                      className={`flex items-center gap-2 p-2.5 rounded-2xl border-2 transition ${
+                        themeColor === t.id
+                          ? 'border-amber-500 bg-amber-50/50 dark:bg-amber-950/20'
+                          : 'border-transparent bg-gray-50 dark:bg-white/5 hover:border-gray-200'
+                      }`}
+                    >
+                      <div className={`w-4 h-4 rounded-full ${t.color} shrink-0`} />
+                      <span className="text-[11px] font-bold text-gray-900 dark:text-white truncate">{t.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Encouragement Note */}
+              <div>
+                <label className="block text-[11px] font-black text-gray-600 dark:text-gray-300 mb-1">
+                  ملاحظة تشجيعية من المعلم:
+                </label>
+                <textarea
+                  value={form.note}
+                  onChange={(e) => setForm((p) => ({ ...p, note: e.target.value }))}
+                  rows={2}
+                  className="w-full rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#252538] px-3.5 py-2 text-xs font-bold text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none"
+                />
+              </div>
+
+              {/* Dispatch Action Buttons */}
+              <div className="pt-2 space-y-2">
+                <Button
+                  onClick={handleSendToPortal}
+                  disabled={isGenerating || !form.studentName.trim()}
+                  className="w-full rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs h-11 shadow-sm"
+                >
+                  <ShieldCheck className="w-4 h-4 ml-1.5" />
+                  اعتماد وإرسال لبوابة الطالب وولي الأمر 🚀
+                </Button>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    onClick={handleSendWhatsApp}
+                    variant="outline"
+                    className="rounded-2xl border-gray-200 dark:border-white/10 text-xs font-black h-10 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400"
+                  >
+                    <Send className="w-3.5 h-3.5 ml-1.5" />
+                    إشعار WhatsApp 📱
+                  </Button>
+                  <Button
+                    onClick={handlePrint}
+                    className="rounded-2xl bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-black h-10 shadow-sm"
+                  >
+                    <Printer className="w-3.5 h-3.5 ml-1.5" />
+                    طباعة PDF 🖨️
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Right Column: Live Certificate Canvas Preview */}
+        <div className="lg:col-span-7 space-y-3 sticky top-6">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-black text-gray-600 dark:text-gray-400 flex items-center gap-1.5">
+              <Eye className="w-4 h-4 text-amber-500" />
+              معاينة حية للشهادة المعتمدة بشعار نِكْسَس ومدارس الإخلاص
+            </span>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handlePrint}
+                className="rounded-xl h-8 text-xs font-black border-gray-200 dark:border-white/10 hover:bg-gray-100 dark:hover:bg-white/5"
+              >
+                <Printer className="w-3.5 h-3.5 ml-1" />
+                استخراج وطباعة
+              </Button>
+            </div>
+          </div>
+
+          {/* Master Certificate Preview Component */}
+          <div className="rounded-3xl border border-gray-200 dark:border-white/10 bg-slate-950 p-2 sm:p-3 shadow-2xl overflow-x-auto">
+            <div className="min-w-[650px]" ref={printContainerRef}>
+              <OfficialCertificateDesign form={form} isPrintTarget={false} />
+            </div>
+          </div>
+
+          <p className="text-[11px] text-gray-400 text-center font-bold">
+            💡 يتم استخراج الشهادة بدقة عالية A4 Landscape مع كود التحقق الرقمي وختم المعلم وشعارات المنصة والمدرسة.
+          </p>
+        </div>
+      </div>
+
+      {/* Hidden container for print rendering */}
+      <div style={{ display: 'none' }}>
+        <div id="printable-certificate">
+          <OfficialCertificateDesign form={form} isPrintTarget={true} />
+        </div>
+      </div>
+    </div>
+  );
 }
