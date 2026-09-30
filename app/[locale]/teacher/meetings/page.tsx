@@ -31,12 +31,21 @@ export default function TeacherMeetingsPage() {
     return () => window.removeEventListener('nexus:data-changed', loadMeetings)
   }, [])
 
+  const getTeacherName = () => {
+    try {
+      const u = JSON.parse(localStorage.getItem('nexus_user') || '{}')
+      const t = u.title || 'أ'
+      const n = u.name || u.displayName || u.firstName || 'المعلم'
+      return `${t}. ${n}`
+    } catch { return 'أ. المعلم' }
+  }
+
   const handleSave = async () => {
     if (!title.trim() || !meetingUrl.trim() || !scheduledAt) return
     setSaving(true)
     try {
       const { nexusBridge } = await import('@/lib/nexusDataBridge')
-      nexusBridge.createMeeting({ title, meetingUrl, scheduledAt, duration, notes: notes || undefined, hostName: 'د. إسماعيل عيسى' })
+      nexusBridge.createMeeting({ title, meetingUrl, scheduledAt, duration, notes: notes || undefined, hostName: getTeacherName() })
       setTitle(''); setMeetingUrl(''); setScheduledAt(''); setNotes('')
       setSaved(true)
       setTimeout(() => { setSaved(false); setShowForm(false) }, 1500)
@@ -44,6 +53,7 @@ export default function TeacherMeetingsPage() {
     } catch (e) { console.error(e) }
     finally { setSaving(false) }
   }
+
 
   const handleDelete = async (id: string) => {
     try {

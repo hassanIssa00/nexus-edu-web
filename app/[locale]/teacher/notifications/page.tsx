@@ -85,14 +85,18 @@ export default function NotificationsPage() {
             }
             try {
                 const { nexusBridge } = await import('@/lib/nexusDataBridge');
+                const u = (() => { try { return JSON.parse(localStorage.getItem('nexus_user') || '{}'); } catch { return {}; } })();
+                const teacherTitle = u.title || 'أ';
+                const teacherName = u.name || u.displayName || u.firstName || 'المعلم';
+                const fullName = `${teacherTitle}. ${teacherName}`;
                 nexusBridge.addObservation({
-                    studentId: 'cls-std-2',
-                    studentName: 'أحمد فيصل وجميع طلاب الفصل',
-                    authorName: 'د. إسماعيل عيسى',
+                    studentId: 'cls-std-all',
+                    studentName: 'جميع طلاب الفصل',
+                    authorName: fullName,
                     authorRole: 'teacher',
                     category: 'academic',
                     severity: 'positive',
-                    text: `[إشعار عام من د. إسماعيل] ${form.title}: ${form.message}`,
+                    text: `[إشعار عام من ${fullName}] ${form.title}: ${form.message}`,
                 });
             } catch {}
 

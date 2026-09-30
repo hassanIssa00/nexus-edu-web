@@ -28,18 +28,28 @@ export default function TeacherLivePage() {
     return () => window.removeEventListener('nexus:data-changed', loadSessions)
   }, [])
 
+  const getTeacherName = () => {
+    try {
+      const u = JSON.parse(localStorage.getItem('nexus_user') || '{}')
+      const t = u.title || 'أ'
+      const n = u.name || u.displayName || u.firstName || 'المعلم'
+      return `${t}. ${n}`
+    } catch { return 'أ. المعلم' }
+  }
+
   const handleStartLive = async () => {
     if (!title.trim()) return
     setSaving(true)
     try {
       const { nexusBridge } = await import('@/lib/nexusDataBridge')
-      nexusBridge.createLiveSession({ title, description, durationMinutes, status: 'LIVE', hostName: 'د. إسماعيل عيسى', viewerCount: 0 })
+      nexusBridge.createLiveSession({ title, description, durationMinutes, status: 'LIVE', hostName: getTeacherName(), viewerCount: 0 })
       setTitle(''); setDescription('')
       setShowForm(false)
       await loadSessions()
     } catch (e) { console.error(e) }
     finally { setSaving(false) }
   }
+
 
   const liveSessions = sessions.filter(s => s.status === 'LIVE')
   const recorded = sessions.filter(s => s.status === 'RECORDED')

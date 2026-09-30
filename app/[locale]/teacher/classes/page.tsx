@@ -269,7 +269,7 @@ export default function TeacherClassesPage() {
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground mt-1 flex flex-wrap items-center gap-2 font-medium">
-              <span>رائد الفصل: {activeClass?.homeroomTeacherName || 'د. إسماعيل عيسى'}</span>
+              <span>رائد الفصل: {activeClass?.homeroomTeacherName || (() => { try { const u = JSON.parse(localStorage.getItem('nexus_user') || '{}'); const t = u.title || 'أ'; const n = u.name || u.displayName || 'المعلم'; return `${t}. ${n}`; } catch { return 'أ. المعلم'; } })()}</span>
               <span>•</span>
               <span className="font-bold text-primary">{students.length} طلاب مسجلين</span>
               <span>•</span>
@@ -442,7 +442,7 @@ export default function TeacherClassesPage() {
             </div>
 
             <div className="bg-gray-50 dark:bg-white/5 p-3.5 rounded-2xl">
-              <span className="text-xs font-black text-gray-900 dark:text-white block mb-1">ملاحظات المعلم (د. إسماعيل عيسى):</span>
+              <span className="text-xs font-black text-gray-900 dark:text-white block mb-1">ملاحظات المعلم ({(() => { try { const u = JSON.parse(localStorage.getItem('nexus_user') || '{}'); const t = u.title || 'أ'; const n = u.name || u.displayName || 'المعلم'; return `${t}. ${n}`; } catch { return 'أ. المعلم'; } })()}):</span>
               <p className="text-xs text-muted-foreground leading-relaxed">{selectedStudent.notes}</p>
             </div>
 

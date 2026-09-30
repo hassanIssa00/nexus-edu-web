@@ -31,14 +31,24 @@ export default function TeacherCommunityPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
+  const getTeacherProfile = () => {
+    try {
+      const u = JSON.parse(localStorage.getItem('nexus_user') || '{}')
+      const t = u.title || 'أ'
+      const n = u.name || u.displayName || u.firstName || 'المعلم'
+      return { id: u.id || u.uid || 'teacher_user', name: `${t}. ${n}` }
+    } catch { return { id: 'teacher_user', name: 'أ. المعلم' } }
+  }
+
   const handleSend = async () => {
     if (!inputText.trim() || sending) return
     setSending(true)
     try {
       const { nexusBridge } = await import('@/lib/nexusDataBridge')
+      const profile = getTeacherProfile()
       nexusBridge.sendCommunityMessage({
-        senderId: 'acc_teacher_ismail',
-        senderName: 'د. إسماعيل عيسى',
+        senderId: profile.id,
+        senderName: profile.name,
         senderRole: 'teacher',
         text: inputText.trim(),
         isAnnouncement,
