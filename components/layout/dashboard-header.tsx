@@ -54,7 +54,7 @@ const PAGE_TITLES: Record<string, string> = {
     '/parent/attendance': 'سجل الحضور',
     '/parent/notifications': 'الإشعارات',
     '/parent/payments': 'المدفوعات',
-    '/parent/messages': 'التواصل',
+    '/parent/messages': 'التواصل مع المعلمين',
 }
 
 function getPageTitle(pathname: string): string {

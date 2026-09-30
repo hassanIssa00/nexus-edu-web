@@ -382,7 +382,7 @@ function getNavigationByRole(role: string) {
                 { href: '/parent/reports' as any, label: 'التقرير الأكاديمي الشامل', icon: BarChart3 },
                 { href: '/parent/grades' as any, label: 'درجات الأبناء والشهادات', icon: Award },
                 { href: '/parent/meetings' as any, label: 'لقاءات أولياء الأمور', icon: HeartHandshake },
-                { href: '/parent/messages' as any, label: 'التواصل مع د. إسماعيل', icon: MessageSquare },
+                { href: '/parent/messages' as any, label: 'التواصل مع المعلمين', icon: MessageSquare },
                 { href: '/parent/community' as any, label: 'ملتقى أولياء الأمور', icon: Users },
                 { href: '/parent/photos' as any, label: 'معرض فعاليات الفصل', icon: Camera },
                 { href: '/parent/payments' as any, label: 'المدفوعات والمستحقات', icon: CreditCard },

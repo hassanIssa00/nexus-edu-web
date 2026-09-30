@@ -336,14 +336,50 @@ export default function ParentDashboard() {
             className="absolute -bottom-40 -left-20 w-[400px] h-[400px] bg-rose-400/30 rounded-full blur-3xl" />
         </div>
         <div className="relative z-10 flex flex-col md:flex-row items-start justify-between gap-6">
-          <div>
+          <div className="flex-1">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md mb-4">
               <Shield className="w-3 h-3 text-yellow-300" />
               <span className="text-xs font-bold text-amber-100">بوابة المتابعة الأبوية الموحدة</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-black mb-4 tracking-tight leading-[1.2]">
-              أهلاً بك،<br />{parentDisplayName} 👨‍👩‍👧‍👦
-            </h1>
+
+            <div className="flex flex-col sm:flex-row sm:items-center gap-5 mb-5">
+              <div>
+                <span className="text-xl md:text-2xl font-bold text-amber-100 block mb-1">
+                  أهلاً بك ولي الأمر،
+                </span>
+                <h1 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-[1.2]">
+                  {parentDisplayName}
+                </h1>
+              </div>
+
+              {/* Child Profile with photo next to Parent Name */}
+              {selected && (
+                <div className="flex items-center gap-3.5 bg-white/15 backdrop-blur-md border border-white/25 rounded-2xl p-3 shadow-lg">
+                  <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl overflow-hidden border-2 border-white/50 shadow-md flex items-center justify-center bg-white/20 flex-shrink-0">
+                    {selected.photoUrl ? (
+                      <img src={selected.photoUrl} alt={selected.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-black text-2xl">
+                        {(selected.name || 'ط')[0]}
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-200">الابن المتابع</span>
+                      {childrenData.length > 1 && (
+                        <span className="px-1.5 py-0.5 rounded-full bg-white/25 text-[9px] font-bold text-white">
+                          {selectedIdx + 1} من {childrenData.length}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-base md:text-lg font-black text-white leading-tight mt-0.5">{selected.name}</p>
+                    <p className="text-xs text-white/80 font-medium">{selected.class}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <p className="text-white/90 text-sm font-medium mb-6 max-w-xl leading-relaxed">
               تتابع من خلال هذا المركز الأداء الأكاديمي لـ <strong className="text-yellow-200 text-lg px-1">{childrenData.length}</strong>
               {childrenData.length === 1 ? ' ابن مسجل' : ' أبناء مسجلين'}.
@@ -352,7 +388,7 @@ export default function ParentDashboard() {
               {[
                 { href: '/parent/payments', icon: CreditCard, label: 'الرسوم والمدفوعات' },
                 { href: '/parent/notifications', icon: Bell, label: 'سجل الإشعارات' },
-                { href: '/parent/messages', icon: MessageSquare, label: 'تواصل مع الهيئة', primary: true },
+                { href: '/parent/messages', icon: MessageSquare, label: 'التواصل مع المعلمين', primary: true },
               ].map((a, i) => (
                 <Link key={i} href={a.href}>
                   <motion.div whileHover={{ scale: 1.05 }} className={`flex items-center gap-2 backdrop-blur-sm rounded-xl px-5 py-3 cursor-pointer transition-colors shadow-sm text-sm font-bold ${a.primary ? 'bg-white text-orange-600 hover:bg-orange-50' : 'bg-white/15 hover:bg-white/25 text-white border border-white/20'}`}>
@@ -414,7 +450,7 @@ export default function ParentDashboard() {
             سجل الحضور 📋
           </Link>
           <Link href="/parent/messages" className="flex-1 md:flex-none px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-black text-xs shadow-md shadow-emerald-600/20 transition-all text-center">
-            مراسلة د. إسماعيل 💬
+            مراسلة المعلمين 💬
           </Link>
         </div>
       </motion.div>
