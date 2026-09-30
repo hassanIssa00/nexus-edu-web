@@ -116,6 +116,15 @@ export default function SurveyPage() {
         try {
           const u = JSON.parse(uStr);
           if (u.name) parentName = u.name;
+          u.onboardingComplete = true;
+          u.surveyCompleted = true;
+          if (studentId && !u.linkedStudentId) {
+            u.linkedStudentId = studentId;
+            u.linkedStudentIds = [studentId];
+          }
+          localStorage.setItem('nexus_user', JSON.stringify(u));
+          sessionStorage.setItem('nexus_user', JSON.stringify(u));
+          nexusBridge.saveAccount(u);
         } catch {}
       }
       

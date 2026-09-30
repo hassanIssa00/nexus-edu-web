@@ -150,6 +150,12 @@ export default function StudentDashboardPage() {
           const stored = localStorage.getItem('nexus_user')
           if (stored) {
             storedAcc = JSON.parse(stored)
+            // ✅ Onboarding check for Student (redirect if profile/test not completed)
+            if (storedAcc.role === 'student' && storedAcc.onboardingComplete === false) {
+              const targetId = storedAcc.linkedStudentId || storedAcc.id || '';
+              window.location.href = `/${locale}/student/new?flow=student${targetId ? `&student=${targetId}` : ''}`;
+              return;
+            }
             if (storedAcc.linkedStudentId) linkedStudentId = storedAcc.linkedStudentId
             else if (storedAcc.role === 'student') linkedStudentId = storedAcc.id
           }

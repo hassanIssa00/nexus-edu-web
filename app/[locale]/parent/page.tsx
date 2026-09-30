@@ -30,8 +30,14 @@ function ChildSelector({ children, selectedIdx, onSelect }: { children: any[]; s
             style={isSelected ? { background: `linear-gradient(135deg, ${color}15, ${color}05)`, borderColor: `${color}50`, boxShadow: `0 20px 40px ${color}20` } : {}}>
             {isSelected && <div className="absolute -top-10 -left-10 w-32 h-32 blur-3xl opacity-30 rounded-full" style={{ backgroundColor: color }} />}
             <div className="flex items-center gap-3 mb-4 relative z-10">
-              <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${GRADIENTS[i % GRADIENTS.length]} flex items-center justify-center text-white font-black text-xl shadow-lg`}>
-                {(child.name || 'S')[0]}
+              <div className="w-14 h-14 rounded-2xl overflow-hidden border-2 border-white/20 shadow-lg relative flex items-center justify-center bg-slate-100 dark:bg-white/10 flex-shrink-0">
+                {child.photoUrl ? (
+                  <img src={child.photoUrl} alt={child.name} className="w-full h-full object-cover" />
+                ) : (
+                  <div className={`w-full h-full bg-gradient-to-br ${GRADIENTS[i % GRADIENTS.length]} flex items-center justify-center text-white font-black text-xl`}>
+                    {(child.name || 'S')[0]}
+                  </div>
+                )}
               </div>
               <div>
                 <p className="font-extrabold text-gray-900 dark:text-white text-base leading-tight">{child.name}</p>
@@ -84,6 +90,11 @@ export default function ParentDashboard() {
           const stored = localStorage.getItem('nexus_user')
           if (stored) {
             const acc = JSON.parse(stored)
+            // ✅ Onboarding check for Parent (redirect if profile/survey not yet complete)
+            if (acc.role === 'parent' && acc.onboardingComplete === false) {
+              window.location.href = `/${locale}/student/new?flow=parent${acc.linkedStudentId ? `&student=${acc.linkedStudentId}` : ''}`;
+              return;
+            }
             waitingFlag = !!acc.isWaitingForStudent
             childTarget = acc.targetChildName || ''
             if (acc.linkedStudentId) linkedStudentId = acc.linkedStudentId
@@ -185,9 +196,11 @@ export default function ParentDashboard() {
           excused: 0,
         }
 
+        const childPhoto = student?.photoUrl || (typeof window !== 'undefined' ? localStorage.getItem('nexus_student_photo') : null) || null;
         const childData = {
           id: linkedStudentId || 'std_none',
           name: student?.fullName || 'لا يوجد طالب مسجل بعد',
+          photoUrl: childPhoto,
           class: student?.grade || 'بانتظار تسجيل الطالب وربط الحساب',
           gpa: student ? `${((student.averageGrade || 100) / 10).toFixed(1)}` : '0.0',
           attendanceRate: student?.attendanceRate || 100,
@@ -373,22 +386,22 @@ export default function ParentDashboard() {
       <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}
         className="bg-white/80 dark:bg-[#1e1e2d]/80 backdrop-blur-xl border border-emerald-100 dark:border-white/5 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-600 flex items-center justify-center text-white text-2xl shadow-md shadow-emerald-500/20 flex-shrink-0">
-            👨‍🏫
-          </div>
+          <img src="/ikhlas-logo.jpg" alt="Ikhlas School" className="w-14 h-14 rounded-2xl object-cover border border-emerald-500/20 shadow-md shadow-emerald-500/20 flex-shrink-0" />
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-black text-gray-900 dark:text-white">الصف الأول الابتدائي — الفئة (أ) • رائد الفصل: د. إسماعيل عيسى</h2>
+              <h2 className="text-lg font-black text-gray-900 dark:text-white">
+                {selected?.class || 'الصف الأول الابتدائي'} • رائد الفصل: د. إسماعيل عيسى
+              </h2>
               <span className="px-2.5 py-0.5 rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 text-xs font-black">
                 حاضر بالبصمة ✅
               </span>
             </div>
             <p className="text-xs text-gray-500 font-medium mt-1">
-              معلم الفصل: <span className="font-bold text-emerald-600">د. إسماعيل عيسى</span> • الطالب: <span className="font-bold text-gray-800 dark:text-gray-200">أحمد فيصل الغامدي</span>
+              معلم الفصل: <span className="font-bold text-emerald-600">د. إسماعيل عيسى</span> • الطالب: <span className="font-bold text-gray-800 dark:text-gray-200">{selected?.name || 'طالب مسجل'}</span>
             </p>
             <p className="text-xs text-emerald-600 font-bold mt-1.5 flex items-center gap-1.5">
               <span>💬 آخر ملاحظة من المعلم:</span>
-              <span className="font-normal text-gray-600 dark:text-gray-300">"أحمد متميز اليوم في حفظ وترتيل القرآن الكريم، تم منحه وسام التميز و50 نقطة!"</span>
+              <span className="font-normal text-gray-600 dark:text-gray-300">"الطالب {selected?.name?.split(' ')[0] || ''} متميز اليوم في حفظ وترتيل القرآن الكريم، تم منحه وسام التميز و50 نقطة!"</span>
             </p>
           </div>
         </div>

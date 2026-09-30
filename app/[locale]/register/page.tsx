@@ -128,27 +128,29 @@ export default function RegisterPage() {
         };
 
         nexusBridge.saveTeacher(teacherRecord);
-        nexusBridge.saveAccount({
+        const teacherAccountObj = {
           id: teacherAccId,
           universalId,
           name: fullName.trim(),
           email: email.trim().toLowerCase(),
           phone: phone.trim(),
-          role: 'teacher',
+          password: password.trim(),
+          role: 'teacher' as const,
           title: `معلم ${finalSpecialization}`,
           employeeId: `EMP-${universalId}`,
           department: finalSpecialization,
-          status: 'active',
+          status: 'active' as const,
           schoolName: 'مدارس الإخلاص الأهلية للبنين بجدة',
           avatarUrl: regPhoto || undefined,
           createdAt: new Date().toISOString(),
-        });
-        localStorage.setItem('nexus_user', JSON.stringify(teacherRecord));
+        };
+        nexusBridge.saveAccount(teacherAccountObj);
+        localStorage.setItem('nexus_user', JSON.stringify(teacherAccountObj));
         localStorage.setItem('access_token', `nexus_live_${teacherAccId}`);
         localStorage.setItem('nexus_role', 'teacher');
-        sessionStorage.setItem('nexus_user', JSON.stringify(teacherRecord));
+        sessionStorage.setItem('nexus_user', JSON.stringify(teacherAccountObj));
         sessionStorage.setItem('access_token', `nexus_live_${teacherAccId}`);
-        sessionStorage.setItem('demo_profile', JSON.stringify(teacherRecord));
+        sessionStorage.setItem('demo_profile', JSON.stringify(teacherAccountObj));
         sessionStorage.setItem('is_demo', 'false');
         window.dispatchEvent(new CustomEvent('nexus:data-changed'));
 
@@ -165,7 +167,10 @@ export default function RegisterPage() {
           name: fullName.trim(),
           email: email.trim().toLowerCase(),
           phone: phone.trim(),
+          password: password.trim(),
           role: 'parent' as const,
+          onboardingComplete: false,
+          surveyCompleted: false,
           title: matchedStudent ? `ولي أمر الطالب ${matchedStudent.fullName}` : `ولي أمر الطالب ${childName.trim() || fullName.trim()}`,
           linkedStudentId: studentId,
           linkedStudentIds: studentId ? [studentId] : [],
@@ -186,11 +191,8 @@ export default function RegisterPage() {
         sessionStorage.setItem('is_demo', 'false');
         window.dispatchEvent(new CustomEvent('nexus:data-changed'));
 
-        if (matchedStudent) {
-          window.location.href = `/${locale}/student/new?flow=parent&student=${matchedStudent.id}`;
-        } else {
-          window.location.href = `/${locale}/parent/waiting`;
-        }
+        // Always route parent to student/new wizard first, then to survey
+        window.location.href = `/${locale}/student/new?flow=parent${matchedStudent ? `&student=${matchedStudent.id}` : ''}`;
       } else {
         // Student registration
         const universalId = nexusBridge.generateUniversalId('STD');
@@ -234,9 +236,11 @@ export default function RegisterPage() {
           name: fullName.trim(),
           email: email.trim().toLowerCase(),
           phone: phone.trim(),
+          password: password.trim(),
           photoUrl: regPhoto || undefined,
           stage: studentStage,
           role: 'student' as const,
+          onboardingComplete: false,
           linkedStudentId: studentRecordId,
           title: `طالب — ${stageLabel}`,
           schoolName: 'مدارس الإخلاص الأهلية للبنين بجدة',

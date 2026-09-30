@@ -170,6 +170,23 @@ export default function StudentNewPage() {
 
       nexusBridge.saveClassStudent(updatedOrNewStudent);
 
+      if (isParent) {
+        try {
+          const uStr = localStorage.getItem('nexus_user');
+          if (uStr) {
+            const u = JSON.parse(uStr);
+            u.parentAge = parentAge;
+            u.childrenCount = childrenCount;
+            u.nationalId = nationalId.trim();
+            u.linkedStudentId = updatedOrNewStudent.id;
+            u.linkedStudentIds = [updatedOrNewStudent.id];
+            localStorage.setItem('nexus_user', JSON.stringify(u));
+            sessionStorage.setItem('nexus_user', JSON.stringify(u));
+            nexusBridge.saveAccount(u);
+          }
+        } catch {}
+      }
+
       if (flow === 'student') {
         window.location.href = `/${locale}/assessment?student=${updatedOrNewStudent.id}&flow=student`;
       } else {
@@ -200,7 +217,7 @@ export default function StudentNewPage() {
           </h1>
           <p className="text-xs text-gray-500 mt-1">
             {isParent
-              ? `استكمال بيانات رب الأسرة للطالب: ${student?.fullName || 'أحمد فيصل الغامدي'}`
+              ? `استكمال بيانات رب الأسرة للطالب: ${student?.fullName || (typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('nexus_user') || '{}')?.targetChildName : '') || 'المسجل بالنظام'}`
               : 'يرجى تزويدنا برقم الهوية وتاريخ الميلاد لإصدار السجلات المعتمدة'}
           </p>
         </div>

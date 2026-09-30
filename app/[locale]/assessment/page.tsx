@@ -103,6 +103,19 @@ export default function AssessmentPage() {
         } catch {}
       }
 
+      if (typeof window !== 'undefined') {
+        try {
+          const uStr = localStorage.getItem('nexus_user');
+          if (uStr) {
+            const u = JSON.parse(uStr);
+            u.onboardingComplete = true;
+            localStorage.setItem('nexus_user', JSON.stringify(u));
+            sessionStorage.setItem('nexus_user', JSON.stringify(u));
+            nexusBridge.saveAccount(u);
+          }
+        } catch {}
+      }
+
       nexusBridge.issueCertificate({
         studentId,
         studentName,
@@ -217,7 +230,18 @@ export default function AssessmentPage() {
               <span>تم إصدار شهادة اجتياز تشخيصية معتمدة وإضافتها لسجل إنجازاتك تلقائياً!</span>
             </div>
 
-            <button onClick={() => { window.location.href = `/${locale}/student`; }}
+            <button onClick={() => {
+              try {
+                const uStr = localStorage.getItem('nexus_user');
+                if (uStr) {
+                  const u = JSON.parse(uStr);
+                  u.onboardingComplete = true;
+                  localStorage.setItem('nexus_user', JSON.stringify(u));
+                  sessionStorage.setItem('nexus_user', JSON.stringify(u));
+                }
+              } catch {}
+              window.location.href = `/${locale}/student`;
+            }}
               className="w-full py-4 rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white font-black text-sm shadow-xl shadow-teal-500/30">
               الدخول إلى لوحة تحكم الطالب الآن 🚀
             </button>

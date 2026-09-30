@@ -39,6 +39,7 @@ export interface NexusAccount {
   id: string;
   universalId?: string; // e.g. TCH-1001, STD-1002, ADM-101, PRT-2001
   email: string;
+  password?: string;
   name: string;
   role: NexusUserRole;
   title: string;
@@ -349,6 +350,7 @@ export const NEXUS_CORE_ACCOUNTS: NexusAccount[] = [
     id: 'acc_teacher_ismail',
     universalId: 'TCH-1001',
     email: 'arabic.teacher@nexusedu.sa',
+    password: '123456',
     name: 'د. إسماعيل عيسى',
     role: 'teacher',
     title: 'معلم الفصل والمشرف الأكاديمي',
@@ -356,7 +358,7 @@ export const NEXUS_CORE_ACCOUNTS: NexusAccount[] = [
     employeeId: 'EMP-TCH-001',
     department: 'قسم اللغة العربية والتربية الإسلامية',
     status: 'active',
-    schoolName: 'مدارس نكسس التعليمية الأهلية',
+    schoolName: 'مدارس الإخلاص الأهلية للبنين بجدة',
     avatarUrl: '/images/auth/teacher.webp',
     createdAt: '2026-08-01T00:00:00Z',
   },
@@ -365,6 +367,7 @@ export const NEXUS_CORE_ACCOUNTS: NexusAccount[] = [
     id: 'acc_principal_khaled',
     universalId: 'ADM-101',
     email: 'principal@nexusedu.sa',
+    password: '123456',
     name: 'د. خالد العتيبي',
     role: 'principal',
     title: 'مدير عام المدرسة',
@@ -372,7 +375,7 @@ export const NEXUS_CORE_ACCOUNTS: NexusAccount[] = [
     employeeId: 'EMP-DIR-001',
     department: 'الإدارة العامة والتطوير المالي والأكاديمي',
     status: 'active',
-    schoolName: 'مدارس نكسس التعليمية الأهلية',
+    schoolName: 'مدارس الإخلاص الأهلية للبنين بجدة',
     avatarUrl: '/images/auth/principal.webp',
     createdAt: '2026-08-01T00:00:00Z',
   },
@@ -380,6 +383,7 @@ export const NEXUS_CORE_ACCOUNTS: NexusAccount[] = [
     id: 'acc_vp_mansour',
     universalId: 'ADM-102',
     email: 'vice.principal@nexusedu.sa',
+    password: '123456',
     name: 'أ. منصور القحطاني',
     role: 'vice_principal',
     title: 'وكيل المدرسة لشؤون الطلاب والانضباط',
@@ -387,7 +391,7 @@ export const NEXUS_CORE_ACCOUNTS: NexusAccount[] = [
     employeeId: 'EMP-VP-001',
     department: 'شؤون الطلاب والانضباط المدرسي',
     status: 'active',
-    schoolName: 'مدارس نكسس التعليمية الأهلية',
+    schoolName: 'مدارس الإخلاص الأهلية للبنين بجدة',
     avatarUrl: '/images/auth/vice_principal.webp',
     createdAt: '2026-08-01T00:00:00Z',
   },
@@ -395,6 +399,7 @@ export const NEXUS_CORE_ACCOUNTS: NexusAccount[] = [
     id: 'acc_counselor_abdullah',
     universalId: 'ADM-103',
     email: 'counselor@nexusedu.sa',
+    password: '123456',
     name: 'أ. عبد الله الغامدي',
     role: 'counselor',
     title: 'الموجه الطلابي والمستشار النفسي',
@@ -402,7 +407,7 @@ export const NEXUS_CORE_ACCOUNTS: NexusAccount[] = [
     employeeId: 'EMP-CNS-001',
     department: 'التوجيه الطلابي والرعاية النفسية',
     status: 'active',
-    schoolName: 'مدارس نكسس التعليمية الأهلية',
+    schoolName: 'مدارس الإخلاص الأهلية للبنين بجدة',
     avatarUrl: '/images/auth/counselor.webp',
     createdAt: '2026-08-01T00:00:00Z',
   },
@@ -410,6 +415,7 @@ export const NEXUS_CORE_ACCOUNTS: NexusAccount[] = [
     id: 'acc_supervisor_abdulrahman',
     universalId: 'ADM-104',
     email: 'supervisor@nexusedu.sa',
+    password: '123456',
     name: 'د. عبد الرحمن السبيعي',
     role: 'supervisor',
     title: 'المشرف التربوي التخصصي',
@@ -417,7 +423,7 @@ export const NEXUS_CORE_ACCOUNTS: NexusAccount[] = [
     employeeId: 'EMP-SUP-001',
     department: 'الإشراف التربوي وضمان الجودة',
     status: 'active',
-    schoolName: 'إدارة التعليم — مكتب الإشراف',
+    schoolName: 'مدارس الإخلاص الأهلية للبنين بجدة',
     avatarUrl: '/images/auth/supervisor.webp',
     createdAt: '2026-08-01T00:00:00Z',
   },
@@ -425,6 +431,7 @@ export const NEXUS_CORE_ACCOUNTS: NexusAccount[] = [
     id: 'acc_admin_fahad',
     universalId: 'ADM-105',
     email: 'admin@nexusedu.sa',
+    password: '123456',
     name: 'أ. فهد الزهراني',
     role: 'admin',
     title: 'مدير الشؤون الإدارية والمالية',
@@ -432,7 +439,7 @@ export const NEXUS_CORE_ACCOUNTS: NexusAccount[] = [
     employeeId: 'EMP-ADM-001',
     department: 'الشؤون الإدارية والتقنية',
     status: 'active',
-    schoolName: 'مدارس نكسس التعليمية الأهلية',
+    schoolName: 'مدارس الإخلاص الأهلية للبنين بجدة',
     avatarUrl: '/images/auth/admin.webp',
     createdAt: '2026-08-01T00:00:00Z',
   },
@@ -440,6 +447,7 @@ export const NEXUS_CORE_ACCOUNTS: NexusAccount[] = [
     id: 'acc_accountant_salim',
     universalId: 'ADM-106',
     email: 'accountant@nexusedu.sa',
+    password: '123456',
     name: 'أ. سليم النجار',
     role: 'accountant',
     title: 'المحاسب المالي ومدير الحسابات المدرسية',
@@ -447,7 +455,7 @@ export const NEXUS_CORE_ACCOUNTS: NexusAccount[] = [
     employeeId: 'EMP-ACC-001',
     department: 'الإدارة المالية والمحاسبة',
     status: 'active',
-    schoolName: 'مدارس نكسس التعليمية الأهلية',
+    schoolName: 'مدارس الإخلاص الأهلية للبنين بجدة',
     avatarUrl: '/images/auth/admin.webp',
     createdAt: '2026-08-01T00:00:00Z',
   },
@@ -456,6 +464,7 @@ export const NEXUS_CORE_ACCOUNTS: NexusAccount[] = [
     id: 'cls-std-2',
     universalId: 'STD-2026-002',
     email: 'student1@nexusedu.sa',
+    password: '123456',
     name: 'أحمد فيصل الغامدي',
     role: 'student',
     title: 'طالب — الصف الأول الابتدائي — فئة (أ)',
@@ -463,6 +472,7 @@ export const NEXUS_CORE_ACCOUNTS: NexusAccount[] = [
     linkedStudentId: 'cls-std-2',
     schoolName: 'مدارس الإخلاص الأهلية للبنين بجدة',
     status: 'active',
+    onboardingComplete: true,
     createdAt: '2026-08-15T00:00:00Z',
   },
   // ── Parent Account ─────────────────────────────────────────────────────────
@@ -470,6 +480,7 @@ export const NEXUS_CORE_ACCOUNTS: NexusAccount[] = [
     id: 'acc_parent_faisal',
     universalId: 'PRT-2026-001',
     email: 'parent1@nexusedu.sa',
+    password: '123456',
     name: 'فيصل الغامدي',
     role: 'parent',
     title: 'ولي أمر الطالب أحمد فيصل الغامدي',
@@ -478,6 +489,8 @@ export const NEXUS_CORE_ACCOUNTS: NexusAccount[] = [
     linkedStudentIds: ['cls-std-2'],
     schoolName: 'مدارس الإخلاص الأهلية للبنين بجدة',
     status: 'active',
+    onboardingComplete: true,
+    surveyCompleted: true,
     createdAt: '2026-08-15T00:00:00Z',
   },
 ];
@@ -1039,6 +1052,13 @@ export const nexusBridge = {
     // Check universal ID match (e.g. logging in with TCH-1001 or STD-1002)
     const idMatch = all.find((a) => a.universalId?.toLowerCase() === clean || a.id.toLowerCase() === clean);
     if (idMatch) return idMatch;
+
+    // Check phone number match
+    const cleanPhone = clean.replace(/\D/g, '');
+    if (cleanPhone.length >= 7) {
+      const phoneMatch = all.find((a) => (a.phone || '').replace(/\D/g, '').includes(cleanPhone));
+      if (phoneMatch) return phoneMatch;
+    }
 
     // Flexible shortcuts
     if (clean === 'dr.ismail@masar.com' || clean === 'ismail@masar.com' || clean === 'teacher@nexusedu.sa' || clean === 'arabic.teacher@nexusedu.sa') {

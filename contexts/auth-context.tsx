@@ -85,7 +85,7 @@ function normalizeApiRole(role: string | undefined): UserRole {
 }
 
 function canUseDemoAuth(): boolean {
-    return true;
+    return false;
 }
 
 function getApiBaseUrl(): string | null {
@@ -353,6 +353,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             if (realAccount) {
                 await new Promise(resolve => setTimeout(resolve, 400));
+
+                // ✅ STRICT PASSWORD VALIDATION (Masar Platform Security Logic)
+                const storedPw = realAccount.password || '123456';
+                const submittedPw = password.trim();
+                if (submittedPw !== storedPw) {
+                    throw new Error('بيانات الدخول غير صحيحة. يرجى التأكد من البريد وكلمة المرور.');
+                }
+
                 const realProfile: UserProfile = {
                     id: realAccount.id,
                     email: realAccount.email,
@@ -361,12 +369,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     avatar_url: realAccount.avatarUrl,
                 };
 
+                const completeUserToStore = {
+                    ...realAccount,
+                    full_name: realAccount.name,
+                };
+
                 sessionStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, `nexus_live_${realAccount.id}`);
                 sessionStorage.setItem(DEMO_FLAG_STORAGE_KEY, 'false');
                 sessionStorage.setItem(DEMO_PROFILE_STORAGE_KEY, JSON.stringify(realProfile));
-                sessionStorage.setItem('nexus_user', JSON.stringify(realProfile));
+                sessionStorage.setItem('nexus_user', JSON.stringify(completeUserToStore));
                 localStorage.setItem('access_token', `nexus_live_${realAccount.id}`);
-                localStorage.setItem('nexus_user', JSON.stringify(realProfile));
+                localStorage.setItem('nexus_user', JSON.stringify(completeUserToStore));
                 localStorage.setItem('nexus_role', realAccount.role);
 
                 setAuthenticatedState(createApiUser(realAccount.id, realAccount.email), realProfile);
@@ -457,10 +470,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 return;
             }
 
-            throw new Error('Authentication services are not configured');
+            throw new Error('بيانات الدخول غير صحيحة. يرجى التأكد من البريد وكلمة المرور.');
         } catch (error: any) {
             console.error('Login error:', error);
-            throw new Error(error.message || 'حدث خطأ في تسجيل الدخول');
+            throw new Error(error.message || 'بيانات الدخول غير صحيحة. يرجى التأكد من البريد وكلمة المرور.');
         }
     };
 

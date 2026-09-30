@@ -63,6 +63,24 @@ export default function RoleLoginPage() {
             await signIn(email, password);
             toast({ title: '✅ تم بنجاح', description: 'مرحباً بك في بوابتك' });
             
+            // ✅ ONBOARDING CHECK — redirect to wizard if not yet completed
+            const storedUser = localStorage.getItem('nexus_user');
+            const acc = storedUser ? JSON.parse(storedUser) : null;
+
+            if (acc?.role === 'student' && !acc?.onboardingComplete) {
+                window.location.href = `/${locale}/student/new?flow=student&student=${acc.linkedStudentId || ''}`;
+                return;
+            }
+            if (acc?.role === 'parent' && !acc?.onboardingComplete) {
+                const linkedId = acc.linkedStudentId || '';
+                if (linkedId) {
+                    window.location.href = `/${locale}/student/new?flow=parent&student=${linkedId}`;
+                } else {
+                    window.location.href = `/${locale}/parent/waiting`;
+                }
+                return;
+            }
+
             const target = 
                 role === 'teacher' ? 'teacher' :
                 role === 'principal' ? 'principal' :
@@ -78,6 +96,7 @@ export default function RoleLoginPage() {
 
             // Direct page transition to ensure full fresh state
             window.location.href = `/${locale}/${target}`;
+
         } catch (error: any) {
             toast({ variant: 'destructive', title: '❌ خطأ', description: error?.message || tAuth('loginFailed') });
             setLoading(false);
