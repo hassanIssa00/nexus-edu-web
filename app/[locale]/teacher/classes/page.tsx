@@ -309,6 +309,7 @@ export default function TeacherClassesPage() {
                   >
                     <div className="relative">
                       <Avatar className="h-11 w-11 rounded-xl border border-gray-100 shadow-sm">
+                        <AvatarImage src={student.photoUrl || undefined} className="object-cover" />
                         <AvatarFallback className="bg-primary/10 text-primary font-bold text-sm">
                           {student.fullName.slice(0, 2)}
                         </AvatarFallback>

@@ -85,8 +85,12 @@ export default function TeacherReportsPage() {
               whileHover={{ y: -2 }} onClick={() => setSelectedId(selectedId === rep.id ? null : rep.id)}
               className="bg-white/80 dark:bg-[#1e1e2d]/80 backdrop-blur-xl border border-gray-100 dark:border-white/5 rounded-3xl p-5 shadow-sm cursor-pointer">
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center font-black text-blue-700 dark:text-blue-300 text-lg">
-                  {rep.studentName[0]}
+                <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center font-black text-blue-700 dark:text-blue-300 text-lg overflow-hidden flex-shrink-0">
+                  {rep.photoUrl ? (
+                    <img src={rep.photoUrl} alt={rep.studentName} className="w-full h-full object-cover" />
+                  ) : (
+                    rep.studentName[0]
+                  )}
                 </div>
                 <div className="flex-1">
                   <h3 className="font-black text-gray-900 dark:text-white">{rep.studentName}</h3>

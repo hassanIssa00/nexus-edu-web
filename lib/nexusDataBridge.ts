@@ -272,6 +272,7 @@ export interface StudentWeeklyReport {
   reportNumber: string;
   studentId: string;
   studentName: string;
+  photoUrl?: string;
   weekTitle: string;
   date: string;
   attendanceRate: number;
@@ -1496,6 +1497,7 @@ export const nexusBridge = {
         reportNumber: `NEXUS-REP-2026-${2000 + idx}`,
         studentId: s.id,
         studentName: s.fullName,
+        photoUrl: s.photoUrl || undefined,
         weekTitle: 'التقرير الأكاديمي الشامل — الصف الأول الابتدائي (أ)',
         date: new Date().toISOString().split('T')[0],
         attendanceRate: s.attendanceRate,

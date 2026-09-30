@@ -37,7 +37,7 @@ export default function TeacherCurriculumPage() {
                 العام الدراسي 1448هـ
               </span>
             </div>
-            <h1 className="text-3xl font-black">إدارة المناهج التعليمية</h1>
+            <h1 className="text-3xl font-black text-white">إدارة المناهج التعليمية</h1>
             <p className="mt-2 max-w-xl text-sm font-bold leading-7 text-slate-300">
               افتح أي كتاب تفاعلي، راجع الوحدات، وأسند الواجبات والصفحات للطلاب مباشرة.
             </p>
